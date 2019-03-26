@@ -1,0 +1,16 @@
+plugin:
+    name: 'wbry.content::lang.plugin.name'
+    description: 'wbry.content::lang.plugin.description'
+    author: Weberry
+    icon: oc-icon-list-alt
+    homepage: ''
+navigation:
+    items:
+        label: Content
+        url: wbry/content/items
+        icon: icon-list-alt
+        sideMenu:
+            item-index:
+                label: Главная
+                url: wbry/content/items
+                icon: icon-arrow-circle-right
