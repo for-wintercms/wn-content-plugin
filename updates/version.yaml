@@ -3,3 +3,9 @@
 1.0.2:
     - 'Created table wbry_content_items'
     - builder_table_create_wbry_content_items.php
+1.0.3:
+    - 'Updated table wbry_content_items'
+    - builder_table_update_wbry_content_items.php
+1.0.4:
+    - 'Updated table wbry_content_items'
+    - builder_table_update_wbry_content_items_2.php

@@ -1,0 +1,16 @@
+columns:
+    id:
+        label: ID
+        type: number
+        sortable: true
+        width: '100px'
+    title:
+        label: Title
+        type: text
+        searchable: true
+        sortable: true
+    slug:
+        label: Slug
+        type: text
+        searchable: true
+        sortable: true

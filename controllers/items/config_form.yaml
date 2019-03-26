@@ -1,0 +1,11 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+name: "Content list"
+modelClass: Wbry\Content\Models\Item
+form: $/wbry/content/models/item/fields.yaml
+
+create:  {}
+update:  {}
+preview: {}

@@ -1,0 +1,20 @@
+fields:
+    title:
+        label: Title
+        span: left
+        required: 1
+        type: text
+    slug:
+        label: Slug
+        span: right
+        required: 1
+        preset:
+            field: title
+            type: slug
+        type: text
+    items:
+        label: Content
+        span: full
+        prompt: 'Add new item'
+        type: repeater
+        form: {  }
