@@ -9,3 +9,6 @@
 1.0.4:
     - 'Updated table wbry_content_items'
     - builder_table_update_wbry_content_items_2.php
+1.0.5:
+    - 'Updated table wbry_content_items'
+    - builder_table_update_wbry_content_items_3.php

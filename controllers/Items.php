@@ -4,6 +4,7 @@ namespace Wbry\Content\Controllers;
 
 use Lang;
 use View;
+use Request;
 use Response;
 use BackendMenu;
 use Backend\Classes\Controller;
@@ -28,7 +29,9 @@ class Items extends Controller
     public $requiredPermissions = ['wbry.content.items'];
 
     public $currentMenu = null;
-    public $listTitle = '';
+    public $listTitle   = null;
+    public $actionAjax  = null;
+    public $ajaxHandler = null;
 
     public function __construct()
     {
@@ -44,24 +47,76 @@ class Items extends Controller
         if (! $this->currentMenu)
             $this->makeView404();
 
+        # dynamic methods
         $this->addDynamicMethod($this->action, self::class);
+        if ($this->ajaxHandler = $this->getAjaxHandler())
+        {
+            $this->actionAjax = $this->action.'_'.$this->ajaxHandler;
+            $this->addDynamicMethod($this->actionAjax, self::class);
+        }
+
+        $this->addAssets();
     }
 
-    /*
-     * Action control
-     */
-
-    public function __call($name, $arguments)
+    protected function addAssets()
     {
-        if ($name === $this->action)
-            return $this->actionView(...$arguments);
-
-        return parent::__call($name, $arguments);
+        $this->addCss('/plugins/wbry/content/assets/css/backend/main.css');
     }
 
     protected function makeView404()
     {
         return Response::make(View::make('backend::404'), 404);
+    }
+
+    /*
+     * Filters
+     */
+
+    public function listExtendQuery($query)
+    {
+        $query->where('page', $this->action);
+    }
+
+    public function formExtendFields($form)
+    {
+        $form->addFields([
+            'page' => [
+                'type' => 'text',
+                'cssClass' => 'd-none',
+                'default' => $this->action
+            ]
+        ]);
+    }
+
+
+    /*
+     * Action control
+     */
+
+    public function index(...$d)   { return $this->actionView(...$d); }
+    public function create(...$d)  { return $this->actionView(...$d); }
+    public function update(...$d)  { return $this->actionView(...$d); }
+    public function preview(...$d) { return $this->actionView(...$d); }
+
+    public function __call($name, $arguments)
+    {
+        if ($this->actionAjax === $name)
+            return $this->actionAjax(...$arguments);
+        elseif ($name === $this->action)
+            return $this->actionView(...$arguments);
+
+        return parent::__call($name, $arguments);
+    }
+
+    protected function actionAjax($action = 'index', $id = null)
+    {
+        $methodName = $action .'_'. $this->ajaxHandler;
+        if ($this->methodExists($methodName))
+        {
+            $result = call_user_func_array([$this, $methodName], [$id]);
+            return $result ?: true;
+        }
+        return false;
     }
 
     protected function actionView($action = 'list', $id = 0)

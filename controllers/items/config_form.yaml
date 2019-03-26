@@ -6,6 +6,9 @@ name: "Content list"
 modelClass: Wbry\Content\Models\Item
 form: $/wbry/content/models/item/fields.yaml
 
-create:  {}
-update:  {}
+create:
+  redirect: wbry/content/items/:page/update/:id
+  redirectClose: wbry/content/items/:page
+update:
+  redirectClose: wbry/content/items/:page
 preview: {}

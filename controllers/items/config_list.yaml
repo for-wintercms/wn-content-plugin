@@ -5,7 +5,7 @@
 #title: Title
 modelClass: Wbry\Content\Models\Item
 list: $/wbry/content/models/item/columns.yaml
-recordUrl: 'wbry/content/items/update/:id'
+recordUrl: 'wbry/content/items/:page/update/:id'
 noRecordsMessage: 'backend::lang.list.no_records'
 recordsPerPage: 20
 showSetup: true
