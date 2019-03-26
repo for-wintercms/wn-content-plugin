@@ -34,23 +34,35 @@ class Items extends Controller
     {
         parent::__construct();
 
+        if (! $this->action)
+            $this->makeView404();
+
         BackendMenu::setContext('Wbry.Content', 'items');
-        $this->currentMenu = BackendMenu::listSideMenuItems()['item-'.$this->action] ?? [];
-    }
+        $listSideMenu = BackendMenu::listSideMenuItems();
+        $this->currentMenu = $listSideMenu['item-'.$this->action] ?? [];
 
-    public function index(...$p)
-    {
-        return $this->actionView(...$p);
-    }
+        if (! $this->currentMenu)
+            $this->makeView404();
 
-    public function products(...$p)
-    {
-        return $this->actionView(...$p);
+        $this->addDynamicMethod($this->action, self::class);
     }
 
     /*
      * Action control
      */
+
+    public function __call($name, $arguments)
+    {
+        if ($name === $this->action)
+            return $this->actionView(...$arguments);
+
+        return parent::__call($name, $arguments);
+    }
+
+    protected function makeView404()
+    {
+        return Response::make(View::make('backend::404'), 404);
+    }
 
     protected function actionView($action = 'list', $id = 0)
     {
@@ -59,9 +71,7 @@ class Items extends Controller
 
     protected function actionListView()
     {
-        if (isset($this->currentMenu->label))
-            $this->pageTitle = $this->currentMenu->label;
-
+        $this->pageTitle = $this->currentMenu->label;
         $this->bodyClass = 'slim-container';
         $this->makeLists();
 
@@ -79,12 +89,12 @@ class Items extends Controller
 
             case 'update':
                 if (! is_numeric($id) || $id < 1 || ! ($model = ItemModel::find($id)))
-                    return Response::make(View::make('backend::404'), 404);
+                    return $this->makeView404();
 
                 $this->pageTitle = Lang::get('wbry.content::lang.controllers.items.update_title', ['title' => $model->title]);
                 break;
 
-            default: return Response::make(View::make('backend::404'), 404);
+            default: return $this->makeView404();
         }
 
         $this->listTitle = $this->currentMenu->label ?? Lang::get('wbry.content::lang.controllers.items.list_title');
