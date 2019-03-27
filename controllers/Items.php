@@ -38,14 +38,16 @@ class Items extends Controller
         parent::__construct();
 
         if (! $this->action)
-            $this->makeView404();
+            return;
 
         BackendMenu::setContext('Wbry.Content', 'items');
         $listSideMenu = BackendMenu::listSideMenuItems();
         $this->currentMenu = $listSideMenu['item-'.$this->action] ?? [];
 
+        $this->addAssets();
+
         if (! $this->currentMenu)
-            $this->makeView404();
+            return;
 
         # dynamic methods
         $this->addDynamicMethod($this->action, self::class);
@@ -54,8 +56,6 @@ class Items extends Controller
             $this->actionAjax = $this->action.'_'.$this->ajaxHandler;
             $this->addDynamicMethod($this->actionAjax, self::class);
         }
-
-        $this->addAssets();
     }
 
     protected function addAssets()
