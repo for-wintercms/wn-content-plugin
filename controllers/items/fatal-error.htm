@@ -4,9 +4,10 @@
 <h3><?=e(trans('wbry.content::lang.controllers.items.errors.repeater_example'))?></h3>
 <pre class="pre-content">
 menu:
-  label: 'Home page'
-  slug: index
-  icon: icon-home  #optional
+  label: 'Home page'   #required
+  slug: index          #required
+  icon: icon-home
+  order: 2
 
 repeater:
   index-list:
