@@ -7,6 +7,8 @@ use File;
 use Yaml;
 use Lang;
 use View;
+use Event;
+use Backend;
 use Session;
 use Request;
 use Response;
@@ -36,7 +38,7 @@ class Items extends Controller
     public $requiredPermissions = ['wbry.content.items'];
 
     public $menuList    = null;
-    public $currentMenu = null;
+    public $menuName    = null;
     public $listTitle   = null;
     public $actionAjax  = null;
     public $ajaxHandler = null;
@@ -90,10 +92,9 @@ class Items extends Controller
                 if (empty($config['menu']) || empty($config['menu']['label']) || empty($config['menu']['slug']))
                     throw new ApplicationException(Lang::get('wbry.content::lang.controllers.items.errors.repeater_menu', ['fileName' => $fileName]));
 
-                $this->menuList[$config['menu']['slug']] = [
-                    'label' => $config['menu']['label'],
-                    'icon'  => $config['menu']['icon'] ?? '',
-                ];
+                $this->menuList[$config['menu']['slug']] = array_merge($config['menu'], [
+                    'url' => Backend::url('wbry/content/items/'. $config['menu']['slug']),
+                ]);
 
                 # repeat
                 $errRepeater = Lang::get('wbry.content::lang.controllers.items.errors.repeater_list', ['fileName' => $fileName]);
@@ -116,13 +117,19 @@ class Items extends Controller
     protected function addActionMenu()
     {
         BackendMenu::setContext('Wbry.Content', 'items');
-        $listSideMenu = BackendMenu::listSideMenuItems();
-        $this->currentMenu = $listSideMenu['item-'.$this->action] ?? [];
+        BackendMenu::setContextSideMenu($this->action);
+
+        $thisObj = &$this;
+        Event::listen('backend.menu.extendItems', function($menu) use($thisObj) {
+            $menu->addSideMenuItems('Wbry.Content', 'items', $thisObj->menuList);
+        });
+
+        $this->menuName = $thisObj->menuList[$this->action] ? $thisObj->menuList[$this->action]['label'] : '';
     }
 
     protected function addDynamicActionMethods()
     {
-        if (! $this->currentMenu)
+        if (! $this->menuList)
             return;
 
         $this->addDynamicMethod($this->action, self::class);
@@ -192,7 +199,7 @@ class Items extends Controller
     {
         if (($action === 'list' || $this->isRepeaterError) && $this->fatalError)
             return $this->makeViewContentFile('fatal-error');
-        elseif (! $this->currentMenu)
+        elseif (! $this->menuList)
             return $this->makeViewContentFile('no-content');
         else
             return ($action === 'list') ? $this->actionListView() : $this->actionFormView($action, $id);
@@ -200,7 +207,7 @@ class Items extends Controller
 
     protected function actionListView()
     {
-        $this->pageTitle = $this->currentMenu->label;
+        $this->pageTitle = $this->menuName;
         $this->bodyClass = 'slim-container';
         $this->makeLists();
 
@@ -226,7 +233,7 @@ class Items extends Controller
             default: return $this->makeView404();
         }
 
-        $this->listTitle = $this->currentMenu->label ?? Lang::get('wbry.content::lang.controllers.items.list_title');
+        $this->listTitle = $this->menuName ?: Lang::get('wbry.content::lang.controllers.items.list_title');
         $this->initForm($model);
 
         return $this->makeViewContentFile($action);
