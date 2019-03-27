@@ -40,11 +40,12 @@ class Items extends Controller
         if (! $this->action)
             return;
 
+        $this->addAssets();
+
+        # menu
         BackendMenu::setContext('Wbry.Content', 'items');
         $listSideMenu = BackendMenu::listSideMenuItems();
         $this->currentMenu = $listSideMenu['item-'.$this->action] ?? [];
-
-        $this->addAssets();
 
         if (! $this->currentMenu)
             return;
@@ -121,6 +122,9 @@ class Items extends Controller
 
     protected function actionView($action = 'list', $id = 0)
     {
+        if (! $this->currentMenu)
+            return Response::make($this->makeView('no-content'), $this->statusCode);
+
         return ($action === 'list') ? $this->actionListView() : $this->actionFormView($action, $id);
     }
 

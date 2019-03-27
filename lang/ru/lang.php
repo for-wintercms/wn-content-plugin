@@ -8,6 +8,7 @@
             'list_title'   => 'Список',
             'create_title' => 'Создать предмет',
             'update_title' => 'Обновить :title',
+            'no_content'   => 'Добавьте область управления',
         ],
     ],
     'models' => [

@@ -1,3 +1,6 @@
 .form-group.d-none {
     display: none;
 }
+.layout-row .no-content {
+    padding: 40px 0;
+}
