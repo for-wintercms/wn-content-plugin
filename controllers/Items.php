@@ -2,13 +2,20 @@
 
 namespace Wbry\Content\Controllers;
 
+use App;
+use File;
+use Yaml;
 use Lang;
 use View;
+use Session;
 use Request;
 use Response;
 use BackendMenu;
+use Exception;
+use Cms\Classes\Theme as CmsTheme;
 use Backend\Classes\Controller;
 use Wbry\Content\Models\Item as ItemModel;
+use October\Rain\Exception\ApplicationException;
 
 /**
  * Items controller
@@ -28,10 +35,17 @@ class Items extends Controller
 
     public $requiredPermissions = ['wbry.content.items'];
 
+    public $menuList    = null;
     public $currentMenu = null;
     public $listTitle   = null;
     public $actionAjax  = null;
     public $ajaxHandler = null;
+
+    public $isRepeaterError = false;
+
+    /*
+     * Initialize
+     */
 
     public function __construct()
     {
@@ -40,9 +54,63 @@ class Items extends Controller
         if (! $this->action)
             return;
 
-        $this->addAssets();
+        # set lang
+        if (Session::has('locale'))
+        {
+            $locale = Session::get('locale');
+            if ($locale !== App::getLocale())
+                App::setLocale($locale);
+        }
+
+        # load
+        $this->parseRepeatersConfig();
         $this->addActionMenu();
         $this->addDynamicActionMethods();
+        $this->addAssets();
+    }
+
+    protected function parseRepeatersConfig()
+    {
+        $theme = CmsTheme::getActiveTheme();
+        $directory = $theme->getPath().'/repeaters';
+
+        if (! File::isDirectory($directory))
+            return;
+
+        try {
+            foreach (File::files($directory) as $file)
+            {
+                $fileName = $file->getFilename();
+                if (! preg_match("#^config\-(.+?)\.yaml$#i", $fileName))
+                    continue;
+
+                $config = Yaml::parseFile($file->getRealPath());
+
+                # menu
+                if (empty($config['menu']) || empty($config['menu']['label']) || empty($config['menu']['slug']))
+                    throw new ApplicationException(Lang::get('wbry.content::lang.controllers.items.errors.repeater_menu', ['fileName' => $fileName]));
+
+                $this->menuList[$config['menu']['slug']] = [
+                    'label' => $config['menu']['label'],
+                    'icon'  => $config['menu']['icon'] ?? '',
+                ];
+
+                # repeat
+                $errRepeater = Lang::get('wbry.content::lang.controllers.items.errors.repeater_list', ['fileName' => $fileName]);
+                if (empty($config['repeater']) || ! is_array($config['repeater']))
+                    throw new ApplicationException($errRepeater);
+
+                foreach ($config['repeater'] as $rAction => $repeater)
+                {
+                    if (! isset($repeater['fields']))
+                        throw new ApplicationException($errRepeater);
+                }
+            }
+        }
+        catch (Exception $e) {
+            $this->isRepeaterError = true;
+            $this->handleError($e);
+        }
     }
 
     protected function addActionMenu()
@@ -70,11 +138,6 @@ class Items extends Controller
         $this->addCss('/plugins/wbry/content/assets/css/backend/main.css');
     }
 
-    protected function makeView404()
-    {
-        return Response::make(View::make('backend::404'), 404);
-    }
-
     /*
      * Filters
      */
@@ -94,7 +157,6 @@ class Items extends Controller
             ]
         ]);
     }
-
 
     /*
      * Action control
@@ -128,10 +190,12 @@ class Items extends Controller
 
     protected function actionView($action = 'list', $id = 0)
     {
-        if (! $this->currentMenu)
-            return Response::make($this->makeView('no-content'), $this->statusCode);
-
-        return ($action === 'list') ? $this->actionListView() : $this->actionFormView($action, $id);
+        if (($action === 'list' || $this->isRepeaterError) && $this->fatalError)
+            return $this->makeViewContentFile('fatal-error');
+        elseif (! $this->currentMenu)
+            return $this->makeViewContentFile('no-content');
+        else
+            return ($action === 'list') ? $this->actionListView() : $this->actionFormView($action, $id);
     }
 
     protected function actionListView()
@@ -140,7 +204,7 @@ class Items extends Controller
         $this->bodyClass = 'slim-container';
         $this->makeLists();
 
-        return Response::make($this->makeView('list'), $this->statusCode);
+        return $this->makeViewContentFile('list');
     }
 
     protected function actionFormView($action, $id=0)
@@ -165,6 +229,20 @@ class Items extends Controller
         $this->listTitle = $this->currentMenu->label ?? Lang::get('wbry.content::lang.controllers.items.list_title');
         $this->initForm($model);
 
-        return Response::make($this->makeView($action), $this->statusCode);
+        return $this->makeViewContentFile($action);
+    }
+
+    /*
+     * Views
+     */
+
+    protected function makeView404()
+    {
+        return Response::make(View::make('backend::404'), 404);
+    }
+
+    protected function makeViewContentFile($fileHtm)
+    {
+        return Response::make($this->makeView($fileHtm), $this->statusCode);
     }
 }

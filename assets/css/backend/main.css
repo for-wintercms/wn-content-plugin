@@ -4,3 +4,11 @@
 .layout-row .no-content {
     padding: 40px 0;
 }
+.pre-content {
+    display: inline-block;
+    padding: 10px 15px;
+    background: #333;
+    color: #fff;
+    border: 1px solid #111;
+    border-radius: 5px;
+}
