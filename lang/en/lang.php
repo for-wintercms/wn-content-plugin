@@ -9,15 +9,9 @@
             'create_title' => 'Create item',
             'update_title' => 'Update :title',
             'no_content'   => 'Add control area',
-        ],
-    ],
-    'models' => [
-        'item' => [
-            'fields' => [
-                'title_label'  => 'Title',
-                'slug_label'   => 'Slug',
-                'items_label'  => 'Content',
-                'items_prompt' => 'Add new item',
+            'errors' => [
+                'repeater_menu'    => 'Correctly declare the menu item in the file :fileName',
+                'repeater_example' => 'The correct example is:',
             ],
         ],
     ],
