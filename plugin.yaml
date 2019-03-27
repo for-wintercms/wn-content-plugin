@@ -1,7 +1,7 @@
 plugin:
     name: 'wbry.content::lang.plugin.name'
     description: 'wbry.content::lang.plugin.description'
-    author: Weberry
+    author: 'Weberry, Diamond'
     icon: oc-icon-list-alt
     homepage: ''
 navigation:
@@ -11,15 +11,7 @@ navigation:
         icon: icon-list-alt
         permissions:
             - wbry.content.items
-        sideMenu:
-            item-index:
-                label: Главная
-                url: wbry/content/items/index
-                icon: icon-home
-            item-products:
-                label: Продукты
-                url: wbry/content/items/products
-                icon: icon-cubes
+        sideMenu: {}
 permissions:
     wbry.content.items:
         tab: 'wbry.content::lang.plugin.name'

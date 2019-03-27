@@ -17,4 +17,4 @@ fields:
         span: full
         prompt: 'Add new item'
         type: repeater
-        form: {  }
+        form: {}
