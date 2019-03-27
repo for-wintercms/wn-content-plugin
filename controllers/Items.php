@@ -41,16 +41,22 @@ class Items extends Controller
             return;
 
         $this->addAssets();
+        $this->addActionMenu();
+        $this->addDynamicActionMethods();
+    }
 
-        # menu
+    protected function addActionMenu()
+    {
         BackendMenu::setContext('Wbry.Content', 'items');
         $listSideMenu = BackendMenu::listSideMenuItems();
         $this->currentMenu = $listSideMenu['item-'.$this->action] ?? [];
+    }
 
+    protected function addDynamicActionMethods()
+    {
         if (! $this->currentMenu)
             return;
 
-        # dynamic methods
         $this->addDynamicMethod($this->action, self::class);
         if ($this->ajaxHandler = $this->getAjaxHandler())
         {
