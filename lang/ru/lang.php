@@ -9,5 +9,15 @@
             'create_title' => 'Создать предмет',
             'update_title' => 'Обновить :title',
         ],
-    ]
+    ],
+    'models' => [
+        'item' => [
+            'fields' => [
+                'title_label'  => 'Название',
+                'slug_label'   => 'Slug',
+                'items_label'  => 'Контент',
+                'items_prompt' => 'Добавить новый элемент',
+            ],
+        ],
+    ],
 ];

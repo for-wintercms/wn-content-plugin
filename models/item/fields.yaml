@@ -1,11 +1,11 @@
 fields:
     title:
-        label: Title
+        label: 'wbry.content::lang.models.item.fields.title_label'
         span: left
         required: 1
         type: text
     slug:
-        label: Slug
+        label: 'wbry.content::lang.models.item.fields.slug_label'
         span: right
         required: 1
         preset:
@@ -13,8 +13,8 @@ fields:
             type: slug
         type: text
     items:
-        label: Content
+        label: 'wbry.content::lang.models.item.fields.items_label'
         span: full
-        prompt: 'Add new item'
+        prompt: 'wbry.content::lang.models.item.fields.items_prompt'
         type: repeater
         form: {}
