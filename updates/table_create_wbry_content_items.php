@@ -1,9 +1,17 @@
-<?php namespace Wbry\Content\Updates;
+<?php
+
+namespace Wbry\Content\Updates;
 
 use Schema;
 use October\Rain\Database\Updates\Migration;
 
-class BuilderTableCreateWbryContentItems extends Migration
+/**
+ * TableCreateWbryContentItems migration
+ *
+ * @package Wbry\Content\Updates
+ * @author Diamond Systems
+ */
+class TableCreateWbryContentItems extends Migration
 {
     public function up()
     {
@@ -11,6 +19,9 @@ class BuilderTableCreateWbryContentItems extends Migration
         {
             $table->engine = 'InnoDB';
             $table->increments('id')->unsigned();
+            $table->string('page');
+            $table->string('name', 255);
+            $table->string('repeater', 255);
             $table->text('items')->nullable();
         });
     }
