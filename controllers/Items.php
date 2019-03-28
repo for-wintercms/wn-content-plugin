@@ -111,7 +111,7 @@ class Items extends Controller
         # items
         # =======
         $repeater = null;
-        if (preg_match("#::onAddItem$#", $this->ajaxHandler))
+        if (preg_match("#::(onAddItem|onRemoveItem)$#", $this->ajaxHandler))
         {
             $data = post('Item');
             $repeater = $data['repeater'] ?? null;
