@@ -20,6 +20,8 @@ class Item extends Model
 
     protected $jsonable = ['items'];
 
+    public $fillable = ['page', 'name', 'repeater', 'items'];
+
     /**
      * @var array Validation rules
      */
