@@ -188,6 +188,7 @@ class Items extends Controller
         {
             if (! isset($this->repeaters[$repeater]))
                 throw new ApplicationException(Lang::get('wbry.content::lang.controllers.items.errors.items_no_repeater', ['repeater' => $repeater]));
+
             $form->fields['items']['form'] = $this->repeaters[$repeater];
         }
 
@@ -280,7 +281,7 @@ class Items extends Controller
                 if (! is_numeric($this->actionId) || $this->actionId < 1 || ! ($model = ItemModel::find($this->actionId)))
                     return $this->makeView404();
 
-                $this->pageTitle = Lang::get('wbry.content::lang.controllers.items.update_title', ['title' => $model->title]);
+                $this->pageTitle = Lang::get('wbry.content::lang.controllers.items.update_title', ['title' => $model->name]);
                 break;
 
             default: return $this->makeView404();
