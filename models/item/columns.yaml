@@ -3,14 +3,14 @@ columns:
         label: ID
         type: number
         sortable: true
-        width: '100px'
-    title:
-        label: Title
+        width: 100px
+    name:
+        label: 'wbry.content::repeater.items.name_label'
         type: text
         searchable: true
         sortable: true
-    slug:
-        label: Slug
+    repeater:
+        label: 'wbry.content::repeater.items.repeater_label'
         type: text
         searchable: true
         sortable: true

@@ -1,20 +1,25 @@
 fields:
-    title:
-        label: 'wbry.content::repeater.items.title_label'
+    name:
+        label: 'wbry.content::repeater.items.name_label'
         span: left
         required: 1
         type: text
-    slug:
-        label: 'wbry.content::repeater.items.repeat_label'
+        comment: 'wbry.content::repeater.items.name_cmt'
+    repeater:
+        label: 'wbry.content::repeater.items.repeater_label'
+        options:
+            test: test
+        emptyOption: 'wbry.content::repeater.items.repeater_label'
         span: right
-        required: 1
-        preset:
-            field: title
-            type: slug
-        type: text
+        type: dropdown
+        comment: 'wbry.content::repeater.items.repeater_cmt'
     items:
         label: 'wbry.content::repeater.items.items_label'
         span: full
         prompt: 'wbry.content::repeater.prompt'
+#        trigger:
+#            action: empty
+#            field: repeater
+#            condition: someval
         type: repeater
         form: {}
