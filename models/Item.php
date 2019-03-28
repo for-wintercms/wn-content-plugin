@@ -16,15 +16,19 @@ class Item extends Model
     
     public $timestamps = false;
 
-    /**
-     * @var string The database table used by the model.
-     */
     public $table = 'wbry_content_items';
+
+    protected $jsonable = ['items'];
 
     /**
      * @var array Validation rules
      */
-    public $rules = [];
+    public $rules = [
+        'page' => 'required|between:1,256',
+        'name' => 'required|between:1,256|alpha_dash',
+    ];
 
-    protected $jsonable = ['items'];
+    public $attributeNames = [
+        'name' => 'wbry.content::repeater.items.name_label',
+    ];
 }
