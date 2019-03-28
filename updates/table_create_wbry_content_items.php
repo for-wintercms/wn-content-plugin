@@ -23,6 +23,8 @@ class TableCreateWbryContentItems extends Migration
             $table->string('name', 255);
             $table->string('repeater', 255);
             $table->text('items')->nullable();
+
+            $table->unique(['page', 'name']);
         });
     }
     
