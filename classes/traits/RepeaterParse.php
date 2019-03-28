@@ -18,9 +18,11 @@ use October\Rain\Exception\ApplicationException;
  */
 trait RepeaterParse
 {
-    public $menuList     = null;
-    public $repeaters    = null;
-    public $repeaterList = null;
+    public $menuList  = null;
+    public $repeaters = null;
+
+    public $repeaterList    = null;
+    public $repeaterAllList = null;
 
     public $isRepeaterError = false;
 
@@ -61,10 +63,14 @@ trait RepeaterParse
                 if (empty($config['repeater']) || ! is_array($config['repeater']))
                     throw new ApplicationException($errRepeater);
 
+                $this->repeaterAllList[$menuSlug] = [];
+
                 foreach ($config['repeater'] as $rAction => $repeater)
                 {
                     if (empty($repeater['fields']) || empty($repeater['label']))
                         throw new ApplicationException($errRepeater);
+
+                    $this->repeaterAllList[$menuSlug][$rAction] = $repeater['label'];
 
                     if ($isActiveRepeater)
                     {
