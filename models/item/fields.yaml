@@ -8,7 +8,7 @@ fields:
     repeater:
         label: 'wbry.content::repeater.items.repeater_label'
         options: {}
-        emptyOption: 'wbry.content::repeater.items.repeater_label'
+        emptyOption: 'wbry.content::repeater.items.repeater_emptyOption'
         span: right
         type: dropdown
         comment: 'wbry.content::repeater.items.repeater_cmt'
