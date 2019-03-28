@@ -15,4 +15,4 @@ navigation:
 permissions:
     wbry.content.items:
         tab: 'wbry.content::lang.plugin.name'
-        label: 'Управления контентом'
+        label: 'wbry.content::lang.permissions.items'

@@ -3,6 +3,9 @@
         'name' => 'Content control',
         'description' => 'Content control manager'
     ],
+    'permissions' => [
+        'items' => 'Content manage',
+    ],
     'controllers' => [
         'items' => [
             'list_title'   => 'List',
