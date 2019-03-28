@@ -180,6 +180,8 @@ class Items extends Controller
 
             if (! $repeater)
                 throw new ApplicationException(Lang::get('wbry.content::lang.controllers.items.errors.items_empty'));
+
+            // TODO validate change repeater option
         }
         elseif ($this->actionType === 'update' && $form->data->repeater)
             $repeater = $form->data->repeater;
