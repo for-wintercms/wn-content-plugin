@@ -3,6 +3,7 @@
 namespace Wbry\Content\Models;
 
 use Model;
+use October\Rain\Database\Builder;
 
 /**
  * Item model
@@ -33,4 +34,13 @@ class Item extends Model
     public $attributeNames = [
         'name' => 'wbry.content::repeater.items.name_label',
     ];
+
+    /*
+     * Scopes
+     */
+
+    public function scopeItem(Builder $query, string $page, string $name)
+    {
+        $query->where('page', $page)->where('name', $name);
+    }
 }
