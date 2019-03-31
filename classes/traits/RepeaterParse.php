@@ -91,4 +91,10 @@ trait RepeaterParse
                 $this->handleError($e);
         }
     }
+
+    public function reParseRepeatersConfig()
+    {
+        self::$isRepeaterParse = false;
+        $this->parseRepeatersConfig();
+    }
 }
