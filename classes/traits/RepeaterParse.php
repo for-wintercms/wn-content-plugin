@@ -18,6 +18,8 @@ use October\Rain\Exception\ApplicationException;
  */
 trait RepeaterParse
 {
+    protected static $isRepeaterParse = false;
+
     public $menuList  = null;
     public $repeaters = null;
 
@@ -28,7 +30,7 @@ trait RepeaterParse
 
     protected function parseRepeatersConfig($isController = false)
     {
-        if ($this->menuList)
+        if (self::$isRepeaterParse)
             return;
 
         $theme = CmsTheme::getActiveTheme();
@@ -79,6 +81,8 @@ trait RepeaterParse
                     }
                 }
             }
+
+            self::$isRepeaterParse = false;
         }
         catch (Exception $e) {
             $this->isRepeaterError = true;
