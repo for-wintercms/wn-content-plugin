@@ -121,8 +121,7 @@ trait RepeaterParse
                 if (is_numeric(array_keys($content)[0]))
                 {
                     $parseConfig = $this->repeaterConstructor($content, 'item', true);
-                    if (isset($parseConfig['item']['form']['fields']))
-                        $forms['fields'] = $parseConfig['item']['form']['fields'];
+                    $forms['fields'] = $parseConfig['item']['form']['fields'] ?? $parseConfig;
                 }
                 else
                 {
@@ -198,17 +197,28 @@ trait RepeaterParse
             $arrSubD = [];
             if ($val)
             {
-                if (is_numeric(array_keys($val)[0]))
+                $firstKey = array_keys($val)[0];
+                if (is_numeric($firstKey))
                 {
                     $x1 = 0;
+                    $isArr = false;
                     foreach ($val as &$dV)
                     {
                         if (++$x1 === 1)
-                            $arrSubD['item'] = $this->repeaterConstructor($dV, 'item');
+                        {
+                            $isArr = is_array($dV);
+                            if ($isArr)
+                            {
+                                foreach ($dV as $d2K => &$d2V)
+                                    $arrSubD[$d2K] = $this->repeaterConstructor($d2V, $d2K);
+                            }
+                            else
+                                $arrSubD['item'] = $this->repeaterConstructor($dV, 'item');
+                        }
                         else
                             $this->repeaterConstructor($dV, 'item');
 
-                        if (! $isParent)
+                        if (! $isParent && ! $isArr)
                             $dV = ['item' => $dV];
                     }
                 }
