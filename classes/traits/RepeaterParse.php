@@ -218,7 +218,7 @@ trait RepeaterParse
                         else
                             $this->repeaterConstructor($dV, 'item');
 
-                        if (! $isParent && ! $isArr)
+                        if (! $isArr)
                             $dV = ['item' => $dV];
                     }
                 }
