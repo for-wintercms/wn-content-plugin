@@ -50,7 +50,8 @@ class Repeater
             return [];
 
         if ($generate) {
-            if (! $this->generateRepeaterConfig($content, $page, $repeater))
+            $content = $this->generateRepeaterConfig($content, $page, $repeater);
+            if ($content === false)
                 return [];
         }
         elseif (! $repeater || ! isset($this->repeaterAllList[$page][$repeater]))

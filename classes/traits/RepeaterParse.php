@@ -104,12 +104,10 @@ trait RepeaterParse
         $this->parseRepeatersConfig();
     }
 
-    public function generateRepeaterConfig($content, string $page, string $repeater)
+    public function generateRepeaterConfig(&$content, string $page, string $repeater)
     {
         if (! $content || ! $page || ! $repeater)
             return false;
-        elseif (isset($this->repeaterAllList[$page][$repeater]))
-            return true;
 
         $forms = [
             'label'  => studly_case($repeater),
@@ -118,47 +116,121 @@ trait RepeaterParse
 
         if (is_array($content))
         {
-            $key = array_key_first($content);
-            $forms['fields'] = $this->repeaterConstructor($content[$key], $key);
+            if ($content)
+            {
+                if (is_numeric(array_keys($content)[0]))
+                {
+                    $parseConfig = $this->repeaterConstructor($content, 'item', true);
+                    if (isset($parseConfig['item']['form']['fields']))
+                        $forms['fields'] = $parseConfig['item']['form']['fields'];
+                }
+                else
+                {
+                    foreach ($content as $dK => &$dV)
+                        $forms['fields'][$dK] = $this->repeaterConstructor($dV, $dK);
+                    $content = [$content];
+                }
+            }
         }
-        elseif (is_string($content))
-            $forms['fields'] = $this->repeaterConstructor($content, 'item');
+        elseif (is_string($content) || is_numeric($content))
+        {
+            $forms['fields']['item'] = $this->repeaterConstructor($content, 'item');
+            $content = [['item' => $content]];
+        }
         else
             return false;
 
-        return true;
-    }
-
-    private function repeaterConstructor($val, $key)
-    {
-        $res = [];
-
-        if (is_array($val))
+        # get or create page config
+        # ===========================
+        if (isset($this->repeaterFiles[$page]))
         {
-            $firstKey = array_key_first($val);
-            if (is_numeric($firstKey))
+            if (isset($this->repeaterAllList[$page][$repeater]))
+                return $content;
 
-            foreach ($val as $iK => $iV)
-            {
-                # $firstKey
-            }
+            $configPath = $this->repeatersPath .'/'.$this->repeaterFiles[$page];
+            $config = Yaml::parseFile($configPath);
         }
         else
         {
-            if (is_numeric($val))
-                $type = 'number';
-            elseif (is_string($val))
-                $type = $this->repeaterInputTextType($val);
-            else
-                return $res;
+            $configPath = $this->repeatersPath .'/config-'.$page.'.yaml';
+            if (file_exists($configPath))
+                $configPath = $this->repeatersPath .'/config-'.$page.'-'.time().'.yaml';
 
-            $res[$key] = [
-                'label' => studly_case($key),
-                'type'  => $type,
+            $config = [
+                'menu' => [
+                    'label' => studly_case($page),
+                    'slug'  => $page,
+                    'icon'  => 'icon-'.$page,
+                    'order' => count($this->repeaterFiles)+1
+                ],
+                'repeater' => [],
             ];
         }
 
-        return $res;
+        # create repeater
+        # =================
+        if (! isset($config['repeater']))
+            $config['repeater'] = [];
+        $config['repeater'][$repeater] = $forms;
+        $configStr = Yaml::render($config);
+
+        @File::chmod($this->repeatersPath);
+
+        if (! File::put($configPath, $configStr))
+            throw new SystemException(sprintf('Error saving file %s', $configPath));
+
+        @File::chmod($configPath);
+
+        $this->reParseRepeatersConfig();
+
+        return $content;
+    }
+
+    private function repeaterConstructor(&$val, $key, $isParent = false)
+    {
+        $arrD = [
+            'label' => studly_case($key),
+            'type'  => 'section',
+        ];
+
+        if (is_array($val))
+        {
+            $arrSubD = [];
+            if ($val)
+            {
+                if (is_numeric(array_keys($val)[0]))
+                {
+                    $x1 = 0;
+                    foreach ($val as &$dV)
+                    {
+                        if (++$x1 === 1)
+                            $arrSubD['item'] = $this->repeaterConstructor($dV, 'item');
+                        else
+                            $this->repeaterConstructor($dV, 'item');
+
+                        if (! $isParent)
+                            $dV = ['item' => $dV];
+                    }
+                }
+                else
+                {
+                    foreach ($val as $dK => &$dV)
+                        $arrSubD[$dK] = $this->repeaterConstructor($dV, $dK);
+                }
+            }
+
+            if ($isParent)
+                return $arrSubD;
+
+            $arrD['type'] = 'repeater';
+            $arrD['form'] = ['fields' => $arrSubD];
+        }
+        elseif (is_numeric($val))
+            $arrD['type'] = 'number';
+        elseif (is_string($val))
+            $arrD['type'] = $this->repeaterInputTextType($val);
+
+        return $arrD;
     }
 
     private function repeaterInputTextType($text)
