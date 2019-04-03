@@ -58,7 +58,7 @@ trait RepeaterParse
                 if (empty($config['menu']) || empty($config['menu']['label']) || empty($config['menu']['slug']))
                     throw new ApplicationException(Lang::get('wbry.content::lang.controllers.items.errors.repeater_menu', ['fileName' => $fileName]));
 
-                $menuSlug = $config['menu']['slug'];
+                $menuSlug = camel_case($config['menu']['slug']);
                 $this->menuList[$menuSlug] = array_merge($config['menu'], [
                     'url' => Backend::url('wbry/content/items/'. $menuSlug),
                 ]);
@@ -159,7 +159,7 @@ trait RepeaterParse
             $config = [
                 'menu' => [
                     'label' => studly_case($page),
-                    'slug'  => $page,
+                    'slug'  => camel_case($page),
                     'icon'  => 'icon-'.$page,
                     'order' => count($this->repeaterFiles)+1
                 ],

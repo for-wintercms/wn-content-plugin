@@ -38,6 +38,7 @@ class Repeater
         if (! $page || ! $name || ! is_string($page) || ! is_string($name))
             return [];
 
+        $page  = camel_case($page);
         $items = $this->getRepeater($page, $name);
         if ($items)
             return $items;
