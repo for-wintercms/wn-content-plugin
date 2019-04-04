@@ -52,6 +52,7 @@ class Items extends Controller
             return;
 
         # set lang
+        # ==========
         if (Session::has('locale'))
         {
             $locale = Session::get('locale');
@@ -60,6 +61,7 @@ class Items extends Controller
         }
 
         # load
+        # ======
         $this->parseRepeatersConfig(true);
         $this->addActionMenu();
         $this->addDynamicActionMethods();
@@ -109,6 +111,15 @@ class Items extends Controller
 
     public function formExtendFieldsBefore($form)
     {
+        # hidden
+        # =========
+        if ($this->user->hasAccess('wbry.content.items_changes'))
+        {
+            $form->fields['title']['hidden']    = false;
+            $form->fields['name']['hidden']     = false;
+            $form->fields['repeater']['hidden'] = false;
+        }
+
         # items
         # =======
         $repeater = null;

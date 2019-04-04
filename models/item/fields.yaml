@@ -4,19 +4,19 @@ fields:
         span: left
         required: 1
         type: text
-        disabled: true
+        hidden: true
     name:
         label: 'wbry.content::content.items.name_label'
         span: right
         required: 1
         type: text
         comment: 'wbry.content::content.items.name_cmt'
-        disabled: true
+        hidden: true
     repeater:
         label: 'wbry.content::content.items.repeater_label'
         options: {}
         emptyOption: 'wbry.content::content.items.repeater_emptyOption'
-        span: right
+        span: left
         type: dropdown
         comment: 'wbry.content::content.items.repeater_cmt'
         hidden: true
