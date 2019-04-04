@@ -4,6 +4,12 @@ columns:
         type: number
         sortable: true
         width: 100px
+        invisible: true
+    title:
+        lbel: 'wbry.content::content.items.title_label'
+        type: text
+        searchable: true
+        sortable: true
     name:
         label: 'wbry.content::content.items.name_label'
         type: text
@@ -13,4 +19,14 @@ columns:
         label: 'wbry.content::content.items.repeater_label'
         type: text
         searchable: true
+        sortable: true
+    created_at:
+        label: 'wbry.content::content.items.create_at'
+        type: datetime
+        invisible: true
+        sortable: true
+    updated_at:
+        label: 'wbry.content::content.items.updated_at'
+        type: datetime
+        invisible: true
         sortable: true

@@ -7,6 +7,8 @@
         'repeater_label' => 'Репитер',
         'repeater_cmt'   => 'Шаблон репитера.',
         'repeater_emptyOption' => '--- Шаблон репитера ---',
-        'items_label'    => 'Контент',
+        'items_label' => 'Контент',
+        'create_at'   => 'Создано',
+        'updated_at'  => 'Обновлено',
     ],
 ];

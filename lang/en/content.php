@@ -7,6 +7,8 @@
         'repeater_label' => 'Repeater',
         'repeater_cmt'   => 'Repeater pattern.',
         'repeater_emptyOption' => '--- Repeater pattern ---',
-        'items_label'    => 'Content',
+        'items_label' => 'Content',
+        'create_at'   => 'Created',
+        'updated_at'  => 'Updated',
     ],
 ];
