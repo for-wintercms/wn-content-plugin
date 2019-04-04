@@ -9,7 +9,7 @@
     'controllers' => [
         'items' => [
             'list_title'   => 'List',
-            'create_title' => 'Create item',
+            'create_title' => 'Create content',
             'update_title' => 'Update :title',
             'no_content'   => 'Add control area',
             'errors' => [

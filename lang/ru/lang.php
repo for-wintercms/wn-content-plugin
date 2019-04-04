@@ -9,7 +9,7 @@
     'controllers' => [
         'items' => [
             'list_title'   => 'Список',
-            'create_title' => 'Создать предмет',
+            'create_title' => 'Создать контент',
             'update_title' => 'Обновить :title',
             'no_content'   => 'Добавьте область управления',
             'errors' => [
