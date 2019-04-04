@@ -15,8 +15,6 @@ class Item extends Model
 {
     use \October\Rain\Database\Traits\Validation;
     
-    public $timestamps = false;
-
     public $table = 'wbry_content_items';
 
     protected $jsonable = ['items'];
