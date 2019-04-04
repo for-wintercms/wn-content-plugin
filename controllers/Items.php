@@ -88,7 +88,8 @@ class Items extends Controller
         if ($this->ajaxHandler = $this->getAjaxHandler())
         {
             $this->actionAjax = $this->action.'_'.$this->ajaxHandler;
-            $this->addDynamicMethod($this->actionAjax, self::class);
+            if (! $this->methodExists($this->actionAjax))
+                $this->addDynamicMethod($this->actionAjax, self::class);
         }
     }
 
@@ -178,8 +179,8 @@ class Items extends Controller
         $methodName = $action .'_'. $this->ajaxHandler;
         if ($this->methodExists($methodName))
         {
-            $result = call_user_func_array([$this, $methodName], [$id]);
-            return $result ?: true;
+            $this->actionAjax = null;
+            return call_user_func_array([$this, $methodName], [$id]);
         }
         return false;
     }
