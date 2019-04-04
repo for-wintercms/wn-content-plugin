@@ -5,12 +5,12 @@ columns:
         sortable: true
         width: 100px
     name:
-        label: 'wbry.content::repeater.items.name_label'
+        label: 'wbry.content::content.items.name_label'
         type: text
         searchable: true
         sortable: true
     repeater:
-        label: 'wbry.content::repeater.items.repeater_label'
+        label: 'wbry.content::content.items.repeater_label'
         type: text
         searchable: true
         sortable: true

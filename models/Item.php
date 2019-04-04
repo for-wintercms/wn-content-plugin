@@ -32,7 +32,7 @@ class Item extends Model
     ];
 
     public $attributeNames = [
-        'name' => 'wbry.content::repeater.items.name_label',
+        'name' => 'wbry.content::content.items.name_label',
     ];
 
     /*

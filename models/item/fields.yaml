@@ -1,24 +1,20 @@
 fields:
     name:
-        label: 'wbry.content::repeater.items.name_label'
+        label: 'wbry.content::content.items.name_label'
         span: left
         required: 1
         type: text
-        comment: 'wbry.content::repeater.items.name_cmt'
+        comment: 'wbry.content::content.items.name_cmt'
     repeater:
-        label: 'wbry.content::repeater.items.repeater_label'
+        label: 'wbry.content::content.items.repeater_label'
         options: {}
-        emptyOption: 'wbry.content::repeater.items.repeater_emptyOption'
+        emptyOption: 'wbry.content::content.items.repeater_emptyOption'
         span: right
         type: dropdown
-        comment: 'wbry.content::repeater.items.repeater_cmt'
+        comment: 'wbry.content::content.items.repeater_cmt'
     items:
-        label: 'wbry.content::repeater.items.items_label'
+        label: 'wbry.content::content.items.items_label'
         span: full
-        prompt: 'wbry.content::repeater.prompt'
-#        trigger:
-#            action: empty
-#            field: repeater
-#            condition: someval
+        prompt: 'wbry.content::content.prompt'
         type: repeater
         form: {}

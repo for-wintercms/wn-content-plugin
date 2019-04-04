@@ -29,14 +29,14 @@ repeater:
     fields:               #required and not empty
       jobs-list:
         label: 'Jobs list'
-        prompt: 'wbry.content::repeater.prompt'
+        prompt: 'wbry.content::content.prompt'
         span: auto
         type: repeater
         form:
           fields:
             test1:
               label: 'Sub jobs list'
-              prompt: 'wbry.content::repeater.prompt'
+              prompt: 'wbry.content::content.prompt'
               span: auto
               type: repeater
               form: {}
@@ -55,7 +55,7 @@ repeater:
     fields:
       product-type:
         label: 'Product types'
-        prompt: 'wbry.content::repeater.prompt'
+        prompt: 'wbry.content::content.prompt'
         span: auto
         type: repeater
         form: {}
