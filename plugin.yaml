@@ -16,3 +16,6 @@ permissions:
     wbry.content.items:
         tab: 'wbry.content::lang.plugin.name'
         label: 'wbry.content::lang.permissions.items'
+    wbry.content.items_changes:
+        tab: 'wbry.content::lang.plugin.name'
+        label: 'wbry.content::lang.permissions.items_changes'

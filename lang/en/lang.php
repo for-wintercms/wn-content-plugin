@@ -4,7 +4,8 @@
         'description' => 'Content control manager'
     ],
     'permissions' => [
-        'items' => 'Content manage',
+        'items'         => 'Content management',
+        'items_changes' => 'Content block management (for developers only)',
     ],
     'controllers' => [
         'items' => [
