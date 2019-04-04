@@ -1,10 +1,17 @@
 fields:
-    name:
-        label: 'wbry.content::content.items.name_label'
+    title:
+        label: 'wbry.content::content.items.title_label'
         span: left
         required: 1
         type: text
+        disabled: true
+    name:
+        label: 'wbry.content::content.items.name_label'
+        span: right
+        required: 1
+        type: text
         comment: 'wbry.content::content.items.name_cmt'
+        disabled: true
     repeater:
         label: 'wbry.content::content.items.repeater_label'
         options: {}
@@ -12,6 +19,7 @@ fields:
         span: right
         type: dropdown
         comment: 'wbry.content::content.items.repeater_cmt'
+        hidden: true
     items:
         label: 'wbry.content::content.items.items_label'
         span: full
