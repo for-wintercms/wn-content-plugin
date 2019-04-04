@@ -222,7 +222,7 @@ class Items extends Controller
                 if (! is_numeric($this->actionId) || $this->actionId < 1 || ! ($model = ItemModel::find($this->actionId)))
                     return $this->makeView404();
 
-                $this->pageTitle = Lang::get('wbry.content::lang.controllers.items.update_title', ['title' => $model->name]);
+                $this->pageTitle = Lang::get('wbry.content::lang.controllers.items.update_title', ['title' => $model->title, 'name' => $model->name]);
                 break;
 
             default: return $this->makeView404();

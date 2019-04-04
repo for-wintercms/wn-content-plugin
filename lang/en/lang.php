@@ -10,7 +10,7 @@
         'items' => [
             'list_title'   => 'List',
             'create_title' => 'Create content',
-            'update_title' => 'Update :title',
+            'update_title' => 'Update - :title [:name]',
             'no_content'   => 'Add control area',
             'errors' => [
                 'repeater_menu'     => 'Correctly declare the menu item in the file :fileName',
