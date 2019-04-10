@@ -92,7 +92,8 @@ class Items extends Controller
         BackendMenu::setContextSideMenu($this->action);
 
         Event::listen('backend.menu.extendItems', function($menu) {
-            $menu->addSideMenuItems('Wbry.Content', 'items', $this->menuList);
+            if ($this->menuList)
+                $menu->addSideMenuItems('Wbry.Content', 'items', $this->menuList);
         });
 
         $this->menuName = isset($this->menuList[$this->action]) ? $this->menuList[$this->action]['label'] : '';
