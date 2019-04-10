@@ -112,6 +112,7 @@ class Items extends Controller
     {
         # Custom
         $this->addCss('/plugins/wbry/content/assets/css/backend/main.css');
+        $this->addJs('/plugins/wbry/content/assets/js/backend/items_page.js');
 
         # framework extras
         $this->addJs('/modules/system/assets/js/framework.extras.js');
@@ -123,6 +124,17 @@ class Items extends Controller
         return $this->contentItemList[$this->action][$itemSlug] ?? $default;
     }
 
+    public function getReadyItemsList()
+    {
+        if (! $this->contentItemList || ! $this->action)
+            return [];
+
+        return array_diff_key(
+            $this->contentItemList[$this->action],
+            ItemModel::page($this->action)->lists('id', 'name')
+        );
+    }
+
     /*
      * Ajax
      */
@@ -132,50 +144,74 @@ class Items extends Controller
      */
     public function onCreateItem()
     {
-        /*
-         * Validate
-         */
-
         if (! $this->action)
         {
             Flash::error(Lang::get('wbry.content::content.errors.empty_action'));
             return $this->listRefresh();
         }
 
-        Validator::extend('no_exists', function($attribute, $value)
-        {
-            if ($attribute !== 'name')
-                return true;
+        Validator::extend('no_exists_item', function($attr, $value) {
             return (! ItemModel::item($this->action, $value)->count());
         });
 
-        $validator = Validator::make(post(), [
-            'title' => 'required|between:3,255',
-            'name'  => 'required|between:3,255|alpha_dash|no_exists',
-        ]);
-        $validator->setAttributeNames([
-            'title' => Lang::get('wbry.content::content.items.title_label'),
-            'name'  => Lang::get('wbry.content::content.items.name_label'),
-        ]);
+        if (post('formType') == 'ready')
+        {
+            $name = post('readyTmp');
 
-        if ($validator->fails())
-            throw new ValidationException($validator);
+            if (empty($this->contentItemList))
+                throw new ApplicationException(Lang::get('wbry.content::content.list.form_ready_tmp_empty'));
 
-        /*
-         * Create
-         */
+            Validator::extend('ready_item', function($attr, $value) {
+                return ($value && isset($this->contentItemList[$this->action][$value]));
+            });
+            $validator = Validator::make(post(), [
+                'readyTmp' => 'required|no_exists_item|ready_item',
+            ], [
+                'no_exists_item' => Lang::get('wbry.content::content.errors.no_exists_item', ['itemSlug' => $name]),
+                'ready_item' => Lang::get('wbry.content::content.errors.no_item_tmp', ['itemSlug' => $name]),
+            ]);
+            $validator->setAttributeNames([
+                'readyTmp' => Lang::get('wbry.content::content.list.form_ready_tmp_label'),
+            ]);
 
-        $title = post('title');
-        $name  = post('name');
+            if ($validator->fails())
+                throw new ValidationException($validator);
 
-        $this->addContentItem($this->action, $name, $title);
+            $title = $this->contentItemList[$this->action][$name];
+        }
+        else
+        {
+            $title = post('title');
+            $name  = post('name');
+
+            $validator = Validator::make(post(), [
+                'title' => 'required|between:3,255',
+                'name'  => 'required|between:3,255|alpha_dash|no_exists_item',
+            ], [
+                'no_exists_item' => Lang::get('wbry.content::content.errors.no_exists_item', ['itemSlug' => $name]),
+            ]);
+            $validator->setAttributeNames([
+                'title' => Lang::get('wbry.content::content.items.title_label'),
+                'name'  => Lang::get('wbry.content::content.items.name_label'),
+            ]);
+
+            if ($validator->fails())
+                throw new ValidationException($validator);
+
+            $this->addContentItem($this->action, $name, $title);
+        }
 
         ItemModel::create([
             'page' => $this->action,
             'name' => $name,
         ]);
 
-        return $this->listRefresh();
+        $data = $this->listRefresh();
+        $data['#createItemPopup'] = $this->makePartial('create_item_popup');
+
+        Flash::success(Lang::get('wbry.content::content.success.create_item', ['itemName' => $title]));
+
+        return $data;
     }
 
     /*

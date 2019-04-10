@@ -12,3 +12,13 @@
     border: 1px solid #111;
     border-radius: 5px;
 }
+
+/*
+ * Content items
+ */
+
+#popupCreateItemTabs .tab-content {
+    background: #fff;
+    padding: 20px 15px 0;
+    margin-bottom: 10px;
+}

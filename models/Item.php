@@ -37,6 +37,11 @@ class Item extends Model
      * Scopes
      */
 
+    public function scopePage(Builder $query, string $page)
+    {
+        $query->where('page', $page);
+    }
+
     public function scopeItem(Builder $query, string $page, string $name)
     {
         $query->where('page', $page)->where('name', $name);
