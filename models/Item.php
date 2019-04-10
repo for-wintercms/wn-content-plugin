@@ -19,7 +19,7 @@ class Item extends Model
 
     protected $jsonable = ['items'];
 
-    public $fillable = ['page', 'name', 'repeater', 'items'];
+    public $fillable = ['page', 'name', 'items'];
 
     /**
      * @var array Validation rules
@@ -36,6 +36,11 @@ class Item extends Model
     /*
      * Scopes
      */
+
+    public function scopePage(Builder $query, string $page)
+    {
+        $query->where('page', $page);
+    }
 
     public function scopeItem(Builder $query, string $page, string $name)
     {

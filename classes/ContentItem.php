@@ -5,23 +5,23 @@ namespace Wbry\Content\Classes;
 use Lang;
 use Wbry\Content\Models\Item as ItemModel;
 /**
- * Repeater class
+ * ContentItem class
  *
  * @package Wbry\Content\Classes
  */
-class Repeater
+class ContentItem
 {
     use \October\Rain\Support\Traits\Singleton;
-    use Traits\RepeaterParse;
+    use Traits\ContentItemsParse;
 
     protected function init()
     {
-        $this->parseRepeatersConfig();
+        $this->parseContentItemsConfig();
     }
 
     public function getRepeater(string $page, string $name)
     {
-        if (! $page || ! $name || ! isset($this->repeaterAllList[$page]))
+        if (! $page || ! $name || ! isset($this->contentItemList[$page]))
             return [];
 
         $record = ItemModel::item($page, $name)->first();
@@ -55,7 +55,7 @@ class Repeater
             if ($content === false)
                 return [];
         }
-        elseif (! $repeater || ! isset($this->repeaterAllList[$page][$repeater]))
+        elseif (! $repeater || ! isset($this->contentItemList[$page][$repeater]))
             return [];
 
         $record = ItemModel::create(['page' => $page, 'name' => $name, 'repeater' => $repeater, 'items' => $content]);

@@ -7,16 +7,12 @@ columns:
         invisible: true
     title:
         lbel: 'wbry.content::content.items.title_label'
-        type: text
-        searchable: true
-        sortable: true
+        type: partial
+        searchable: false
+        sortable: false
+        path: $/wbry/content/controllers/items/_column_title.htm
     name:
         label: 'wbry.content::content.items.name_label'
-        type: text
-        searchable: true
-        sortable: true
-    repeater:
-        label: 'wbry.content::content.items.repeater_label'
         type: text
         searchable: true
         sortable: true
