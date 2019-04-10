@@ -2,6 +2,8 @@
 
 namespace Wbry\Content\Controllers;
 
+use Yaml;
+
 use App;
 use Lang;
 use View;
@@ -93,7 +95,7 @@ class Items extends Controller
             $menu->addSideMenuItems('Wbry.Content', 'items', $this->menuList);
         });
 
-        $this->menuName = $this->menuList[$this->action] ? $this->menuList[$this->action]['label'] : '';
+        $this->menuName = isset($this->menuList[$this->action]) ? $this->menuList[$this->action]['label'] : '';
     }
 
     protected function addDynamicActionMethods()
