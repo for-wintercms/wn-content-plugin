@@ -6,11 +6,15 @@ use App;
 use Lang;
 use View;
 use Event;
+use Flash;
 use Session;
 use Response;
+use Validator;
+use Exception;
 use BackendMenu;
 use Backend\Classes\Controller;
 use Wbry\Content\Models\Item as ItemModel;
+use October\Rain\Exception\ValidationException;
 use October\Rain\Exception\ApplicationException;
 
 /**
@@ -21,7 +25,7 @@ use October\Rain\Exception\ApplicationException;
  */
 class Items extends Controller
 {
-    use \Wbry\Content\Classes\Traits\RepeaterParse;
+    use \Wbry\Content\Classes\Traits\ContentItemsParse;
 
     public $implement = [
         'Backend\Behaviors\ListController',
@@ -62,10 +66,20 @@ class Items extends Controller
 
         # load
         # ======
-        $this->parseRepeatersConfig(true);
+        $this->parseContentItems();
         $this->addActionMenu();
         $this->addDynamicActionMethods();
         $this->addAssets();
+    }
+
+    protected function parseContentItems()
+    {
+        try {
+            $this->parseContentItemsConfig($this->action);
+        }
+        catch (Exception $e) {
+            $this->handleError($e);
+        }
     }
 
     protected function addActionMenu()
@@ -73,12 +87,11 @@ class Items extends Controller
         BackendMenu::setContext('Wbry.Content', 'items');
         BackendMenu::setContextSideMenu($this->action);
 
-        $thisObj = &$this;
-        Event::listen('backend.menu.extendItems', function($menu) use($thisObj) {
-            $menu->addSideMenuItems('Wbry.Content', 'items', $thisObj->menuList);
+        Event::listen('backend.menu.extendItems', function($menu) {
+            $menu->addSideMenuItems('Wbry.Content', 'items', $this->menuList);
         });
 
-        $this->menuName = $thisObj->menuList[$this->action] ? $thisObj->menuList[$this->action]['label'] : '';
+        $this->menuName = $this->menuList[$this->action] ? $this->menuList[$this->action]['label'] : '';
     }
 
     protected function addDynamicActionMethods()
@@ -97,7 +110,72 @@ class Items extends Controller
 
     protected function addAssets()
     {
+        # Custom
         $this->addCss('/plugins/wbry/content/assets/css/backend/main.css');
+
+        # framework extras
+        $this->addJs('/modules/system/assets/js/framework.extras.js');
+        $this->addCss('/modules/system/assets/css/framework.extras.css');
+    }
+
+    public function getListTitle($itemSlug, $default = '-')
+    {
+        return $this->contentItemList[$this->action][$itemSlug] ?? $default;
+    }
+
+    /*
+     * Ajax
+     */
+
+    /**
+     * @throws
+     */
+    public function onCreateItem()
+    {
+        /*
+         * Validate
+         */
+
+        if (! $this->action)
+        {
+            Flash::error(Lang::get('wbry.content::content.errors.empty_action'));
+            return $this->listRefresh();
+        }
+
+        Validator::extend('no_exists', function($attribute, $value)
+        {
+            if ($attribute !== 'name')
+                return true;
+            return (! ItemModel::item($this->action, $value)->count());
+        });
+
+        $validator = Validator::make(post(), [
+            'title' => 'required|between:3,255',
+            'name'  => 'required|between:3,255|alpha_dash|no_exists',
+        ]);
+        $validator->setAttributeNames([
+            'title' => Lang::get('wbry.content::content.items.title_label'),
+            'name'  => Lang::get('wbry.content::content.items.name_label'),
+        ]);
+
+        if ($validator->fails())
+            throw new ValidationException($validator);
+
+        /*
+         * Create
+         */
+
+        $title = post('title');
+        $name  = post('name');
+
+        $this->addContentItem($this->action, $name, $title);
+
+        ItemModel::create([
+            'page' => $this->action,
+            'name' => $name,
+        ]);
+
+        return $this->listRefresh();
     }
 
     /*
@@ -111,15 +189,6 @@ class Items extends Controller
 
     public function formExtendFieldsBefore($form)
     {
-        # hidden
-        # =========
-        if ($this->user->hasAccess('wbry.content.items_changes'))
-        {
-            $form->fields['title']['hidden']    = false;
-            $form->fields['name']['hidden']     = false;
-            $form->fields['repeater']['hidden'] = false;
-        }
-
         # items
         # =======
         $repeater = null;
@@ -143,22 +212,19 @@ class Items extends Controller
 
             $form->fields['items']['form'] = $this->repeaters[$repeater];
         }
-
-        # repeater (list)
-        # ================
-        if (isset($form->fields['repeater']) && empty($form->fields['repeater']['options']))
-            $form->fields['repeater']['options'] = $this->repeaterList;
-
-        # name (default)
-        # ===============
-        if (isset($form->fields['name']) && empty($form->fields['name']['default']))
-            $form->fields['name']['default'] = $this->action .'-item'.rand(100, 999);
     }
 
     public function formExtendFields($form)
     {
         $form->addFields([
             'page' => [
+                'type' => 'text',
+                'cssClass' => 'd-none',
+                'default' => $this->action
+            ]
+        ]);
+        $form->addFields([
+            'name' => [
                 'type' => 'text',
                 'cssClass' => 'd-none',
                 'default' => $this->action
@@ -187,6 +253,9 @@ class Items extends Controller
 
     protected function actionAjax($action = 'index', $id = null)
     {
+        if (method_exists($this, $this->ajaxHandler))
+            return call_user_func_array([$this, $this->ajaxHandler], func_get_args());
+
         $methodName = $action .'_'. $this->ajaxHandler;
         if ($this->methodExists($methodName))
         {

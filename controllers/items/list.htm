@@ -1,1 +1,40 @@
 <?= $this->listRender() ?>
+
+<?php if ($this->user->hasAccess('wbry.content.items_changes')): ?>
+    <div class="control-popup modal fade" id="popupCreateItem" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form class="form-elements" role="form"
+                      data-request="onCreateItem"
+                      data-request-success="$('#popupCreateItem').modal('hide')"
+                      data-stripe-load-indicator>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title"><?= $this->menuName ?></h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group span-full is-required">
+                            <label><?= e(trans('wbry.content::content.items.title_label')) ?></label>
+                            <input type="text" name="title" value="" class="form-control" id="presetNewItemName" />
+                        </div>
+                        <div class="form-group span-full is-required">
+                            <label><?= e(trans('wbry.content::content.items.name_label')) ?></label>
+                            <input type="text" name="name" value="" class="form-control" data-input-preset="#presetNewItemName" />
+                            <p class="help-block"><?= e(trans('wbry.content::content.items.name_cmt')) ?></p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            <?= e(trans('backend::lang.form.cancel')) ?>
+                        </button>
+                        <button type="submit"
+                                class="btn btn-primary"
+                                data-attach-loading>
+                            <?= e(trans('backend::lang.form.create')) ?>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<?php endif ?>

@@ -1,28 +1,5 @@
 fields:
-    title:
-        label: 'wbry.content::content.items.title_label'
-        span: left
-        required: 1
-        type: text
-        hidden: true
-    name:
-        label: 'wbry.content::content.items.name_label'
-        span: right
-        required: 1
-        type: text
-        comment: 'wbry.content::content.items.name_cmt'
-        hidden: true
-    repeater:
-        label: 'wbry.content::content.items.repeater_label'
-        options: {}
-        emptyOption: 'wbry.content::content.items.repeater_emptyOption'
-        span: left
-        type: dropdown
-        comment: 'wbry.content::content.items.repeater_cmt'
-        hidden: true
     items:
-        label: 'wbry.content::content.items.items_label'
-        span: full
-        prompt: 'wbry.content::content.prompt'
-        type: repeater
+        type: nestedform
+        usePanelStyles: false
         form: {}
