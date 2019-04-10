@@ -22,3 +22,9 @@
     padding: 20px 15px 0;
     margin-bottom: 10px;
 }
+.create-content-item-title {
+    padding: 2px 4px;
+    margin-left: 10px;
+    border: 1px solid #8D97A1;
+    border-radius: 4px;
+}

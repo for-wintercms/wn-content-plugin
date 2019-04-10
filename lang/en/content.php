@@ -9,10 +9,16 @@
         'updated_at'  => 'Updated',
     ],
     'list' => [
+        'title' => 'List',
         'popup_btn_new_item'   => 'New template',
         'popup_btn_ready_item' => 'Ready template',
         'form_ready_tmp_label' => 'Template',
         'form_ready_tmp_empty' => 'No pre-made templates',
+    ],
+    'form' => [
+        'title'         => 'Update - :title',
+        'items_missing' => 'No form',
+        'items_empty'   => 'Form is empty',
     ],
     'errors' => [
         'content_menu' => 'Correctly declare the menu item in the file :fileName',

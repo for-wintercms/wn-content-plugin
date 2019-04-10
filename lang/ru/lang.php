@@ -9,9 +9,6 @@
     ],
     'controllers' => [
         'items' => [
-            'list_title'   => 'Список',
-            'create_title' => 'Создать контент',
-            'update_title' => 'Обновить - :title [:name]',
             'no_content'   => 'Добавьте область управления',
             'errors' => [
                 'repeater_example'  => 'Правильный пример:',

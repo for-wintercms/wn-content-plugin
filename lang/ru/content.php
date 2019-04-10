@@ -9,10 +9,16 @@
         'updated_at'  => 'Обновлено',
     ],
     'list' => [
+        'title' => 'Список',
         'popup_btn_new_item'   => 'Новый шаблон',
         'popup_btn_ready_item' => 'Готовый шаблон',
         'form_ready_tmp_label' => 'Шаблон',
         'form_ready_tmp_empty' => 'Готовые шаблоны отсутствуют',
+    ],
+    'form' => [
+        'title'         => 'Обновить - :title',
+        'items_empty'   => 'Форма пустая',
+        'items_missing' => 'Форма отсутствует',
     ],
     'errors' => [
         'content_menu' => 'Правильно объявите пункт меню в файле :fileName',

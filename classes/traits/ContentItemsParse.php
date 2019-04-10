@@ -55,7 +55,7 @@ trait ContentItemsParse
      *                  form => [active_item_form_data] (@see https://octobercms.com/docs/backend/forms#form-fields)
      *              ]]
      */
-    protected $activeContentItemForm = null;
+    protected $activeContentItemForm = [];
 
 
     private $isContentItemsParse = false;
@@ -135,7 +135,7 @@ trait ContentItemsParse
         $this->menuList = null;
         $this->contentItemFiles = [];
         $this->contentItemList = null;
-        $this->activeContentItemForm = null;
+        $this->activeContentItemForm = [];
 
         $this->parseContentItemsConfig();
     }

@@ -40,9 +40,10 @@ class Items extends Controller
     public $menuName     = null;
     public $listTitle    = null;
     public $actionAjax   = null;
-    public $actionType   = null;
     public $actionId     = null;
     public $ajaxHandler  = null;
+
+    public $isContentItemError = false;
 
     /*
      * Initialize
@@ -78,6 +79,7 @@ class Items extends Controller
             $this->parseContentItemsConfig($this->action);
         }
         catch (Exception $e) {
+            $this->isContentItemError = true;
             $this->handleError($e);
         }
     }
@@ -122,6 +124,11 @@ class Items extends Controller
     public function getListTitle($itemSlug, $default = '-')
     {
         return $this->contentItemList[$this->action][$itemSlug] ?? $default;
+    }
+
+    public function getListPageTitle()
+    {
+        return $this->menuName ?: Lang::get('wbry.content::content.list.title');
     }
 
     public function getReadyItemsList()
@@ -227,45 +234,22 @@ class Items extends Controller
     {
         # items
         # =======
-        $repeater = null;
-        if (preg_match("#::(onAddItem|onRemoveItem)$#", $this->ajaxHandler))
+        if (isset($form->fields['items']) && empty($form->fields['items']['form']))
         {
-            $data = post('Item');
-            $repeater = $data['repeater'] ?? null;
-
-            if (! $repeater)
-                throw new ApplicationException(Lang::get('wbry.content::lang.controllers.items.errors.items_empty'));
-
-            // TODO validate change repeater option
+            $itemName = $form->data->name;
+            if (! empty($this->activeContentItemForm[$itemName]['form']))
+                $form->fields['items']['form'] = $this->activeContentItemForm[$itemName]['form'];
+            else
+            {
+                $form->fields['items']['form'] = ['fields' => [
+                    'no_item' => [
+                        'type' => 'partial',
+                        'span' => 'full',
+                        'path' => isset($this->activeContentItemForm[$itemName]) ? 'content_item_form_empty' : 'content_item_form_missing',
+                    ]
+                ]];
+            }
         }
-        elseif ($this->actionType === 'update' && $form->data->repeater)
-            $repeater = $form->data->repeater;
-
-        if ($repeater && isset($form->fields['items']) && empty($form->fields['items']['form']))
-        {
-            if (! isset($this->repeaters[$repeater]))
-                throw new ApplicationException(Lang::get('wbry.content::lang.controllers.items.errors.items_no_repeater', ['repeater' => $repeater]));
-
-            $form->fields['items']['form'] = $this->repeaters[$repeater];
-        }
-    }
-
-    public function formExtendFields($form)
-    {
-        $form->addFields([
-            'page' => [
-                'type' => 'text',
-                'cssClass' => 'd-none',
-                'default' => $this->action
-            ]
-        ]);
-        $form->addFields([
-            'name' => [
-                'type' => 'text',
-                'cssClass' => 'd-none',
-                'default' => $this->action
-            ]
-        ]);
     }
 
     /*
@@ -301,24 +285,23 @@ class Items extends Controller
         return false;
     }
 
-    protected function actionView($action = 'list', $id = 0)
+    protected function actionView($id = 0)
     {
-        $this->actionType = $action;
-        $this->actionId   = $id;
+        $this->actionId = $id;
 
         if (! is_numeric($this->actionId))
             return $this->makeView404();
-        if (($action === 'list' || $this->isRepeaterError) && $this->fatalError)
+        if ((! $this->actionId || $this->isContentItemError) && $this->fatalError)
             return $this->makeViewContentFile('fatal-error');
         elseif (! $this->menuList)
             return $this->makeViewContentFile('no-content');
         else
-            return ($action === 'list') ? $this->actionListView() : $this->actionFormView();
+            return $this->actionId ? $this->actionFormView() : $this->actionListView();
     }
 
     protected function actionListView()
     {
-        $this->pageTitle = $this->menuName;
+        $this->pageTitle = $this->getListPageTitle();
         $this->bodyClass = 'slim-container';
         $this->makeLists();
 
@@ -327,27 +310,15 @@ class Items extends Controller
 
     protected function actionFormView()
     {
-        switch ($this->actionType)
-        {
-            case 'create':
-                $model = $this->formCreateModelObject();
-                $this->pageTitle = Lang::get('wbry.content::lang.controllers.items.create_title');
-                break;
+        if ($this->actionId < 1 || ! ($model = ItemModel::find($this->actionId)))
+            return $this->makeView404();
 
-            case 'update':
-                if (! is_numeric($this->actionId) || $this->actionId < 1 || ! ($model = ItemModel::find($this->actionId)))
-                    return $this->makeView404();
-
-                $this->pageTitle = Lang::get('wbry.content::lang.controllers.items.update_title', ['title' => $model->title, 'name' => $model->name]);
-                break;
-
-            default: return $this->makeView404();
-        }
-
-        $this->listTitle = $this->menuName ?: Lang::get('wbry.content::lang.controllers.items.list_title');
+        $title = $this->contentItemList[$this->action][$model->name] ?? $model->name;
+        $this->pageTitle = Lang::get('wbry.content::content.form.title', ['title' => $title]);
+        $this->listTitle = $this->getListPageTitle();
         $this->initForm($model);
 
-        return $this->makeViewContentFile($this->actionType);
+        return $this->makeViewContentFile('update');
     }
 
     /*
