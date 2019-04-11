@@ -274,16 +274,17 @@ class Items extends Controller
         return parent::__call($name, $arguments);
     }
 
-    protected function actionAjax($action = 'index', $id = null)
+    protected function actionAjax($id = null)
     {
         if (method_exists($this, $this->ajaxHandler))
             return call_user_func_array([$this, $this->ajaxHandler], func_get_args());
 
+        $action = (is_numeric($id) && $id > 0) ? 'update' : 'index';
         $methodName = $action .'_'. $this->ajaxHandler;
         if ($this->methodExists($methodName))
         {
             $this->actionAjax = null;
-            return call_user_func_array([$this, $methodName], [$id]);
+            return call_user_func_array([$this, $methodName], func_get_args());
         }
         return false;
     }
