@@ -17,10 +17,10 @@ class Plugin extends PluginBase
     {
         return [
             'filters' => [
-                'repeater' => [ContentItem::instance(), 'filterRepeater'],
+                'contentItem' => [ContentItem::instance(), 'filterRepeater'],
             ],
             'functions' => [
-                'repeater' => [ContentItem::instance(), 'getRepeater'],
+                'contentItem' => [ContentItem::instance(), 'getRepeater'],
             ],
         ];
     }
