@@ -3,7 +3,9 @@
 namespace Wbry\Content\Classes;
 
 use Lang;
+use Exception;
 use Wbry\Content\Models\Item as ItemModel;
+
 /**
  * ContentItem class
  *
@@ -16,7 +18,10 @@ class ContentItem
 
     protected function init()
     {
-        $this->parseContentItemsConfig();
+        try {
+            $this->parseContentItemsConfig();
+        }
+        catch (Exception $e){}
     }
 
     public function getRepeater(string $page, string $name)

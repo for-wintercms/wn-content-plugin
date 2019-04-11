@@ -3,7 +3,7 @@
 namespace Wbry\Content;
 
 use System\Classes\PluginBase;
-use Wbry\Content\Classes\Repeater;
+use Wbry\Content\Classes\ContentItem;
 
 /**
  * Plugin - Content control
@@ -17,10 +17,10 @@ class Plugin extends PluginBase
     {
         return [
             'filters' => [
-                'repeater' => [Repeater::instance(), 'filterRepeater'],
+                'repeater' => [ContentItem::instance(), 'filterRepeater'],
             ],
             'functions' => [
-                'repeater' => [Repeater::instance(), 'getRepeater'],
+                'repeater' => [ContentItem::instance(), 'getRepeater'],
             ],
         ];
     }
