@@ -2,8 +2,6 @@
 
 namespace Wbry\Content\Controllers;
 
-use Yaml;
-
 use App;
 use Lang;
 use View;
