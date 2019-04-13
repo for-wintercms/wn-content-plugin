@@ -184,7 +184,7 @@ class Items extends Controller
 
     public function getReadyItemsList()
     {
-        if (! $this->contentItemList || ! $this->action)
+        if (! $this->action || ! isset($this->contentItemList[$this->action]))
             return [];
 
         return array_diff_key(

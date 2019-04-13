@@ -47,7 +47,7 @@ trait ContentItemsParse
     /**
      * @var array - [page_slug => [item_slug => item_name]]
      */
-    protected $contentItemList = null;
+    protected $contentItemList = [];
 
     /**
      * @var array - [item_slug => [
@@ -134,7 +134,7 @@ trait ContentItemsParse
         $this->isContentItemsParse = false;
         $this->menuList = null;
         $this->contentItemFiles = [];
-        $this->contentItemList = null;
+        $this->contentItemList = [];
         $this->activeContentItemForm = [];
 
         $this->parseContentItemsConfig();
