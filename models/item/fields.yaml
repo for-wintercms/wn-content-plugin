@@ -1,5 +1,1 @@
-fields:
-    items:
-        type: nestedform
-        usePanelStyles: false
-        form: {}
+fields: {}

@@ -14,10 +14,16 @@ use October\Rain\Database\Builder;
 class Item extends Model
 {
     use \October\Rain\Database\Traits\Validation;
-    
+
+    public $implement = [
+        'RainLab\Translate\Behaviors\TranslatableModel'
+    ];
+
     public $table = 'wbry_content_items';
 
     protected $jsonable = ['items'];
+
+    public $translatable = ['items'];
 
     public $fillable = ['page', 'name', 'items'];
 
