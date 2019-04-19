@@ -9,6 +9,7 @@ navigation:
         label: Content
         url: wbry/content/items
         icon: icon-list-alt
+        iconSvg: 'plugins/wbry/content/assets/images/icon-content.svg'
         permissions:
             - wbry.content.items
         sideMenu: {}
