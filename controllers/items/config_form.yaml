@@ -11,4 +11,6 @@ create:
   redirectClose: wbry/content/items/:page
 update:
   redirectClose: wbry/content/items/:page
+delete:
+  redirectClose: wbry/content/items/:page
 preview: {}

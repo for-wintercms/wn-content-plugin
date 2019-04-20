@@ -169,6 +169,44 @@ class Items extends Controller
     }
 
     /*
+     * Functional limitations
+     */
+
+    public function isItemCreate()
+    {
+        return $this->getEventResult('wbry.content.isItemCreate');
+    }
+
+    public function isItemCreateNewTmp()
+    {
+        return $this->getEventResult('wbry.content.isItemCreateNewTmp');
+    }
+
+    public function isItemCreateReadyTmp()
+    {
+        return $this->getEventResult('wbry.content.isItemCreateReadyTmp');
+    }
+
+    public function isItemDelete()
+    {
+        return $this->getEventResult('wbry.content.isItemDelete');
+    }
+
+    public function hasAccessItemsChanges()
+    {
+        static $itemsChanges;
+        return $itemsChanges ?: ($itemsChanges = $this->user->hasAccess('wbry.content.items_changes'));
+    }
+
+    private function getEventResult($event)
+    {
+        $default = $this->hasAccessItemsChanges();
+        $result  = Event::fire($event, [$this->action, $default], true);
+
+        return $result !== null ? $result : $default;
+    }
+
+    /*
      * Helpers
      */
 
@@ -193,6 +231,22 @@ class Items extends Controller
         );
     }
 
+    public function strActive(string $str = null)
+    {
+        static $saveStr;
+
+        if ($str)
+            return $saveStr = $str;
+        elseif (! $saveStr)
+            return '';
+        else
+        {
+            $str = $saveStr;
+            $saveStr = '';
+            return $str;
+        }
+    }
+
     /*
      * Ajax
      */
@@ -202,11 +256,17 @@ class Items extends Controller
      */
     public function onCreateItem()
     {
-        if (! $this->action)
+        $errors = function ($langSlug)
         {
-            Flash::error(Lang::get('wbry.content::content.errors.empty_action'));
+            Flash::error(Lang::get($langSlug));
             return $this->listRefresh();
-        }
+        };
+
+        if (! $this->action)
+            return $errors('wbry.content::content.errors.empty_action');
+
+        if (! $this->isItemCreate())
+            return $errors('wbry.content::content.errors.non_item_create');
 
         Validator::extend('no_exists_item', function($attr, $value) {
             return (! ItemModel::item($this->action, $value)->count());
@@ -214,6 +274,9 @@ class Items extends Controller
 
         if (post('formType') == 'ready')
         {
+            if (! $this->isItemCreateReadyTmp())
+                return $errors('wbry.content::content.errors.non_item_create_ready_tmp');
+
             $name = post('readyTmp');
 
             if (empty($this->contentItemList))
@@ -239,6 +302,9 @@ class Items extends Controller
         }
         else
         {
+            if (! $this->isItemCreateNewTmp())
+                return $errors('wbry.content::content.errors.non_item_create_new_tmp');
+
             $title = post('title');
             $name  = post('name');
 
@@ -270,6 +336,29 @@ class Items extends Controller
         Flash::success(Lang::get('wbry.content::content.success.create_item', ['itemName' => $title]));
 
         return $data;
+    }
+
+    public function onDelete_index()
+    {
+        if (! $this->isItemDelete())
+        {
+            Flash::error(Lang::get('wbry.content::content.errors.non_item_delete'));
+            return $this->listRefresh();
+        }
+        return $this->extendableCall('index_onDelete', []);
+    }
+
+    public function onDelete_update($id = null)
+    {
+        if (is_numeric($id) && $id > 0)
+        {
+            if (! $this->isItemDelete())
+                Flash::error(Lang::get('wbry.content::content.errors.non_item_delete'));
+            else
+                return $this->extendableCall('update_onDelete', [$id]);
+        }
+
+        return null;
     }
 
     /*
@@ -336,13 +425,18 @@ class Items extends Controller
             return call_user_func_array([$this, $this->ajaxHandler], func_get_args());
 
         $action = (is_numeric($id) && $id > 0) ? 'update' : 'index';
+
+        $thisMethodName = $this->ajaxHandler .'_'. $action;
+        if (method_exists($this, $thisMethodName))
+            return call_user_func_array([$this, $thisMethodName], func_get_args());
+
         $methodName = $action .'_'. $this->ajaxHandler;
         if ($this->methodExists($methodName))
         {
             $this->actionAjax = null;
             return call_user_func_array([$this, $methodName], func_get_args());
         }
-        return false;
+        return null;
     }
 
     protected function actionView($id = 0)

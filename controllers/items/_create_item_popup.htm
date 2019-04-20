@@ -1,4 +1,4 @@
-<?php if ($this->user->hasAccess('wbry.content.items_changes')): ?>
+<?php if ($this->isItemCreate()): ?>
 <div class="control-popup modal fade" id="popupCreateItem" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -14,45 +14,67 @@
                     <div id="popupCreateItemTabs" class="control-tabs content-tabs" data-control="tab">
                         <input type="hidden" name="formType" value="new">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="javascript:" data-form-type="new">
-                                <?= e(trans('wbry.content::content.list.popup_btn_new_item')) ?></a>
-                            </li>
-                            <li><a href="javascript:" data-form-type="ready">
-                                <?= e(trans('wbry.content::content.list.popup_btn_ready_item')) ?></a>
-                            </li>
+
+                            <?php $this->strActive('active') ?>
+
+                            <?php if ($this->isItemCreateNewTmp()): ?>
+                                <!-- btn new item -->
+                                <li class="<?= $this->strActive() ?>"><a href="javascript:" data-form-type="new">
+                                    <?= e(trans('wbry.content::content.list.popup_btn_new_item')) ?></a>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if ($this->isItemCreateReadyTmp()): ?>
+                                <!-- btn ready item -->
+                                <li class="<?= $this->strActive() ?>"><a href="javascript:" data-form-type="ready">
+                                    <?= e(trans('wbry.content::content.list.popup_btn_ready_item')) ?></a>
+                                </li>
+                            <?php endif; ?>
+
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane active">
-                                <div class="form-group span-full is-required">
-                                    <label><?= e(trans('wbry.content::content.items.title_label')) ?></label>
-                                    <input type="text" name="title" value="" class="form-control" id="presetNewItemName" />
-                                </div>
-                                <div class="form-group span-full is-required">
-                                    <label><?= e(trans('wbry.content::content.items.name_label')) ?></label>
-                                    <input type="text" name="name" value="" class="form-control" data-input-preset="#presetNewItemName" />
-                                    <p class="help-block"><?= e(trans('wbry.content::content.items.name_cmt')) ?></p>
-                                </div>
-                            </div>
-                            <div class="tab-pane">
-                                <?php $readyItems = $this->getReadyItemsList() ?>
-                                <?php if (count($readyItems)) : ?>
-                                <div class="form-group dropdown-field span-left is-required">
-                                    <label><?= e(trans('wbry.content::content.list.form_ready_tmp_label')) ?></label>
-                                    <select name="readyTmp" class="form-control custom-select">
-                                        <?php foreach ($readyItems as $itemK => $itemV) : ?>
-                                        <option value="<?= $itemK ?>"><?= $itemV .'&nbsp;&nbsp;-&nbsp;&nbsp;['. $itemK .']' ?></option>
-                                        <?php endforeach ?>
-                                    </select>
-                                </div>
-                                <?php else : ?>
-                                <div class="callout fade in callout-info no-subheader">
-                                    <div class="header">
-                                        <i class="icon-info"></i>
-                                        <h3><?= e(trans('wbry.content::content.list.form_ready_tmp_empty')) ?></h3>
+
+                            <?php $this->strActive('active') ?>
+
+                            <?php if ($this->isItemCreateNewTmp()): ?>
+                                <!-- fields ready item -->
+                                <div class="tab-pane <?= $this->strActive() ?>">
+                                    <div class="form-group span-full is-required">
+                                        <label><?= e(trans('wbry.content::content.items.title_label')) ?></label>
+                                        <input type="text" name="title" value="" class="form-control" id="presetNewItemName" />
+                                    </div>
+                                    <div class="form-group span-full is-required">
+                                        <label><?= e(trans('wbry.content::content.items.name_label')) ?></label>
+                                        <input type="text" name="name" value="" class="form-control" data-input-preset="#presetNewItemName" />
+                                        <p class="help-block"><?= e(trans('wbry.content::content.items.name_cmt')) ?></p>
                                     </div>
                                 </div>
-                                <?php endif ?>
-                            </div>
+                            <?php endif; ?>
+
+                            <?php if ($this->isItemCreateReadyTmp()): ?>
+                                <!-- fields ready item -->
+                                <div class="tab-pane <?= $this->strActive() ?>">
+                                    <?php $readyItems = $this->getReadyItemsList() ?>
+                                    <?php if (count($readyItems)) : ?>
+                                    <div class="form-group dropdown-field span-left is-required">
+                                        <label><?= e(trans('wbry.content::content.list.form_ready_tmp_label')) ?></label>
+                                        <select name="readyTmp" class="form-control custom-select">
+                                            <?php foreach ($readyItems as $itemK => $itemV) : ?>
+                                            <option value="<?= $itemK ?>"><?= $itemV .'&nbsp;&nbsp;-&nbsp;&nbsp;['. $itemK .']' ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                    </div>
+                                    <?php else : ?>
+                                    <div class="callout fade in callout-info no-subheader">
+                                        <div class="header">
+                                            <i class="icon-info"></i>
+                                            <h3><?= e(trans('wbry.content::content.list.form_ready_tmp_empty')) ?></h3>
+                                        </div>
+                                    </div>
+                                    <?php endif ?>
+                                </div>
+                            <?php endif; ?>
+
                         </div>
                     </div>
                 </div>
@@ -60,6 +82,7 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">
                         <?= e(trans('backend::lang.form.cancel')) ?>
                     </button>
+
                     <button type="submit"
                             class="btn btn-primary"
                             data-attach-loading>

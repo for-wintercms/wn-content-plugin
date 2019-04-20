@@ -30,6 +30,10 @@
         'no_exists_item' => 'Content block ":itemSlug" already exists',
         'available_item' => 'The content of the page ":pageSlug" setting ":itemSlug" is already available',
         'add_item_empty_args' => 'Unable to add empty data',
+        'non_item_create' => 'It is forbidden to add blocks',
+        'non_item_create_new_tmp' => 'It is forbidden to add new blocks',
+        'non_item_create_ready_tmp' => 'It is forbidden to add template blocks',
+        'non_item_delete' => 'It is forbidden to delete templates',
     ],
     'success' => [
         'create_item' => 'Content block ":itemName" successfully added',

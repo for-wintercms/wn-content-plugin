@@ -30,6 +30,10 @@
         'no_exists_item' => 'Контент блок ":itemSlug" уже существует',
         'available_item' => 'В контент странице ":pageSlug" настройка ":itemSlug" уже имеется',
         'add_item_empty_args' => 'Невозможно добавить пустые данные',
+        'non_item_create' => 'Запрещено добавлять блоки',
+        'non_item_create_new_tmp' => 'Запрещено добавлять новые блоки',
+        'non_item_create_ready_tmp' => 'Запрещено добавлять шаблонные блоки',
+        'non_item_delete' => 'Запрещено удалять шаблоны',
     ],
     'success' => [
         'create_item' => 'Контент блок ":itemName" успешно добавлен',
