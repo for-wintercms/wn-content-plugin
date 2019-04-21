@@ -5,6 +5,7 @@ namespace Wbry\Content\Controllers;
 use App;
 use Lang;
 use View;
+use Block;
 use Event;
 use Flash;
 use Session;
@@ -14,6 +15,7 @@ use Exception;
 use BackendMenu;
 use Backend\Classes\Controller;
 use Wbry\Content\Models\Item as ItemModel;
+use Wbry\Content\Classes\IconList;
 use October\Rain\Exception\ValidationException;
 use October\Rain\Exception\ApplicationException;
 
@@ -135,9 +137,55 @@ class Items extends Controller
         BackendMenu::setContext('Wbry.Content', 'items');
         BackendMenu::setContextSideMenu($this->action);
 
-        Event::listen('backend.menu.extendItems', function($menu) {
+        Event::listen('backend.menu.extendItems', function($menu)
+        {
+            # submenu attributes
+            # ======================
+            $submenu = [];
             if ($this->menuList)
-                $menu->addSideMenuItems('Wbry.Content', 'items', $this->menuList);
+            {
+                $submenu      = $this->menuList;
+                $isEditPage   = $this->isPageEdit();
+                $isEditDelete = $this->isPageDelete();
+
+                foreach ($submenu as &$menuItem)
+                {
+                    $menuAttr = [
+                        'data-submenu-title'  => $menuItem['label'],
+                        'data-submenu-slug'   => $menuItem['slug'],
+                        'data-submenu-icon'   => $menuItem['icon'] ?? '',
+                        'data-submenu-order'  => $menuItem['order'] ?? '',
+                        'data-submenu-edit'   => $isEditPage,
+                        'data-submenu-delete' => $isEditDelete,
+                    ];
+
+                    if (! isset($menuItem['attributes']))
+                        $menuItem['attributes'] = $menuAttr;
+                    elseif (is_array($menuItem['attributes']))
+                        $menuItem['attributes'] = array_merge($menuItem['attributes'], $menuAttr);
+                    else
+                        $menuItem['attributes'] = $menuAttr[] = $menuItem['attributes'];
+                }
+            }
+
+            # add new page btn
+            # ======================
+            if ($this->isPageCreate())
+            {
+                $submenu['create_new_page'] = [
+                    'label' => Lang::get('wbry.content::content.submenu.create_page_btn'),
+                    'url' => 'javascript:;',
+                    'icon' => 'icon-plus-circle',
+                    'order' => -1000,
+                    'attributes' => [
+                        'data-btn-type' => 'create_new_page',
+                    ],
+                ];
+            }
+
+            # add submenu list
+            # ======================
+            $menu->addSideMenuItems('Wbry.Content', 'items', $submenu);
         });
 
         $this->menuName = isset($this->menuList[$this->action]) ? $this->menuList[$this->action]['label'] : '';
@@ -192,6 +240,21 @@ class Items extends Controller
         return $this->getEventResult('wbry.content.isItemDelete');
     }
 
+    public function isPageCreate()
+    {
+        return $this->getEventResult('wbry.content.isPageCreate');
+    }
+
+    public function isPageEdit()
+    {
+        return $this->getEventResult('wbry.content.isPageEdit');
+    }
+
+    public function isPageDelete()
+    {
+        return $this->getEventResult('wbry.content.isPageDelete');
+    }
+
     public function hasAccessItemsChanges()
     {
         static $itemsChanges;
@@ -231,6 +294,11 @@ class Items extends Controller
         );
     }
 
+    public function getIconList()
+    {
+        return IconList::getList();
+    }
+
     public function strActive(string $str = null)
     {
         static $saveStr;
@@ -250,6 +318,33 @@ class Items extends Controller
     /*
      * Ajax
      */
+
+    /**
+     * @throws
+     */
+    public function onCreatePage()
+    {
+        if (! $this->isPageCreate())
+            Flash::error(Lang::get('wbry.content::content.errors.non_page_create'));
+    }
+
+    /**
+     * @throws
+     */
+    public function onEditPage()
+    {
+        if (! $this->isPageEdit())
+            Flash::error(Lang::get('wbry.content::content.errors.non_page_edit'));
+    }
+
+    /**
+     * @throws
+     */
+    public function onDeletePage()
+    {
+        if (! $this->isPageDelete())
+            Flash::error(Lang::get('wbry.content::content.errors.non_page_delete'));
+    }
 
     /**
      * @throws
@@ -280,7 +375,7 @@ class Items extends Controller
             $name = post('readyTmp');
 
             if (empty($this->contentItemList))
-                throw new ApplicationException(Lang::get('wbry.content::content.list.form_ready_tmp_empty'));
+                throw new ApplicationException(Lang::get('wbry.content::content.popup.block.field_ready_tmp_empty'));
 
             Validator::extend('ready_item', function($attr, $value) {
                 return ($value && isset($this->contentItemList[$this->action][$value]));
@@ -292,7 +387,7 @@ class Items extends Controller
                 'ready_item' => Lang::get('wbry.content::content.errors.no_item_tmp', ['itemSlug' => $name]),
             ]);
             $validator->setAttributeNames([
-                'readyTmp' => Lang::get('wbry.content::content.list.form_ready_tmp_label'),
+                'readyTmp' => Lang::get('wbry.content::content.popup.block.field_ready_tmp_label'),
             ]);
 
             if ($validator->fails())
@@ -495,6 +590,9 @@ class Items extends Controller
 
     protected function makeViewContentFile($fileHtm)
     {
+        Block::append('head', $this->makePartial('head'));
+        Block::append('body', $this->makePartial('additional_content'));
+
         return Response::make($this->makeView($fileHtm), $this->statusCode);
     }
 }

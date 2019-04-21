@@ -10,15 +10,33 @@
     ],
     'list' => [
         'title' => 'Список',
-        'popup_btn_new_item'   => 'Новый шаблон',
-        'popup_btn_ready_item' => 'Готовый шаблон',
-        'form_ready_tmp_label' => 'Шаблон',
-        'form_ready_tmp_empty' => 'Готовые шаблоны отсутствуют',
+        'create_btn' => 'Создать блок',
+        'delete_selected_btn'  => 'Удалить выбранные блоки',
     ],
     'form' => [
         'title'         => 'Обновить - :title',
         'items_empty'   => 'Форма пустая',
         'items_missing' => 'Форма отсутствует',
+    ],
+    'submenu' => [
+        'create_page_btn' => 'Создать',
+    ],
+    'popup' => [
+        'page' => [
+            'title_create' => 'Создать страницу',
+            'title_edit'   => 'Редактировать страницу',
+            'field_title'  => 'Название',
+            'field_slug'   => 'Слаг (часть URN)',
+            'field_icon'   => 'Иконка',
+            'field_order'  => 'Порядок',
+        ],
+        'block' => [
+            'title_create'   => 'Создать блок для страницы - :page',
+            'btn_new_item'   => 'Новый шаблон',
+            'btn_ready_item' => 'Готовый шаблон',
+            'field_ready_tmp_label' => 'Шаблон',
+            'field_ready_tmp_empty' => 'Готовые шаблоны отсутствуют',
+        ],
     ],
     'errors' => [
         'content_menu' => 'Правильно объявите пункт меню в файле :fileName',
@@ -34,8 +52,14 @@
         'non_item_create_new_tmp' => 'Запрещено добавлять новые блоки',
         'non_item_create_ready_tmp' => 'Запрещено добавлять шаблонные блоки',
         'non_item_delete' => 'Запрещено удалять шаблоны',
+        'non_page_create' => 'Запрещено создавать страницы',
+        'non_page_edit'   => 'Запрещено редактировать страницы',
+        'non_page_delete' => 'Запрещено удалять страницы',
     ],
     'success' => [
         'create_item' => 'Контент блок ":itemName" успешно добавлен',
+    ],
+    'msg' => [
+        'confirm_page_delete' => 'Страница будет удалена безвозвратно! Вы действительно хотите удалить страницу ":page"?',
     ],
 ];

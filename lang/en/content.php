@@ -10,15 +10,33 @@
     ],
     'list' => [
         'title' => 'List',
-        'popup_btn_new_item'   => 'New template',
-        'popup_btn_ready_item' => 'Ready template',
-        'form_ready_tmp_label' => 'Template',
-        'form_ready_tmp_empty' => 'No pre-made templates',
+        'create_btn' => 'Create block',
+        'delete_selected_btn'  => 'Delete selected blocks',
     ],
     'form' => [
         'title'         => 'Update - :title',
         'items_missing' => 'No form',
         'items_empty'   => 'Form is empty',
+    ],
+    'submenu' => [
+        'create_page_btn' => 'Create',
+    ],
+    'popup' => [
+        'page' => [
+            'title_create' => 'Create page',
+            'title_edit'   => 'Edit page',
+            'field_title'  => 'Title',
+            'field_slug'   => 'Slug (part URN)',
+            'field_icon'   => 'Icon',
+            'field_order'  => 'Order',
+        ],
+        'block' => [
+            'title_create'   => 'Create block for page - :page',
+            'btn_new_item'   => 'New template',
+            'btn_ready_item' => 'Ready template',
+            'field_ready_tmp_label' => 'Template',
+            'field_ready_tmp_empty' => 'No pre-made templates',
+        ],
     ],
     'errors' => [
         'content_menu' => 'Correctly declare the menu item in the file :fileName',
@@ -34,8 +52,14 @@
         'non_item_create_new_tmp' => 'It is forbidden to add new blocks',
         'non_item_create_ready_tmp' => 'It is forbidden to add template blocks',
         'non_item_delete' => 'It is forbidden to delete templates',
+        'non_page_create' => 'It is forbidden to create pages',
+        'non_page_edit'   => 'Forbidden to edit pages',
+        'non_page_delete' => 'It is forbidden to delete pages',
     ],
     'success' => [
         'create_item' => 'Content block ":itemName" successfully added',
+    ],
+    'msg' => [
+        'confirm_page_delete' => 'The page will be permanently deleted! Do you really want to delete the page ":page"?',
     ],
 ];

@@ -7,6 +7,9 @@
         'items'         => 'Content management',
         'items_changes' => 'Content block management (for developers only)',
     ],
+    'form' => [
+        'change' => 'Change',
+    ],
     'controllers' => [
         'items' => [
             'no_content'   => 'Add control area',

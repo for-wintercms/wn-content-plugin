@@ -1,0 +1,59 @@
+<?php if ($this->isPageCreate() || $this->isPageEdit()): ?>
+<div class="control-popup modal fade" id="popupChangePage" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form class="form-elements" role="form"
+                  data-request=""
+                  data-stripe-load-indicator>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title toggle-change toggle-create"><?= e(trans('wbry.content::content.popup.page.title_create')) ?></h4>
+                    <h4 class="modal-title toggle-change toggle-edit"><?= e(trans('wbry.content::content.popup.page.title_edit')) ?></h4>
+                </div>
+                <div class="modal-body form-elements">
+
+                    <input type="hidden" name="formType">
+
+                    <div class="form-group span-left is-required">
+                        <label><?= e(trans('wbry.content::content.popup.page.field_title')) ?></label>
+                        <input type="text" name="title" class="form-control" id="presetNewPageName" />
+                    </div>
+
+                    <div class="form-group span-right is-required">
+                        <label><?= e(trans('wbry.content::content.popup.page.field_slug')) ?></label>
+                        <input type="text" name="slug" class="form-control" data-input-preset="#presetNewPageName" />
+                    </div>
+
+                    <div class="form-group dropdown-field span-left">
+                        <label><?= e(trans('wbry.content::content.popup.page.field_icon')) ?></label>
+                        <select name="icon" class="form-control custom-select">
+                            <?php foreach ($this->getIconList() as $itemV) : ?>
+                            <option value="icon-<?= $itemV ?>"><?= $itemV ?></option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group span-right">
+                        <label><?= e(trans('wbry.content::content.popup.page.field_order')) ?></label>
+                        <input type="number" name="order" class="form-control" min="-999" max="1000" />
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <?= e(trans('backend::lang.form.cancel')) ?>
+                    </button>
+
+                    <button type="submit"
+                            name="create"
+                            class="btn btn-primary"
+                            data-attach-loading>
+                        <span class="toggle-change toggle-create"><?= e(trans('backend::lang.form.create')) ?></span>
+                        <span class="toggle-change toggle-edit"><?= e(trans('wbry.content::lang.form.change')) ?></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<?php endif ?>

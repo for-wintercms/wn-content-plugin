@@ -10,6 +10,7 @@ use Wbry\Content\Models\Item as ItemModel;
  * ContentItem class
  *
  * @package Wbry\Content\Classes
+ * @author Diamond Systems
  */
 class ContentItem
 {

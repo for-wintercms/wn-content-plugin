@@ -1,7 +1,7 @@
 <div data-control="toolbar">
     <?php if ($this->isItemCreate()): ?>
         <a data-toggle="modal" href="#popupCreateItem" class="btn btn-primary oc-icon-plus">
-            <?= e(trans('backend::lang.form.create')) ?>
+            <?= e(trans('wbry.content::content.list.create_btn')) ?>
         </a>
     <?php endif ?>
     <?php if ($this->isItemDelete()): ?>
@@ -18,7 +18,7 @@
                 data-trigger-condition="checked"
                 data-request-success="$(this).prop('disabled', true)"
                 data-stripe-load-indicator>
-            <?= e(trans('backend::lang.list.delete_selected')) ?>
+            <?= e(trans('wbry.content::content.list.delete_selected_btn')) ?>
         </button>
     <?php endif ?>
 </div>

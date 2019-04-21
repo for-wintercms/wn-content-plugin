@@ -8,7 +8,7 @@
                   data-stripe-load-indicator>
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title"><?= $this->getListPageTitle() ?></h4>
+                    <h4 class="modal-title"><?= e(trans('wbry.content::content.popup.block.title_create', ['page' => $this->menuName])) ?></h4>
                 </div>
                 <div class="modal-body">
                     <div id="popupCreateItemTabs" class="control-tabs content-tabs" data-control="tab">
@@ -20,14 +20,14 @@
                             <?php if ($this->isItemCreateNewTmp()): ?>
                                 <!-- btn new item -->
                                 <li class="<?= $this->strActive() ?>"><a href="javascript:" data-form-type="new">
-                                    <?= e(trans('wbry.content::content.list.popup_btn_new_item')) ?></a>
+                                    <?= e(trans('wbry.content::content.popup.block.btn_new_item')) ?></a>
                                 </li>
                             <?php endif; ?>
 
                             <?php if ($this->isItemCreateReadyTmp()): ?>
                                 <!-- btn ready item -->
                                 <li class="<?= $this->strActive() ?>"><a href="javascript:" data-form-type="ready">
-                                    <?= e(trans('wbry.content::content.list.popup_btn_ready_item')) ?></a>
+                                    <?= e(trans('wbry.content::content.popup.block.btn_ready_item')) ?></a>
                                 </li>
                             <?php endif; ?>
 
@@ -57,7 +57,7 @@
                                     <?php $readyItems = $this->getReadyItemsList() ?>
                                     <?php if (count($readyItems)) : ?>
                                     <div class="form-group dropdown-field span-left is-required">
-                                        <label><?= e(trans('wbry.content::content.list.form_ready_tmp_label')) ?></label>
+                                        <label><?= e(trans('wbry.content::content.popup.block.field_ready_tmp_label')) ?></label>
                                         <select name="readyTmp" class="form-control custom-select">
                                             <?php foreach ($readyItems as $itemK => $itemV) : ?>
                                             <option value="<?= $itemK ?>"><?= $itemV .'&nbsp;&nbsp;-&nbsp;&nbsp;['. $itemK .']' ?></option>
@@ -68,7 +68,7 @@
                                     <div class="callout fade in callout-info no-subheader">
                                         <div class="header">
                                             <i class="icon-info"></i>
-                                            <h3><?= e(trans('wbry.content::content.list.form_ready_tmp_empty')) ?></h3>
+                                            <h3><?= e(trans('wbry.content::content.popup.block.field_ready_tmp_empty')) ?></h3>
                                         </div>
                                     </div>
                                     <?php endif ?>

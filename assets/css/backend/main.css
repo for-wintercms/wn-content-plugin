@@ -14,6 +14,39 @@
 }
 
 /*
+ * Submenu
+ */
+#layout-sidenav ul li[data-btn-type="create_new_page"] {
+    background: #203748;
+}
+#layout-sidenav ul li[data-btn-type="create_new_page"] a {
+    padding: 1.05em .714em;
+}
+#layout-sidenav ul li .page-control {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 1.215em .714em 1.429em;
+    display: none;
+}
+#layout-sidenav ul li .page-control button {
+    display: block;
+    margin-bottom: 3px;
+    padding: 1px 4px;
+    opacity: 0.4;
+}
+
+/*
+ * Popup - change page
+ */
+#popupChangePage .modal-header h4 {
+    display: none;
+}
+#popupChangePage .modal-footer button[type="submit"] span {
+    display: none;
+}
+
+/*
  * Content items
  */
 
