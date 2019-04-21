@@ -117,7 +117,6 @@ var wd_items = wd_items || {
             iconVal = isEdit ? liObj.data('submenu-icon') : 'icon-plus',
             request = 'on'+ modalType.substring(0, 1).toUpperCase() + modalType.substring(1) +'Page',
             valData = {
-                formType: modalType,
                 title: isEdit ? liObj.data('submenu-title') : '',
                 slug:  isEdit ? liObj.data('submenu-slug')  : '',
                 order: isEdit ? liObj.data('submenu-order') : '',
