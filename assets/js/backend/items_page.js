@@ -119,7 +119,7 @@ var wd_items = wd_items || {
             valData = {
                 title: isEdit ? liObj.data('submenu-title') : '',
                 slug:  isEdit ? liObj.data('submenu-slug')  : '',
-                order: isEdit ? liObj.data('submenu-order') : '',
+                order: isEdit ? liObj.data('submenu-order') : '100',
             };
 
         for (var k in valData)
