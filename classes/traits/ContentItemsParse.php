@@ -2,12 +2,17 @@
 
 namespace Wbry\Content\Classes\Traits;
 
+use Db;
 use Lang;
 use File;
+use League\Flysystem\Exception;
 use Yaml;
 use Backend;
+use Validator;
 use Cms\Classes\Theme as CmsTheme;
+use Wbry\Content\Models\Item as ItemModel;
 use October\Rain\Exception\SystemException;
+use October\Rain\Exception\ValidationException;
 use October\Rain\Exception\ApplicationException;
 
 /**
@@ -93,7 +98,7 @@ trait ContentItemsParse
 
             # menu
             #========
-            if (empty($config['menu']) || empty($config['menu']['label']) || empty($config['menu']['slug']))
+            if (! is_array($config) || empty($config['menu']) || empty($config['menu']['label']) || empty($config['menu']['slug']))
                 throw new ApplicationException(Lang::get('wbry.content::content.errors.content_menu', ['fileName' => $fileName]));
 
             $menuSlug = camel_case($config['menu']['slug']);
@@ -105,7 +110,7 @@ trait ContentItemsParse
             #================
             $errItem = Lang::get('wbry.content::content.errors.content_list', ['fileName' => $fileName]);
 
-            if (empty($config['items']) || ! is_array($config['items']))
+            if (! isset($config['items']) || ! is_array($config['items']))
                 throw new ApplicationException($errItem);
 
             $this->contentItemFiles[$menuSlug] = $fileName;
@@ -141,7 +146,144 @@ trait ContentItemsParse
     }
 
     /**
-     * addContentItem
+     * Create or edit content item page
+     *
+     * @var array  $pageAttr
+     *          [
+     *              label => (required) menu title,
+     *              slug  => (required) menu slug and\or URN slug,
+     *              icon  => (optional) menu icon, default ''
+     *              order => (optional) menu order, default '100'
+     *          ]
+     * @param bool    $isEditPage - default false = create page
+     * @param string  $old_slug   - (required for edit page) old menu slug and\or URN slug,
+     * @throws
+     */
+    public function buildContentItemPage(array $pageAttr, bool $isEditPage = false, string $old_slug = null)
+    {
+        /*
+         * Validate
+         */
+
+        Validator::extend('check_old_slug', function($attr, $value) {
+            return (! empty($value) && isset($this->menuList[$value]));
+        });
+
+        Validator::extend('no_exists_page', function($attr, $value) use ($isEditPage, $old_slug)
+        {
+            if ($isEditPage && $old_slug === $value)
+                return true;
+            return (! isset($this->menuList[$value]));
+        });
+
+        $rules = [
+            'old_slug' => 'required|alpha_dash|min:2|check_old_slug',
+            'title' => 'required',
+            'slug'  => 'required|alpha_dash|min:2|no_exists_page',
+            'icon'  => 'alpha_dash|min:2',
+            'order' => 'numeric|min:-999|max:1000',
+        ];
+        $slug = $pageAttr['slug'] ?? '';
+
+        if ($isEditPage)
+            $pageAttr['old_slug'] = $old_slug;
+        else
+            unset($rules['old_slug']);
+
+        $validator = Validator::make($pageAttr, $rules, [
+            'check_old_slug' => Lang::get('wbry.content::content.errors.exists_old_page', ['slug' => $old_slug]),
+            'no_exists_page' => Lang::get('wbry.content::content.errors.no_exists_page', ['slug' => $slug]),
+        ]);
+        $validator->setAttributeNames([
+            'title' => Lang::get('wbry.content::content.popup.page.field_title'),
+            'slug'  => Lang::get('wbry.content::content.popup.page.field_slug'),
+            'icon'  => Lang::get('wbry.content::content.popup.page.field_icon'),
+            'order' => Lang::get('wbry.content::content.popup.page.field_order'),
+        ]);
+
+        if ($validator->fails())
+            throw new ValidationException($validator);
+
+        /*
+         * Produce
+         */
+
+        Db::transaction(function () use (&$pageAttr, $isEditPage, $old_slug)
+        {
+            $configPath = null;
+            $saveConfig = ['menu' => [], 'items' => []];
+
+            if ($isEditPage)
+            {
+                if (isset($this->contentItemFiles[$old_slug]))
+                {
+                    $configPath = $this->contentItemsPath .'/'. $this->contentItemFiles[$old_slug];
+                    if (file_exists($configPath))
+                    {
+                        if ($old_slug !== $pageAttr['slug'])
+                        {
+                            $oldConfigPath = $configPath;
+                            $configPath    = $this->newConfigFilePath($pageAttr['slug']);
+
+                            File::move($oldConfigPath, $configPath);
+                        }
+
+                        $parseConfigs = Yaml::parseFile($configPath);
+                        if (is_array($parseConfigs))
+                            $saveConfig = array_merge($saveConfig, $parseConfigs);
+                    }
+                    else
+                        $configPath = null;
+                }
+
+                ItemModel::where('page', $old_slug)->update(['page' => $pageAttr['slug']]);
+            }
+
+            if (! $configPath)
+                $configPath = $this->newConfigFilePath($pageAttr['slug']);
+
+            $saveConfig['menu'] = [
+                'label' => $pageAttr['title'],
+                'slug'  => $pageAttr['slug'],
+                'icon'  => $pageAttr['icon'] ?? '',
+                'order' => $pageAttr['order'] ?? '100',
+            ];
+
+            $this->saveContentItemConfigFile($saveConfig, $configPath);
+        });
+
+        try {
+            $this->reParseContentItemsConfig();
+        }
+        catch (\Exception $e){}
+    }
+
+    /**
+     * Delete content item page
+     *
+     * @param string  $pageSlug
+     * @throws
+     */
+    public function deleteContentItemPage(string $pageSlug)
+    {
+        if (empty($pageSlug))
+            return;
+
+        Db::transaction(function () use ($pageSlug)
+        {
+            ItemModel::where('page', $pageSlug)->delete();
+
+            if (isset($this->contentItemFiles[$pageSlug]))
+            {
+                $configPath = $this->contentItemsPath .'/'. $this->contentItemFiles[$pageSlug];
+                if (file_exists($configPath))
+                    File::delete($configPath);
+            }
+        });
+    }
+
+    /**
+     * Add content item
      *
      * @param string $pageSlug
      * @param string $itemSlug
@@ -169,7 +311,7 @@ trait ContentItemsParse
 
         $config = Yaml::parseFile($configPath);
 
-        if (! isset($config['items']))
+        if (! is_array($config) || ! isset($config['items']))
             throw new ApplicationException(Lang::get('wbry.content::content.errors.error_config', ['fileName' => $this->contentItemFiles[$pageSlug]]));
 
         $config['items'][$itemSlug] = [
@@ -178,7 +320,10 @@ trait ContentItemsParse
         ];
 
         $this->saveContentItemConfigFile($config, $configPath);
-        $this->reParseContentItemsConfig();
+        try {
+            $this->reParseContentItemsConfig();
+        }
+        catch (\Exception $e){}
     }
 
     /**
@@ -327,12 +472,12 @@ trait ContentItemsParse
     }
 
     /**
-     * @param $config
-     * @param $configPath
+     * @param array  $config
+     * @param string $configPath
      *
      * @throws
      */
-    private function saveContentItemConfigFile($config, $configPath)
+    private function saveContentItemConfigFile(array $config, string $configPath)
     {
         @File::chmod($this->contentItemsPath);
 
@@ -341,5 +486,14 @@ trait ContentItemsParse
             throw new SystemException(sprintf('Error saving file %s', $configPath));
 
         @File::chmod($configPath);
+    }
+
+    private function newConfigFilePath(string $pageSlug)
+    {
+        $configPath = $this->contentItemsPath .'/config-'. $pageSlug .'.yaml';
+        if (file_exists($configPath))
+            $configPath = $this->contentItemsPath .'/config-'. $pageSlug .'_'. str_random(8) .'.yaml';
+
+        return $configPath;
     }
 }

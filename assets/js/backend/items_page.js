@@ -116,14 +116,16 @@ var wd_items = wd_items || {
             isEdit  = modalType === 'edit',
             iconVal = isEdit ? liObj.data('submenu-icon') : 'icon-plus',
             request = 'on'+ modalType.substring(0, 1).toUpperCase() + modalType.substring(1) +'Page',
-            valData = {
-                title: isEdit ? liObj.data('submenu-title') : '',
-                slug:  isEdit ? liObj.data('submenu-slug')  : '',
-                order: isEdit ? liObj.data('submenu-order') : '100',
-            };
+            valData = {};
+
+        valData.title    = isEdit ? liObj.data('submenu-title') : '';
+        valData.slug     = isEdit ? liObj.data('submenu-slug')  : '';
+        valData.order    = isEdit ? liObj.data('submenu-order') : '100';
+        valData.old_slug = isEdit ? valData.slug : '';
 
         for (var k in valData)
             $modal.find('input[name="' + k + '"]').val(valData[k]);
+
         $modal.find('select[name="icon"] option[value="'+ iconVal +'"]:eq(0)').prop('selected', true).change();
         $modal.find('form[data-request]').data('request',request);
         $modal.find('.toggle-change').hide();

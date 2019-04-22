@@ -9,6 +9,7 @@ use Block;
 use Event;
 use Flash;
 use Session;
+use Backend;
 use Response;
 use Validator;
 use Exception;
@@ -326,6 +327,12 @@ class Items extends Controller
     {
         if (! $this->isPageCreate())
             Flash::error(Lang::get('wbry.content::content.errors.non_page_create'));
+
+        $this->buildContentItemPage(post());
+
+        Flash::success(Lang::get('wbry.content::content.success.create_page', ['page' => post('title')]));
+
+        return $this->redirectChangePage();
     }
 
     /**
@@ -335,6 +342,14 @@ class Items extends Controller
     {
         if (! $this->isPageEdit())
             Flash::error(Lang::get('wbry.content::content.errors.non_page_edit'));
+
+        $this->buildContentItemPage(post(), true, post('old_slug'));
+
+        Flash::success(Lang::get('wbry.content::content.success.edit_page', ['page' => post('title')]));
+
+        if ($this->action == post('old_slug'))
+            return $this->redirectChangePage();
+        return redirect();
     }
 
     /**
@@ -344,6 +359,25 @@ class Items extends Controller
     {
         if (! $this->isPageDelete())
             Flash::error(Lang::get('wbry.content::content.errors.non_page_delete'));
+
+        $pageSlug = post('slug');
+        $this->deleteContentItemPage($pageSlug);
+
+        Flash::success(Lang::get('wbry.content::content.success.delete_page'));
+
+        $redirect = ($this->action == $pageSlug) ? Backend::url('wbry/content/items') : null;
+
+        return redirect($redirect);
+    }
+
+    private function redirectChangePage()
+    {
+        $pageSlug = post('slug');
+        $redirect = null;
+        if ($pageSlug && ! empty($this->menuList[$pageSlug]))
+            $redirect = $this->menuList[$pageSlug]['url'] ?? null;
+
+        return redirect($redirect);
     }
 
     /**
