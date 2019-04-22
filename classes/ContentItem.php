@@ -20,7 +20,7 @@ class ContentItem
     protected function init()
     {
         try {
-            $this->parseContentItemsConfig();
+            $this->parseContentItems();
         }
         catch (Exception $e){}
     }

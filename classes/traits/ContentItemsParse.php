@@ -32,6 +32,9 @@ trait ContentItemsParse
      * @var string - config files path (domain_path/themes/your_theme/content_items_dir)
      */
     protected $contentItemsPath = null;
+    protected $contentItemsPagesPath = null;
+    protected $contentItemsSectionsPath = null;
+    protected $contentItemsContentPath = null;
 
     /**
      * @var array - [page_slug => filename]
@@ -70,28 +73,59 @@ trait ContentItemsParse
      */
 
     /**
-     * @param string $activePage - active menu slug
+     * @return bool
      * @throws
      */
-    protected function parseContentItemsConfig(string $activePage = null)
+    private function buildContentItemsPaths()
     {
-        if ($this->isContentItemsParse)
-            return;
-
+        # main path
+        # ======================
         if (! $this->contentItemsPath || ! File::isDirectory($this->contentItemsPath))
         {
             $directory = CmsTheme::getActiveTheme()->getPath().'/'.self::$contentItemsDir;
 
             if (! File::isDirectory($directory))
-                return;
+                return false;
 
             $this->contentItemsPath = $directory;
         }
+        $this->contentItemsPath = rtrim($this->contentItemsPath, '/');
 
-        foreach (File::files($this->contentItemsPath) as $file)
+        # pages, sections and contents paths
+        # ====================================
+        $directories = [
+            'contentItemsPagesPath'    => 'pages',
+            'contentItemsSectionsPath' => 'sections',
+            'contentItemsContentPath'  => 'contents',
+        ];
+        foreach ($directories as $dirK => $dirV)
+        {
+            $path = $this->{$dirK};
+            if (! $path || ! File::isDirectory($path))
+            {
+                $this->{$dirK} = $path = rtrim($this->contentItemsPath, '/') .'/'. $dirV;
+
+                if (! File::isDirectory($path))
+                    File::makeDirectory($path);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $activePage - active menu slug
+     * @throws
+     */
+    protected function parseContentItems(string $activePage = null)
+    {
+        if ($this->isContentItemsParse || ! $this->buildContentItemsPaths())
+            return;
+
+        foreach (File::files($this->contentItemsPagesPath) as $file)
         {
             $fileName = $file->getFilename();
-            if (! preg_match("#^config\-(.+?)\.yaml$#i", $fileName))
+            if (! preg_match("#^(.+?)\.yaml$#i", $fileName))
                 continue;
 
             $config = Yaml::parseFile($file->getRealPath());
@@ -134,7 +168,7 @@ trait ContentItemsParse
     /**
      * @throws
      */
-    public function reParseContentItemsConfig()
+    public function reparseContentItems()
     {
         $this->isContentItemsParse = false;
         $this->menuList = null;
@@ -142,7 +176,7 @@ trait ContentItemsParse
         $this->contentItemList = [];
         $this->activeContentItemForm = [];
 
-        $this->parseContentItemsConfig();
+        $this->parseContentItems();
     }
 
     /**
@@ -217,7 +251,7 @@ trait ContentItemsParse
             {
                 if (isset($this->contentItemFiles[$old_slug]))
                 {
-                    $configPath = $this->contentItemsPath .'/'. $this->contentItemFiles[$old_slug];
+                    $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$old_slug];
                     if (file_exists($configPath))
                     {
                         if ($old_slug !== $pageAttr['slug'])
@@ -253,7 +287,7 @@ trait ContentItemsParse
         });
 
         try {
-            $this->reParseContentItemsConfig();
+            $this->reparseContentItems();
         }
         catch (\Exception $e){}
     }
@@ -275,7 +309,7 @@ trait ContentItemsParse
 
             if (isset($this->contentItemFiles[$pageSlug]))
             {
-                $configPath = $this->contentItemsPath .'/'. $this->contentItemFiles[$pageSlug];
+                $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug];
                 if (file_exists($configPath))
                     File::delete($configPath);
             }
@@ -301,7 +335,7 @@ trait ContentItemsParse
         if (! isset($this->contentItemFiles[$pageSlug]))
             throw new ApplicationException($langErrPage);
 
-        $configPath = $this->contentItemsPath .'/'. $this->contentItemFiles[$pageSlug];
+        $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug];
 
         if (! file_exists($configPath))
             throw new ApplicationException($langErrPage);
@@ -321,7 +355,7 @@ trait ContentItemsParse
 
         $this->saveContentItemConfigFile($config, $configPath);
         try {
-            $this->reParseContentItemsConfig();
+            $this->reparseContentItems();
         }
         catch (\Exception $e){}
     }
@@ -403,7 +437,7 @@ trait ContentItemsParse
         $config['repeater'][$item] = $forms;
 
         $this->saveContentItemConfigFile($config, $configPath);
-        $this->reParseContentItemsConfig();
+        $this->reparseContentItems();
 
         return $content;
     }
@@ -479,7 +513,7 @@ trait ContentItemsParse
      */
     private function saveContentItemConfigFile(array $config, string $configPath)
     {
-        @File::chmod($this->contentItemsPath);
+        @File::chmod($this->contentItemsPagesPath);
 
         $configStr = Yaml::render($config);
         if (! File::put($configPath, $configStr))
@@ -490,9 +524,9 @@ trait ContentItemsParse
 
     private function newConfigFilePath(string $pageSlug)
     {
-        $configPath = $this->contentItemsPath .'/config-'. $pageSlug .'.yaml';
+        $configPath = $this->contentItemsPagesPath .'/'. $pageSlug .'.yaml';
         if (file_exists($configPath))
-            $configPath = $this->contentItemsPath .'/config-'. $pageSlug .'_'. str_random(8) .'.yaml';
+            $configPath = $this->contentItemsPagesPath .'/'. $pageSlug .'_'. str_random(8) .'.yaml';
 
         return $configPath;
     }

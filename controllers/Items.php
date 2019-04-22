@@ -64,7 +64,7 @@ class Items extends Controller
 
         $this->locales();
         $this->translatableDataManager();
-        $this->parseContentItems();
+        $this->parseContentItemsData();
         $this->addActionMenu();
         $this->addDynamicActionMethods();
         $this->addAssets();
@@ -122,10 +122,10 @@ class Items extends Controller
         });
     }
 
-    protected function parseContentItems()
+    protected function parseContentItemsData()
     {
         try {
-            $this->parseContentItemsConfig($this->action);
+            $this->parseContentItems($this->action);
         }
         catch (Exception $e) {
             $this->isContentItemError = true;
