@@ -14,6 +14,20 @@ var wd_items = wd_items || {
         });
     },
 
+    select2CreateTmp: function(selector)
+    {
+        var funSelect = function(state)
+        {
+            if (!state.id)
+                return state.text;
+            return $('<span>'+ state.text +'&nbsp;&nbsp;<small class="br-a"><i>'+ state.id +'</i></small></span>');
+        };
+        $(selector).select2({
+            templateResult: funSelect,
+            templateSelection: funSelect
+        });
+    },
+
     addSubmenuControlPanels: function()
     {
         var panelOpen  = '<span class="page-control">',
@@ -66,6 +80,7 @@ var wd_items = wd_items || {
         $('#createItemPopup').on('click', '#popupCreateItemTabs ul li a', function(){
             $('#popupCreateItemTabs input[name="formType"]').val($(this).data('form-type'));
         });
+        this.select2CreateTmp('#popupCreateItem select[name="readyTmp"]');
 
         // submenu control panel
         $('#layout-sidenav ul li').mouseover(function() {
@@ -78,18 +93,12 @@ var wd_items = wd_items || {
             var $this = $(this);
             switch (e.type)
             {
-                case 'mouseover':
-                    $this.css({'opacity': '1'});
-                    break;
-
-                case 'mouseout':
-                    $this.css({'opacity': '0.4'});
-                    break;
+                case 'mouseover': $this.css({'opacity': '1'});   break;
+                case 'mouseout':  $this.css({'opacity': '0.4'}); break;
 
                 case 'click':
                 {
                     var $parentLi = $this.closest('li');
-
                     switch ($this.data('btn-type'))
                     {
                         case 'edit':

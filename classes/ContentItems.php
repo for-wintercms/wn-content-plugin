@@ -5,6 +5,7 @@ namespace Wbry\Content\Classes;
 use Lang;
 use Exception;
 use Wbry\Content\Models\Item as ItemModel;
+use Wbry\Content\Classes\Interfaces\ContentItems as InterfaceContentItems;
 
 /**
  * ContentItems class
@@ -12,7 +13,7 @@ use Wbry\Content\Models\Item as ItemModel;
  * @package Wbry\Content\Classes
  * @author Diamond Systems
  */
-class ContentItems
+class ContentItems implements InterfaceContentItems
 {
     use \October\Rain\Support\Traits\Singleton;
     use Traits\ContentItemsParse;

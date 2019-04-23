@@ -54,14 +54,28 @@
                             <?php if ($this->isItemCreateReadyTmp()): ?>
                                 <!-- fields ready item -->
                                 <div class="tab-pane <?= $this->strActive() ?>">
-                                    <?php $readyItems = $this->getReadyItemsList() ?>
-                                    <?php if (count($readyItems)) : ?>
-                                    <div class="form-group dropdown-field span-left is-required">
+                                    <?php $itemsList = $this->getReadyItemsList() ?>
+                                    <?php if (count($itemsList)) : ?>
+                                    <div class="form-group dropdown-field span-full is-required">
                                         <label><?= e(trans('wbry.content::content.popup.block.field_ready_tmp_label')) ?></label>
                                         <select name="readyTmp" class="form-control custom-select">
-                                            <?php foreach ($readyItems as $itemK => $itemV) : ?>
-                                            <option value="<?= $itemK ?>"><?= $itemV .'&nbsp;&nbsp;-&nbsp;&nbsp;['. $itemK .']' ?></option>
-                                            <?php endforeach ?>
+
+                                            <?php if (! empty($itemsList['ready'])) : ?>
+                                                <optgroup label="<?= e(trans('wbry.content::content.popup.block.optgroup_ready_tmp_current')) ?>">
+                                                    <?php foreach ($itemsList['ready'] as $itemK => $itemV) : ?>
+                                                        <option value="ready_<?= $itemK ?>"><?= $itemV ?></option>
+                                                    <?php endforeach ?>
+                                                </optgroup>
+                                            <?php endif ?>
+
+                                            <?php if (! empty($itemsList['sections'])) : ?>
+                                                <optgroup label="<?= e(trans('wbry.content::content.popup.block.optgroup_ready_tmp_global')) ?>">
+                                                    <?php foreach ($itemsList['sections'] as $itemK => $itemV) : ?>
+                                                        <option value="section_<?= $itemK ?>"><?= $itemV ?></option>
+                                                    <?php endforeach ?>
+                                                </optgroup>
+                                            <?php endif ?>
+
                                         </select>
                                     </div>
                                     <?php else : ?>

@@ -17,6 +17,7 @@ use BackendMenu;
 use Backend\Classes\Controller;
 use Wbry\Content\Models\Item as ItemModel;
 use Wbry\Content\Classes\IconList;
+use Wbry\Content\Classes\Interfaces\ContentItems;
 use October\Rain\Exception\ValidationException;
 use October\Rain\Exception\ApplicationException;
 
@@ -26,7 +27,7 @@ use October\Rain\Exception\ApplicationException;
  * @package Wbry\Content\Controllers
  * @author Diamond Systems
  */
-class Items extends Controller
+class Items extends Controller implements ContentItems
 {
     use \Wbry\Content\Classes\Traits\ContentItemsParse;
 
@@ -40,6 +41,7 @@ class Items extends Controller
 
     public $requiredPermissions = ['wbry.content.items'];
 
+    public $page          = null;
     public $locales       = null;
     public $defaultLocale = null;
     public $transLocales  = null;
@@ -58,9 +60,6 @@ class Items extends Controller
     public function __construct()
     {
         parent::__construct();
-
-        if (! $this->action)
-            return;
 
         $this->locales();
         $this->translatableDataManager();
@@ -125,7 +124,7 @@ class Items extends Controller
     protected function parseContentItemsData()
     {
         try {
-            $this->parseContentItems($this->action);
+            $this->parseContentItems();
         }
         catch (Exception $e) {
             $this->isContentItemError = true;
@@ -135,8 +134,13 @@ class Items extends Controller
 
     protected function addActionMenu()
     {
+        $this->page = request()->segment(5);
+        if (! $this->page)
+            $this->page = $this->getContentItemDefaultPage();
+        $this->menuName = isset($this->menuList[$this->page]) ? $this->menuList[$this->page]['label'] : '';
+
         BackendMenu::setContext('Wbry.Content', 'items');
-        BackendMenu::setContextSideMenu($this->action);
+        BackendMenu::setContextSideMenu($this->page);
 
         Event::listen('backend.menu.extendItems', function($menu)
         {
@@ -188,8 +192,6 @@ class Items extends Controller
             # ======================
             $menu->addSideMenuItems('Wbry.Content', 'items', $submenu);
         });
-
-        $this->menuName = isset($this->menuList[$this->action]) ? $this->menuList[$this->action]['label'] : '';
     }
 
     protected function addDynamicActionMethods()
@@ -265,7 +267,7 @@ class Items extends Controller
     private function getEventResult($event)
     {
         $default = $this->hasAccessItemsChanges();
-        $result  = Event::fire($event, [$this->action, $default], true);
+        $result  = Event::fire($event, [$this->page, $default], true);
 
         return $result !== null ? $result : $default;
     }
@@ -276,7 +278,12 @@ class Items extends Controller
 
     public function getListTitle($itemSlug, $default = '-')
     {
-        return $this->contentItemList[$this->action][$itemSlug] ?? $default;
+        return $this->contentItemList[$this->page][$itemSlug] ?? $default;
+    }
+
+    public function getPageUrl()
+    {
+        return $this->menuList[$this->page]['url'] ?? Backend::url('wbry/content/items');
     }
 
     public function getListPageTitle()
@@ -286,13 +293,22 @@ class Items extends Controller
 
     public function getReadyItemsList()
     {
-        if (! $this->action || ! isset($this->contentItemList[$this->action]))
-            return [];
+        $tmpList = [];
 
-        return array_diff_key(
-            $this->contentItemList[$this->action],
-            ItemModel::page($this->action)->lists('id', 'name')
-        );
+        if (!empty($this->contentItemList[$this->page]))
+        {
+            $tmpList['ready'] = array_diff_key(
+                $this->contentItemList[$this->page],
+                ItemModel::page($this->page)->lists('id', 'name')
+            );
+            if (! count($tmpList['ready']))
+                unset($tmpList['ready']);
+        }
+
+        if (! empty($this->contentItemSectionsList))
+            $tmpList['sections'] = $this->contentItemSectionsList;
+
+        return $tmpList;
     }
 
     public function getIconList()
@@ -354,7 +370,7 @@ class Items extends Controller
 
         Flash::success(Lang::get('wbry.content::content.success.edit_page', ['page' => post('title')]));
 
-        if ($this->action == $oldPageSlug && $pageSlug && ! empty($this->menuList[$pageSlug]))
+        if ($this->page == $oldPageSlug && $pageSlug && ! empty($this->menuList[$pageSlug]))
             return redirect($this->menuList[$pageSlug]['url']);
         else
             return back();
@@ -373,7 +389,7 @@ class Items extends Controller
 
         Flash::success(Lang::get('wbry.content::content.success.delete_page'));
 
-        if ($this->action == $pageSlug)
+        if ($this->page == $pageSlug)
             return redirect(Backend::url('wbry/content/items'));
         else
             return back();
@@ -390,78 +406,70 @@ class Items extends Controller
             return $this->listRefresh();
         };
 
-        if (! $this->action)
-            return $errors('wbry.content::content.errors.empty_action');
-
         if (! $this->isItemCreate())
             return $errors('wbry.content::content.errors.non_item_create');
 
-        Validator::extend('no_exists_item', function($attr, $value) {
-            return (! ItemModel::item($this->action, $value)->count());
-        });
-
-        if (post('formType') == 'ready')
+        $title = null;
+        switch ($formType = post('formType'))
         {
-            if (! $this->isItemCreateReadyTmp())
-                return $errors('wbry.content::content.errors.non_item_create_ready_tmp');
+            case self::CONTENT_ITEM_ADD_NEW:
+            {
+                if (! $this->isItemCreateNewTmp())
+                    return $errors('wbry.content::content.errors.non_item_create_new_tmp');
 
-            $name = post('readyTmp');
+                $validator = Validator::make(post(), [
+                    'title' => 'required|between:2,255',
+                    'name'  => 'required|between:2,255|alpha_dash',
+                ]);
+                $validator->setAttributeNames([
+                    'title' => Lang::get('wbry.content::content.items.title_label'),
+                    'name'  => Lang::get('wbry.content::content.items.name_label'),
+                ]);
+                if ($validator->fails())
+                    throw new ValidationException($validator);
 
-            if (empty($this->contentItemList))
-                throw new ApplicationException(Lang::get('wbry.content::content.popup.block.field_ready_tmp_empty'));
+                $title = post('title', '');
+                $name  = post('name', '');
+                $attr  = ['item_title' => $title];
+                $this->addContentItem($this->page, $name, self::CONTENT_ITEM_ADD_NEW, $attr);
+                break;
+            }
 
-            Validator::extend('ready_item', function($attr, $value) {
-                return ($value && isset($this->contentItemList[$this->action][$value]));
-            });
-            $validator = Validator::make(post(), [
-                'readyTmp' => 'required|no_exists_item|ready_item',
-            ], [
-                'no_exists_item' => Lang::get('wbry.content::content.errors.no_exists_item', ['itemSlug' => $name]),
-                'ready_item' => Lang::get('wbry.content::content.errors.no_item_tmp', ['itemSlug' => $name]),
-            ]);
-            $validator->setAttributeNames([
-                'readyTmp' => Lang::get('wbry.content::content.popup.block.field_ready_tmp_label'),
-            ]);
+            case self::CONTENT_ITEM_ADD_READY:
+            case self::CONTENT_ITEM_ADD_SECTION:
+            {
+                if (! $this->isItemCreateReadyTmp())
+                    return $errors('wbry.content::content.errors.non_item_create_ready_tmp');
 
-            if ($validator->fails())
-                throw new ValidationException($validator);
+                if (empty($this->contentItemList) && empty($this->contentItemSectionsList))
+                    throw new ApplicationException(Lang::get('wbry.content::content.popup.block.field_ready_tmp_empty'));
 
-            $title = $this->contentItemList[$this->action][$name];
+                $name = post('readyTmp', '');
+                $attr = [];
+                if (! $name || ! is_string($name) || ! preg_match("/^(ready_|section_).+?/i", $name, $m))
+                    break;
+                if (! $name = preg_replace("/^(ready_|section_)/i", '', $name))
+                    break;
+                if ($m[1] == 'ready_')
+                    $formType = self::CONTENT_ITEM_ADD_READY;
+                else
+                {
+                    $formType = self::CONTENT_ITEM_ADD_SECTION;
+                    $attr['section_name'] = $name;
+                    $name .= '_'. str_random(8);
+                }
+
+                $this->addContentItem($this->page, $name, $formType, $attr);
+                $title = $this->contentItemList[$this->page][$name] ?? null;
+                break;
+            }
         }
-        else
-        {
-            if (! $this->isItemCreateNewTmp())
-                return $errors('wbry.content::content.errors.non_item_create_new_tmp');
-
-            $title = post('title');
-            $name  = post('name');
-
-            $validator = Validator::make(post(), [
-                'title' => 'required|between:3,255',
-                'name'  => 'required|between:3,255|alpha_dash|no_exists_item',
-            ], [
-                'no_exists_item' => Lang::get('wbry.content::content.errors.no_exists_item', ['itemSlug' => $name]),
-            ]);
-            $validator->setAttributeNames([
-                'title' => Lang::get('wbry.content::content.items.title_label'),
-                'name'  => Lang::get('wbry.content::content.items.name_label'),
-            ]);
-
-            if ($validator->fails())
-                throw new ValidationException($validator);
-
-            $this->addContentItem($this->action, $name, $title);
-        }
-
-        ItemModel::create([
-            'page' => $this->action,
-            'name' => $name,
-        ]);
 
         $data = $this->listRefresh();
         $data['#createItemPopup'] = $this->makePartial('create_item_popup');
 
-        Flash::success(Lang::get('wbry.content::content.success.create_item', ['itemName' => $title]));
+        if ($title)
+            Flash::success(Lang::get('wbry.content::content.success.create_item', ['itemName' => $title]));
 
         return $data;
     }
@@ -495,18 +503,19 @@ class Items extends Controller
 
     public function listExtendQuery($query)
     {
-        $query->where('page', $this->action);
+        $query->where('page', $this->page);
     }
 
     public function formExtendFields($form, $fields)
     {
-        $itemName = $form->data->name;
-        if (! empty($this->activeContentItemForm[$itemName]['form']))
+        $activeForm = $this->getActiveContentItemForm($this->page, $form->data->name);
+
+        if (! empty($activeForm))
         {
             $itemForm = [
                 'type' => 'nestedform',
                 'usePanelStyles' => false,
-                'form' => $this->activeContentItemForm[$itemName]['form'],
+                'form' => $activeForm,
             ];
 
             if ($this->transLocales)
@@ -523,7 +532,7 @@ class Items extends Controller
             $form->addFields(['no_item' => [
                 'type' => 'partial',
                 'span' => 'full',
-                'path' => isset($this->activeContentItemForm[$itemName]) ? 'content_item_form_empty' : 'content_item_form_missing',
+                'path' => is_array($activeForm) ? 'content_item_form_empty' : 'content_item_form_missing',
             ]]);
         }
     }
@@ -604,7 +613,7 @@ class Items extends Controller
             }
         }
 
-        $title = $this->contentItemList[$this->action][$model->name] ?? $model->name;
+        $title = $this->contentItemList[$this->page][$model->name] ?? $model->name;
         $this->pageTitle = Lang::get('wbry.content::content.form.title', ['title' => $title]);
         $this->listTitle = $this->getListPageTitle();
         $this->initForm($model);

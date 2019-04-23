@@ -5,7 +5,6 @@ namespace Wbry\Content\Classes\Traits;
 use Db;
 use Lang;
 use File;
-use League\Flysystem\Exception;
 use Yaml;
 use Backend;
 use Validator;
@@ -23,6 +22,8 @@ use October\Rain\Exception\ApplicationException;
  */
 trait ContentItemsParse
 {
+    use \Illuminate\Validation\Concerns\ValidatesAttributes;
+
     /**
      * @var string - dir name for content item configs (content_items_dir)
      */
@@ -58,13 +59,9 @@ trait ContentItemsParse
     protected $contentItemList = [];
 
     /**
-     * @var array - [item_slug => [
-     *                  label => item_name
-     *                  form => [active_item_form_data] (@see https://octobercms.com/docs/backend/forms#form-fields)
-     *              ]]
+     * @var array - [item_slug => item_name]
      */
-    protected $activeContentItemForm = [];
-
+    protected $contentItemSectionsList = [];
 
     private $isContentItemsParse = false;
 
@@ -114,35 +111,59 @@ trait ContentItemsParse
     }
 
     /**
-     * @param string $activePage - active menu slug
      * @throws
      */
-    protected function parseContentItems(string $activePage = null)
+    private function parseContentItemSections()
     {
-        if ($this->isContentItemsParse || ! $this->buildContentItemsPaths())
-            return;
-
-        foreach (File::files($this->contentItemsPagesPath) as $file)
+        foreach (File::files($this->contentItemsSectionsPath) as $file)
         {
-            $fileName = $file->getFilename();
-            if (! preg_match("#^(.+?)\.yaml$#i", $fileName))
+            $fileExt = $file->getExtension();
+            if ($fileExt !== 'yaml')
+                continue;
+
+            $fileBasename = $file->getBasename('.'.$fileExt);
+            if (! $this->validateAlphaDash('file', $fileBasename))
                 continue;
 
             $config = Yaml::parseFile($file->getRealPath());
 
+            if (! is_array($config) || empty($config['label']) || ! isset($config['form']))
+                throw new ApplicationException(Lang::get('wbry.content::content.errors.section_config', ['fileName' => $file->getFilename()]));
+
+            $this->contentItemSectionsList[$fileBasename] = $config['label'];
+        }
+    }
+
+    /**
+     * @throws
+     */
+    private function parseContentItemPages()
+    {
+        foreach (File::files($this->contentItemsPagesPath) as $file)
+        {
+            $fileExt = $file->getExtension();
+            if ($fileExt !== 'yaml')
+                continue;
+
+            $fileName = $file->getFilename();
+            $config   = Yaml::parseFile($file->getRealPath());
+
             # menu
             #========
             if (! is_array($config) || empty($config['menu']) || empty($config['menu']['label']) || empty($config['menu']['slug']))
-                throw new ApplicationException(Lang::get('wbry.content::content.errors.content_menu', ['fileName' => $fileName]));
+                throw new ApplicationException(Lang::get('wbry.content::content.errors.pages_menu', ['fileName' => $fileName]));
 
-            $menuSlug = camel_case($config['menu']['slug']);
+            $menuSlug = $config['menu']['slug'];
+            if (! $this->validateAlphaDash('slug', $menuSlug))
+                throw new ApplicationException(Lang::get('wbry.content::content.errors.file_item_slug', ['fileName' => $fileName, 'itemSlug' => $menuSlug]));
+
             $this->menuList[$menuSlug] = array_merge($config['menu'], [
                 'url' => Backend::url('wbry/content/items/'. $menuSlug),
             ]);
 
             # content items
             #================
-            $errItem = Lang::get('wbry.content::content.errors.content_list', ['fileName' => $fileName]);
+            $errItem = Lang::get('wbry.content::content.errors.pages_list', ['fileName' => $fileName]);
 
             if (! isset($config['items']) || ! is_array($config['items']))
                 throw new ApplicationException($errItem);
@@ -152,15 +173,31 @@ trait ContentItemsParse
 
             foreach ($config['items'] as $rAction => $item)
             {
-                if (empty($rAction) || empty($item['label']) || ! isset($item['form']))
+                if (empty($rAction) || empty($item['label']))
+                    throw new ApplicationException($errItem);
+                elseif (isset($item['section']))
+                {
+                    if (empty($item['section']) || ! isset($this->contentItemSectionsList[$item['section']]))
+                        throw new ApplicationException(Lang::get('wbry.content::content.errors.no_section_file', ['sectionFile' => $item['section'].'.yaml']));
+                }
+                elseif (! isset($item['form']))
                     throw new ApplicationException($errItem);
 
                 $this->contentItemList[$menuSlug][$rAction] = $item['label'];
             }
-
-            if ($menuSlug == $activePage)
-                $this->activeContentItemForm = $config['items'];
         }
+    }
+
+    /**
+     * @throws
+     */
+    protected function parseContentItems()
+    {
+        if ($this->isContentItemsParse || ! $this->buildContentItemsPaths())
+            return;
+
+        $this->parseContentItemSections();
+        $this->parseContentItemPages();
 
         $this->isContentItemsParse = true;
     }
@@ -168,21 +205,84 @@ trait ContentItemsParse
     /**
      * @throws
      */
-    public function reparseContentItems()
+    public function reParseContentItems()
     {
         $this->isContentItemsParse = false;
         $this->menuList = null;
         $this->contentItemFiles = [];
         $this->contentItemList = [];
-        $this->activeContentItemForm = [];
+        $this->contentItemSectionsList = [];
 
         $this->parseContentItems();
     }
 
     /**
+     * @return string
+     */
+    public function getContentItemDefaultPage()
+    {
+        $page = 'index';
+        if (! $this->menuList || isset($this->menuList[$page]))
+            return $page;
+
+        $min = null;
+        foreach ($this->menuList as $menu)
+        {
+            if (isset($menu['order']) && is_numeric($menu['order']) && (is_null($min) || $menu['order'] < $min))
+            {
+                $page = $menu['slug'];
+                $min  = $menu['order'];
+            }
+        }
+        return $page;
+    }
+
+    /**
+     * Get active content item form
+     *
+     * @param $pageSlug
+     * @param $itemSlug
+     * @return array|null
+     */
+    public function getActiveContentItemForm($pageSlug, $itemSlug)
+    {
+        if (empty($pageSlug) || empty($itemSlug) || ! isset($this->contentItemFiles[$pageSlug]))
+            return null;
+
+        $filePath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug];
+        if (! file_exists($filePath))
+            return null;
+
+        $config = Yaml::parseFile($filePath);
+        if (is_array($config))
+        {
+            if (isset($config['items'][$itemSlug]['form']))
+                return $config['items'][$itemSlug]['form'];
+            else
+            {
+                $section = $config['items'][$itemSlug]['section'] ?? '';
+                if (empty($section) || ! is_string($section))
+                    return null;
+
+                $sectionPath = $this->contentItemsSectionsPath .'/'. $section .'.yaml';
+                if (! file_exists($sectionPath))
+                    return null;
+
+                $sectionConfig = Yaml::parseFile($sectionPath);
+                if (! is_array($sectionConfig) || ! isset($sectionConfig['form']))
+                    return null;
+
+                return $sectionConfig['form'];
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Create or edit content item page
      *
-     * @var array  $pageAttr
+     * @param array  $pageAttr
      *          [
      *              label => (required) menu title,
      *              slug  => (required) menu slug and\or URN slug,
@@ -213,7 +313,7 @@ trait ContentItemsParse
         $rules = [
             'old_slug' => 'required|alpha_dash|min:2|check_old_slug',
             'title' => 'required',
-            'slug'  => 'required|alpha_dash|min:2|no_exists_page',
+            'slug'  => 'required|alpha_dash|between:2,255|no_exists_page',
             'icon'  => 'alpha_dash|min:2',
             'order' => 'numeric|min:-999|max:1000',
         ];
@@ -287,7 +387,7 @@ trait ContentItemsParse
         });
 
         try {
-            $this->reparseContentItems();
+            $this->reParseContentItems();
         }
         catch (\Exception $e){}
     }
@@ -321,43 +421,105 @@ trait ContentItemsParse
      *
      * @param string $pageSlug
      * @param string $itemSlug
-     * @param string $itemLabel
+     * @param string $addType   - 'new', 'ready' or 'section'. Default: 'new'
+     * @param array  $parameters
+     *          [
+     *              item_title   => (optional) item title,
+     *              section_name => (required for addType 'section') section file basename,
+     *          ]
      *
      * @throws
      */
-    public function addContentItem(string $pageSlug, string $itemSlug, string $itemLabel)
+    public function addContentItem(string $pageSlug, string $itemSlug, string $addType, array $parameters = [])
     {
-        if (! $pageSlug || ! $itemLabel || ! $itemSlug)
-            throw new ApplicationException(Lang::get('wbry.content::content.errors.add_item_empty_args'));
+        if (! in_array($addType, ['new', 'ready', 'section']))
+            throw new ApplicationException(Lang::get('wbry.content::content.errors.add_item_type'));
 
+        # check page slug
+        # ===================
         $langErrPage = Lang::get('wbry.content::content.errors.no_page', ['pageSlug' => $pageSlug]);
-
-        if (! isset($this->contentItemFiles[$pageSlug]))
+        if (! $pageSlug || ! isset($this->contentItemFiles[$pageSlug]))
             throw new ApplicationException($langErrPage);
 
         $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug];
-
         if (! file_exists($configPath))
             throw new ApplicationException($langErrPage);
 
+        # check item slug
+        # ===================
+        if (! $this->validateAlphaDash('itemSlug', $itemSlug))
+            throw new ApplicationException(Lang::get('wbry.content::content.errors.item_slug', ['itemSlug' => $itemSlug]));
+
         if (isset($this->contentItemList[$pageSlug][$itemSlug]))
-            throw new ApplicationException(Lang::get('wbry.content::content.errors.available_item', ['pageSlug' => $pageSlug, 'itemSlug' => $itemSlug]));
-
-        $config = Yaml::parseFile($configPath);
-
-        if (! is_array($config) || ! isset($config['items']))
-            throw new ApplicationException(Lang::get('wbry.content::content.errors.error_config', ['fileName' => $this->contentItemFiles[$pageSlug]]));
-
-        $config['items'][$itemSlug] = [
-            'label' => $itemLabel,
-            'form'  => [],
-        ];
-
-        $this->saveContentItemConfigFile($config, $configPath);
-        try {
-            $this->reparseContentItems();
+        {
+            if (ItemModel::item($pageSlug, $itemSlug)->count())
+                throw new ApplicationException(Lang::get('wbry.content::content.errors.no_exists_item', ['itemSlug' => $itemSlug]));
+            elseif ($addType != 'ready')
+                throw new ApplicationException(Lang::get('wbry.content::content.errors.available_item', ['pageSlug' => $pageSlug, 'itemSlug' => $itemSlug]));
         }
-        catch (\Exception $e){}
+
+        # item config
+        # ==============
+        if ($addType != 'ready')
+        {
+            $config = Yaml::parseFile($configPath);
+            if (! is_array($config) || ! isset($config['items']))
+                throw new ApplicationException(Lang::get('wbry.content::content.errors.page_config', ['fileName' => $this->contentItemFiles[$pageSlug]]));
+
+            $addItemConfig = [];
+            if (! empty($parameters['item_title']) && is_string($parameters['item_title']))
+                $addItemConfig['label'] = $parameters['item_title'];
+
+            switch ($addType)
+            {
+                case 'new':
+                    $addItemConfig['form'] = [];
+                    break;
+
+                case 'section':
+                    $sectionSlug = $parameters['section_name'] ?? '';
+                    $langErrSection = Lang::get('wbry.content::content.errors.no_item_tmp', ['itemSlug' => $sectionSlug]);
+                    if (empty($sectionSlug) || ! $this->validateAlphaDash('sectionSlug', $sectionSlug))
+                        throw new ApplicationException($langErrSection);
+                    elseif (! isset($this->contentItemSectionsList[$sectionSlug]))
+                        throw new ApplicationException($langErrSection);
+                    elseif (! file_exists($this->contentItemsSectionsPath .'/'. $sectionSlug .'.yaml'))
+                        throw new ApplicationException($langErrSection);
+
+                    if (! isset($addItemConfig['label']))
+                        $addItemConfig['label'] = $this->contentItemSectionsList[$sectionSlug];
+                    $addItemConfig['section'] = $sectionSlug;
+                    break;
+            }
+
+            # save
+            # =======
+            $config['items'][$itemSlug] = $addItemConfig;
+            Db::transaction(function () use (&$config, $configPath, $pageSlug, $itemSlug)
+            {
+                $result = ItemModel::firstOrCreate([
+                    'page' => $pageSlug,
+                    'name' => $itemSlug,
+                ]);
+                if (! isset($config['items'][$itemSlug]['label']))
+                    $config['items'][$itemSlug]['label'] = 'Block - '. ($result->id ?? 'item');
+                $this->saveContentItemConfigFile($config, $configPath);
+            });
+
+            try {
+                $this->reParseContentItems();
+            }
+            catch (\Exception $e){}
+        }
+        else
+        {
+            # save
+            # =======
+            ItemModel::create([
+                'page' => $pageSlug,
+                'name' => $itemSlug,
+            ]);
+        }
     }
 
     /**
@@ -437,7 +599,7 @@ trait ContentItemsParse
         $config['repeater'][$item] = $forms;
 
         $this->saveContentItemConfigFile($config, $configPath);
-        $this->reparseContentItems();
+        $this->reParseContentItems();
 
         return $content;
     }
