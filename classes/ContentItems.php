@@ -7,12 +7,12 @@ use Exception;
 use Wbry\Content\Models\Item as ItemModel;
 
 /**
- * ContentItem class
+ * ContentItems class
  *
  * @package Wbry\Content\Classes
  * @author Diamond Systems
  */
-class ContentItem
+class ContentItems
 {
     use \October\Rain\Support\Traits\Singleton;
     use Traits\ContentItemsParse;
