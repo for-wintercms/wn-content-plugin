@@ -2,6 +2,7 @@
 
 namespace Wbry\Content\Controllers;
 
+use Db;
 use App;
 use Lang;
 use View;
@@ -481,7 +482,25 @@ class Items extends Controller implements ContentItems
             Flash::error(Lang::get('wbry.content::content.errors.non_item_delete'));
             return $this->listRefresh();
         }
-        return $this->extendableCall('index_onDelete', []);
+
+        $return = null;
+        Db::transaction(function () use (&$return)
+        {
+            $delItems = [];
+            ItemModel::extend(function($model) use (&$delItems) {
+                $model->bindEvent('model.afterDelete', function () use ($model, &$delItems) {
+                    $delItems[] = $model->name;
+                });
+            });
+            $return = $this->extendableCall('index_onDelete', []);
+            try {
+                $this->deleteContentItems($this->page, $delItems);
+            } catch (ApplicationException $e) {
+                Flash::forget();
+                throw $e;
+            }
+        });
+        return $return;
     }
 
     public function onDelete_update($id = null)
@@ -491,7 +510,19 @@ class Items extends Controller implements ContentItems
             if (! $this->isItemDelete())
                 Flash::error(Lang::get('wbry.content::content.errors.non_item_delete'));
             else
-                return $this->extendableCall('update_onDelete', [$id]);
+            {
+                $return = null;
+                Db::transaction(function () use (&$return, $id)
+                {
+                    ItemModel::extend(function($model) {
+                        $model->bindEvent('model.afterDelete', function () use ($model) {
+                            $this->deleteContentItems($this->page, [$model->name]);
+                        });
+                    });
+                    $return = $this->extendableCall('update_onDelete', [$id]);
+                });
+                return $return;
+            }
         }
 
         return null;

@@ -523,6 +523,44 @@ trait ContentItemsParse
     }
 
     /**
+     * Delete content items
+     *
+     * @param string $pageSlug
+     * @param array  $itemSlugList
+     * @throws
+     */
+    public function deleteContentItems(string $pageSlug, array $itemSlugList)
+    {
+        if (! $pageSlug || ! isset($this->contentItemFiles[$pageSlug]) || ! count($itemSlugList))
+            return;
+
+        $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug];
+        if (! file_exists($configPath))
+            return;
+
+        $config = Yaml::parseFile($configPath);
+        if (! is_array($config) || ! isset($config['items']))
+            return;
+
+        $itemsCnt = count($config['items']);
+        foreach ($itemSlugList as $itemSlug)
+        {
+            if (! $itemSlug || ! isset($config['items'][$itemSlug]))
+                continue;
+            unset($config['items'][$itemSlug]);
+        }
+
+        if ($itemsCnt != count($config['items']))
+        {
+            $this->saveContentItemConfigFile($config, $configPath);
+            try {
+                $this->reParseContentItems();
+            }
+            catch (\Exception $e){}
+        }
+    }
+
+    /**
      * @param $content
      * @param string $page
      * @param string $item
