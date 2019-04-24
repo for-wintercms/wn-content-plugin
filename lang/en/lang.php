@@ -10,14 +10,4 @@
     'form' => [
         'change' => 'Change',
     ],
-    'controllers' => [
-        'items' => [
-            'no_content'   => 'Add control area',
-            'errors' => [
-                'repeater_example'  => 'The correct example is:',
-                'items_empty'       => 'Choose a repeater pattern',
-                'items_no_repeater' => 'Repeater :repeater not found',
-            ],
-        ],
-    ],
 ];

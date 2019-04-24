@@ -9,9 +9,11 @@
         'updated_at'  => 'Обновлено',
     ],
     'list' => [
-        'title' => 'Список',
+        'title'      => 'Список',
         'create_btn' => 'Создать блок',
-        'delete_selected_btn'  => 'Удалить выбранные блоки',
+        'no_content' => 'Добавьте область управления',
+        'delete_selected_btn' => 'Удалить выбранные блоки',
+        'page_config_example' => 'Правильный пример:',
     ],
     'form' => [
         'title'         => 'Обновить - :title',

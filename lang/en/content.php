@@ -9,9 +9,11 @@
         'updated_at'  => 'Updated',
     ],
     'list' => [
-        'title' => 'List',
+        'title'      => 'List',
         'create_btn' => 'Create block',
-        'delete_selected_btn'  => 'Delete selected blocks',
+        'no_content' => 'Add control area',
+        'delete_selected_btn' => 'Delete selected blocks',
+        'page_config_example' => 'The correct example is:',
     ],
     'form' => [
         'title'         => 'Update - :title',
