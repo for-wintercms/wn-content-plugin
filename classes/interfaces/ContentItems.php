@@ -5,7 +5,7 @@ namespace Wbry\Content\Classes\Interfaces;
 /**
  * ContentItems interface
  * @package Wbry\Content\Classes\Interfaces
- * @author Diamond Systems
+ * @author Wbry, Diamond <me@diamondsystems.org>
  */
 interface ContentItems
 {

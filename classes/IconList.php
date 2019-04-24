@@ -9,7 +9,7 @@ use File;
  * @see http://octobercms.com/docs/ui/icon
  *
  * @package Wbry\Content\Classes
- * @author Diamond Systems
+ * @author Wbry, Diamond <me@diamondsystems.org>
  */
 class IconList
 {

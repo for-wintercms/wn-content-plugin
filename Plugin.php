@@ -9,7 +9,7 @@ use Wbry\Content\Classes\ContentItems;
  * Plugin - Content control
  *
  * @package Wbry\Content
- * @author Diamond Systems
+ * @author Wbry, Diamond <me@diamondsystems.org>
  */
 class Plugin extends PluginBase
 {
@@ -22,6 +22,13 @@ class Plugin extends PluginBase
             'functions' => [
                 'contentItem' => [ContentItems::instance(), 'getRepeater'],
             ],
+        ];
+    }
+
+    public function registerComponents()
+    {
+        return [
+            'Wbry\Content\Components\GenerateContent' => 'demoTodo'
         ];
     }
 }

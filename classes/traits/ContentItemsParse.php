@@ -18,7 +18,7 @@ use October\Rain\Exception\ApplicationException;
  * ContentItemsParse trait
  *
  * @package Wbry\Content\Classes\Traits
- * @author Diamond Systems
+ * @author Wbry, Diamond <me@diamondsystems.org>
  */
 trait ContentItemsParse
 {

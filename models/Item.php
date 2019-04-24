@@ -9,7 +9,7 @@ use October\Rain\Database\Builder;
  * Item model
  *
  * @package Wbry\Content\Models
- * @author Diamond Systems
+ * @author Wbry, Diamond <me@diamondsystems.org>
  */
 class Item extends Model
 {

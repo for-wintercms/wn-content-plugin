@@ -26,7 +26,7 @@ use October\Rain\Exception\ApplicationException;
  * Items controller
  *
  * @package Wbry\Content\Controllers
- * @author Diamond Systems
+ * @author Wbry, Diamond <me@diamondsystems.org>
  */
 class Items extends Controller implements ContentItems
 {

@@ -11,7 +11,7 @@ use Wbry\Content\Classes\Interfaces\ContentItems as InterfaceContentItems;
  * ContentItems class
  *
  * @package Wbry\Content\Classes
- * @author Diamond Systems
+ * @author Wbry, Diamond <me@diamondsystems.org>
  */
 class ContentItems implements InterfaceContentItems
 {

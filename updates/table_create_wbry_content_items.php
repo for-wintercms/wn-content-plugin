@@ -9,7 +9,7 @@ use October\Rain\Database\Updates\Migration;
  * TableCreateWbryContentItems migration
  *
  * @package Wbry\Content\Updates
- * @author Diamond Systems
+ * @author Wbry, Diamond <me@diamondsystems.org>
  */
 class TableCreateWbryContentItems extends Migration
 {
