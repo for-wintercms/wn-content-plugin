@@ -54,7 +54,7 @@ trait ContentItemsParse
     protected $menuList = null;
 
     /**
-     * @var array - [page_slug => [item_slug => item_name]]
+     * @var array - [page_slug => [item_slug => [title => item_name, section => section_name]]]
      */
     protected $contentItemList = [];
 
@@ -183,7 +183,10 @@ trait ContentItemsParse
                 elseif (! isset($item['form']))
                     throw new ApplicationException($errItem);
 
-                $this->contentItemList[$menuSlug][$rAction] = $item['label'];
+                $this->contentItemList[$menuSlug][$rAction] = [
+                    'title'   => $item['label'],
+                    'section' => $item['section'] ?? '',
+                ];
             }
         }
     }

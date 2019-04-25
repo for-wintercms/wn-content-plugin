@@ -286,7 +286,10 @@ class Items extends Controller implements ContentItems
 
     public function getListTitle($itemSlug, $default = '-')
     {
-        return $this->contentItemList[$this->page][$itemSlug] ?? $default;
+        if (is_string($itemSlug) && isset($this->contentItemList[$this->page][$itemSlug]))
+            return $this->contentItemList[$this->page][$itemSlug]['title'];
+        else
+            return $default;
     }
 
     public function getPageUrl()
@@ -306,7 +309,7 @@ class Items extends Controller implements ContentItems
         if (!empty($this->contentItemList[$this->page]))
         {
             $tmpList['ready'] = array_diff_key(
-                $this->contentItemList[$this->page],
+                array_map(function($v){return $v['title'] ?? '';}, $this->contentItemList[$this->page]),
                 ItemModel::page($this->page)->lists('id', 'name')
             );
             if (! count($tmpList['ready']))
@@ -468,7 +471,7 @@ class Items extends Controller implements ContentItems
                 }
 
                 $this->addContentItem($this->page, $name, $formType, $attr);
-                $title = $this->contentItemList[$this->page][$name] ?? null;
+                $title = $this->getListTitle($name, null);
                 break;
             }
         }
@@ -675,7 +678,7 @@ class Items extends Controller implements ContentItems
             }
         }
 
-        $title = $this->contentItemList[$this->page][$model->name] ?? $model->name;
+        $title = $this->getListTitle($model->name, $model->name);
         $this->pageTitle = Lang::get('wbry.content::content.form.title', ['title' => $title]);
         $this->listTitle = $this->getListPageTitle();
         $this->initForm($model);
