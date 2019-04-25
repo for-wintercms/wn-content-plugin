@@ -317,7 +317,7 @@ class Items extends Controller implements ContentItems
         }
 
         if (! empty($this->contentItemSectionsList))
-            $tmpList['sections'] = $this->contentItemSectionsList;
+            $tmpList['sections'] = array_map(function($v){return $v['title'] ?? '';}, $this->contentItemSectionsList);
 
         return $tmpList;
     }

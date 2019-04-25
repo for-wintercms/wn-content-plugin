@@ -59,7 +59,7 @@ trait ContentItemsParse
     protected $contentItemList = [];
 
     /**
-     * @var array - [item_slug => item_name]
+     * @var array - [item_slug => [title => item_name, partial => partial_file]]
      */
     protected $contentItemSectionsList = [];
 
@@ -130,7 +130,10 @@ trait ContentItemsParse
             if (! is_array($config) || empty($config['label']) || ! isset($config['form']))
                 throw new ApplicationException(Lang::get('wbry.content::content.errors.section_config', ['fileName' => $file->getFilename()]));
 
-            $this->contentItemSectionsList[$fileBasename] = $config['label'];
+            $this->contentItemSectionsList[$fileBasename] = [
+                'title'   => $config['label'],
+                'partial' => $config['partial'] ?? '',
+            ];
         }
     }
 
@@ -490,7 +493,7 @@ trait ContentItemsParse
                         throw new ApplicationException($langErrSection);
 
                     if (! isset($addItemConfig['label']))
-                        $addItemConfig['label'] = $this->contentItemSectionsList[$sectionSlug];
+                        $addItemConfig['label'] = $this->contentItemSectionsList[$sectionSlug]['title'];
                     $addItemConfig['section'] = $sectionSlug;
                     break;
             }
