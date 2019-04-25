@@ -26,6 +26,37 @@ class ContentItems implements InterfaceContentItems
         catch (Exception $e){}
     }
 
+    public function checkPageSlug(string $pageSlug)
+    {
+        return ($pageSlug && isset($this->contentItemList[$pageSlug]));
+    }
+
+    public function getPartials(string $pageSlug)
+    {
+        if ((! $this->checkPageSlug($pageSlug)))
+            return [];
+        $result = [];
+        foreach ($this->contentItemList[$pageSlug] as $k => $v)
+        {
+            if (empty($v['section']) || ! is_string($v['section']))
+                continue;
+
+            $partial = $this->contentItemSectionsList[$v['section']]['partial'] ?? null;
+            if (! is_string($partial))
+                continue;
+
+            $partial = preg_replace("/\.htm$/i", '', $partial) .'.htm';
+            if (file_exists($this->contentItemsContentPath.'/'. $partial))
+                $result[$k] = $partial;
+        }
+        return $result;
+    }
+
+    public function getPartialPath(string $partial)
+    {
+        return $this->contentItemsContentPath.'/'. $partial;
+    }
+
     public function getRepeater(string $page, string $name)
     {
         if (! $page || ! $name || ! isset($this->contentItemList[$page]))
