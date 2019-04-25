@@ -10,4 +10,14 @@
     'form' => [
         'change' => 'Change',
     ],
+    'components' => [
+        'get_content' => [
+            'name' => 'Content collector',
+            'desc' => 'Assembles a template from the specified finished blocks.',
+            'page_slug_title' => 'Slug page URL',
+            'page_slug_desc'  => 'The address of the page that will dynamically change',
+            'is404_title' => 'Page 404',
+            'is404_desc'  => 'If the configuration page is not found, showing 404 page.',
+        ],
+    ],
 ];

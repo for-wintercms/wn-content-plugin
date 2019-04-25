@@ -28,7 +28,7 @@ class Plugin extends PluginBase
     public function registerComponents()
     {
         return [
-            'Wbry\Content\Components\GenerateContent' => 'demoTodo'
+            'Wbry\Content\Components\GetContent' => 'getContent'
         ];
     }
 }
