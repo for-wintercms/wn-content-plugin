@@ -22,6 +22,7 @@ class TableCreateWbryContentItems extends Migration
             $table->string('page', 255);
             $table->string('name', 255);
             $table->text('items')->nullable();
+            $table->integer('sort_order')->default(0);
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
 

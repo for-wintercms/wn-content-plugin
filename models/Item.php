@@ -14,6 +14,7 @@ use October\Rain\Database\Builder;
 class Item extends Model
 {
     use \October\Rain\Database\Traits\Validation;
+    use \October\Rain\Database\Traits\Sortable;
 
     public $implement = [
         'RainLab\Translate\Behaviors\TranslatableModel'

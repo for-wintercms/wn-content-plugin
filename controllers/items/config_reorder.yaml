@@ -1,0 +1,9 @@
+# ===================================
+#  Reorder Behavior Config
+# ===================================
+
+title: 'wbry.content::content.list.create_btn'
+nameFrom: name
+modelClass: Wbry\Content\Models\Item
+toolbar:
+  buttons: reorder_toolbar

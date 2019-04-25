@@ -4,6 +4,13 @@
             <?= e(trans('wbry.content::content.list.create_btn')) ?>
         </a>
     <?php endif ?>
+
+    <?php if ($this->isItemSort()): ?>
+        <a href="<?= $this->getPageUrl() ?>/reorder" class="btn btn-default oc-icon-list">
+            <?= e(trans('wbry.content::content.list.sort_btn')) ?>
+        </a>
+    <?php endif ?>
+
     <?php if ($this->isItemDelete()): ?>
         <button
                 class="btn btn-default oc-icon-trash-o"

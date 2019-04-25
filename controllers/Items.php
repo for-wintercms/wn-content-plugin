@@ -35,10 +35,12 @@ class Items extends Controller implements ContentItems
     public $implement = [
         'Backend\Behaviors\ListController',
         'Backend\Behaviors\FormController',
+        'Backend\Behaviors\ReorderController',
     ];
 
     public $listConfig = 'config_list.yaml';
     public $formConfig = 'config_form.yaml';
+    public $reorderConfig = 'config_reorder.yaml';
 
     public $requiredPermissions = ['wbry.content.items'];
 
@@ -242,6 +244,11 @@ class Items extends Controller implements ContentItems
     public function isItemDelete()
     {
         return $this->getEventResult('wbry.content.isItemDelete');
+    }
+
+    public function isItemSort()
+    {
+        return $this->getEventResult('wbry.content.isItemSort');
     }
 
     public function isPageCreate()
@@ -528,6 +535,11 @@ class Items extends Controller implements ContentItems
         return null;
     }
 
+    public function onReorder()
+    {
+        return $this->extendableCall('onReorder', []);
+    }
+
     /*
      * Filters
      */
@@ -568,6 +580,11 @@ class Items extends Controller implements ContentItems
         }
     }
 
+    public function reorderExtendQuery($query)
+    {
+        $query->where('page', $this->page);
+    }
+
     /*
      * Action control
      */
@@ -579,11 +596,11 @@ class Items extends Controller implements ContentItems
 
     public function __call($name, $arguments)
     {
-        if ($this->actionAjax === $name)
-            return $this->actionAjax(...$arguments);
-        elseif ($name === $this->action)
-            return $this->actionView(...$arguments);
-
+        switch ($name)
+        {
+            case $this->actionAjax: return $this->actionAjax(...$arguments); break;
+            case $this->action:     return $this->actionView(...$arguments); break;
+        }
         return parent::__call($name, $arguments);
     }
 
@@ -611,9 +628,11 @@ class Items extends Controller implements ContentItems
     {
         $this->actionId = $id;
 
-        if (! is_numeric($this->actionId))
+        if ($this->actionId === 'reorder')
+            return $this->actionReorderView();
+        elseif (! is_numeric($this->actionId))
             return $this->makeView404();
-        if ((! $this->actionId || $this->isContentItemError) && $this->fatalError)
+        elseif ((! $this->actionId || $this->isContentItemError) && $this->fatalError)
             return $this->makeViewContentFile('fatal-error');
         elseif (! $this->menuList)
             return $this->makeViewContentFile('no-content');
@@ -628,6 +647,18 @@ class Items extends Controller implements ContentItems
         $this->makeLists();
 
         return $this->makeViewContentFile('list');
+    }
+
+    protected function actionReorderView()
+    {
+        if (! $this->isItemSort())
+            return $this->makeView404();
+
+        $this->listTitle = $this->getListPageTitle();
+        $this->pageTitle = Lang::get('wbry.content::content.list.sort_btn');
+        $this->reorder();
+
+        return $this->makeViewContentFile('reorder');
     }
 
     protected function actionFormView()

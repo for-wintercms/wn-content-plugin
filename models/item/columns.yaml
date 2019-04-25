@@ -16,6 +16,12 @@ columns:
         type: text
         searchable: true
         sortable: true
+    sort_order:
+        label: 'wbry.content::content.items.sort_order'
+        type: number
+        sortable: true
+        width: '60px'
+        invisible: true
     created_at:
         label: 'wbry.content::content.items.create_at'
         type: datetime
