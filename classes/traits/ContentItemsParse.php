@@ -244,7 +244,7 @@ trait ContentItemsParse
      * @param $itemSlug
      * @return array|null
      */
-    public function getActiveContentItemForm($pageSlug, $itemSlug)
+    public function getActiveContentItemForm(string $pageSlug, string $itemSlug)
     {
         if (empty($pageSlug) || empty($itemSlug) || ! isset($this->contentItemFiles[$pageSlug]))
             return null;
