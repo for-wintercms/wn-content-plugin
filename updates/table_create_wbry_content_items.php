@@ -19,10 +19,11 @@ class TableCreateWbryContentItems extends Migration
         {
             $table->engine = 'InnoDB';
             $table->increments('id')->unsigned();
-            $table->string('page');
+            $table->string('page', 255);
             $table->string('name', 255);
-            $table->string('repeater', 255);
             $table->text('items')->nullable();
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
 
             $table->unique(['page', 'name']);
         });
