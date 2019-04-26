@@ -6,6 +6,7 @@ use Event;
 use Backend;
 use System\Classes\PluginBase;
 use Wbry\Content\Classes\ContentItems;
+use Wbry\Content\Models\Item as ItemModel;
 
 /**
  * Plugin - Content control
@@ -75,5 +76,19 @@ class Plugin extends PluginBase
         return [
             'Wbry\Content\Components\GetContent' => 'getContent'
         ];
+    }
+
+    public function boot()
+    {
+        # extend models
+        # ================
+        ItemModel::extend(function($model)
+        {
+            # add RainLab Translatable Model
+            # =================================
+            $transModel = 'RainLab\Translate\Behaviors\TranslatableModel';
+            if (class_exists($transModel))
+                $model->implement[] = $transModel;
+        });
     }
 }
