@@ -10,6 +10,9 @@
     'form' => [
         'change' => 'Изменить',
     ],
+    'menu' => [
+        'items' => 'Контент',
+    ],
     'components' => [
         'get_content' => [
             'name' => 'Контент зборщик',

@@ -10,6 +10,9 @@
     'form' => [
         'change' => 'Change',
     ],
+    'menu' => [
+        'items' => 'Content',
+    ],
     'components' => [
         'get_content' => [
             'name' => 'Content collector',

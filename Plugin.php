@@ -2,6 +2,8 @@
 
 namespace Wbry\Content;
 
+use Event;
+use Backend;
 use System\Classes\PluginBase;
 use Wbry\Content\Classes\ContentItems;
 
@@ -13,6 +15,49 @@ use Wbry\Content\Classes\ContentItems;
  */
 class Plugin extends PluginBase
 {
+    public function pluginDetails()
+    {
+        return [
+            'name'   => 'wbry.content::lang.plugin.name',
+            'description' => 'wbry.content::lang.plugin.description',
+            'author' => 'Weberry, Diamond',
+            'icon'   => 'oc-icon-list-alt',
+        ];
+    }
+
+    public function registerPermissions()
+    {
+        return [
+            'wbry.content.items' => [
+                'label' => 'wbry.content::lang.plugin.name',
+                'tab'   => 'wbry.content::lang.permissions.items',
+            ],
+            'wbry.content.items_changes' => [
+                'label' => 'wbry.content::lang.plugin.name',
+                'tab'   => 'wbry.content::lang.permissions.items_changes',
+            ],
+        ];
+    }
+
+    public function registerNavigation()
+    {
+        $menuItems = [
+            'label'   => 'wbry.content::lang.menu.items',
+            'icon'    => 'icon-list-alt',
+            'iconSvg' => 'plugins/wbry/content/assets/images/icon-content.svg',
+        ];
+        Event::fire('wbry.content.menu.items', [&$menuItems]);
+        if (! is_array($menuItems))
+            return [];
+
+        return [
+            'items' => array_merge($menuItems, [
+                'url'         => Backend::url('wbry/content/items'),
+                'permissions' => ['wbry.content.items'],
+            ])
+        ];
+    }
+
     public function registerMarkupTags()
     {
         return [
