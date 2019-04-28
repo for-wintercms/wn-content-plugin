@@ -6,6 +6,7 @@ use Db;
 use Lang;
 use File;
 use Yaml;
+use Event;
 use Backend;
 use Validator;
 use Cms\Classes\Theme as CmsTheme;
@@ -389,7 +390,9 @@ trait ContentItemsParse
                 'order' => $pageAttr['order'] ?? '100',
             ];
 
+            Event::fire('wbry.content.buildContentItemsPageSave.before', [&$saveConfig, $isEditPage]);
             $this->saveContentItemConfigFile($saveConfig, $configPath);
+            Event::fire('wbry.content.buildContentItemsPageSave.after', [&$saveConfig, $isEditPage]);
         });
 
         try {
