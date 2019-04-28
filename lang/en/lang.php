@@ -9,6 +9,7 @@
     ],
     'form' => [
         'change' => 'Change',
+        'rename' => 'Rename',
     ],
     'menu' => [
         'items' => 'Content',

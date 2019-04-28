@@ -43,6 +43,9 @@
             'optgroup_ready_tmp_current' => 'For the current page',
             'optgroup_ready_tmp_global'  => 'General templates',
         ],
+        'rename_block' => [
+            'title_rename' => 'Rename block',
+        ],
     ],
     'errors' => [
         'pages_menu'  => 'Correctly declare the page menu item in the file :fileName',
@@ -51,12 +54,14 @@
         'section_config'  => 'Incorrect syntax in section configuration file ":fileName"',
         'file_item_slug'  => 'Invalid syntax in section name ":fileName" -> ":itemSlug"',
         'no_page'         => 'Not found the settings page ":pageSlug"',
+        'no_item'         => 'Content block ":itemSlug" not found',
         'no_item_tmp'     => 'Template ":itemSlug" not found',
         'no_exists_item'  => 'Content block ":itemSlug" already exists',
         'available_item'  => 'The content of the page ":pageSlug" setting ":itemSlug" is already available',
         'non_item_create' => 'It is forbidden to add blocks',
         'non_item_create_new_tmp'   => 'It is forbidden to add new blocks',
         'non_item_create_ready_tmp' => 'It is forbidden to add template blocks',
+        'non_item_rename' => 'Forbidden to rename templates',
         'non_item_delete' => 'It is forbidden to delete templates',
         'non_page_create' => 'It is forbidden to create pages',
         'non_page_edit'   => 'Forbidden to edit pages',
@@ -69,6 +74,7 @@
     ],
     'success' => [
         'create_item' => 'Content block ":itemName" successfully added',
+        'rename_item' => 'Content block successfully renamed',
         'create_page' => 'Page ":page" successfully created',
         'edit_page'   => 'Page ":page" successfully changed',
         'delete_page' => 'Page successfully deleted',

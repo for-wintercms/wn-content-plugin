@@ -117,6 +117,22 @@ var wd_items = wd_items || {
                 }
             }
         });
+
+        // item rename block btn
+        $(document).on('click', '.contentItemRenameBtn button', function()
+        {
+            var $this = $(this),
+                $popup = $('#popupRenameItem'),
+                itemId = $this.data('item-id'),
+                itemTitle = $this.data('item-title'),
+                itemName = $this.data('item-name');
+
+            $popup.find('.contentItemId').text(' - #'+itemId);
+            $popup.find('input[name="title"]').val(itemTitle);
+            $popup.find('input[name="name"]').val(itemName);
+            $popup.find('input[name="old_name"]').val(itemName);
+            $popup.modal('show');
+        });
     },
 
     show_changePageModalData: function(modalType, liObj)

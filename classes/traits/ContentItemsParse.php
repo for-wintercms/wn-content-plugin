@@ -426,6 +426,45 @@ trait ContentItemsParse
     }
 
     /**
+     * Get content item page config path
+     *
+     * @param string $pageSlug
+     * @return string
+     * @throws
+     */
+    protected function getContentItemPageConfigPath(string $pageSlug)
+    {
+        $langErrPage = Lang::get('wbry.content::content.errors.no_page', ['pageSlug' => $pageSlug]);
+        if (! $pageSlug || ! isset($this->contentItemFiles[$pageSlug]))
+            throw new ApplicationException($langErrPage);
+
+        $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug];
+        if (! file_exists($configPath))
+            throw new ApplicationException($langErrPage);
+
+        return $configPath;
+    }
+
+    /**
+     * Get content item page config path
+     *
+     * @param string $pageSlug
+     * @param string $configPath
+     *
+     * @return array
+     * @throws
+     */
+    protected function getContentItemPageConfig(string $pageSlug, string $configPath)
+    {
+        $config = Yaml::parseFile($configPath);
+        $fileName = $this->contentItemFiles[$pageSlug] ?? basename($configPath);
+        if (! is_array($config) || ! isset($config['items']))
+            throw new ApplicationException(Lang::get('wbry.content::content.errors.page_config', ['fileName' => $fileName]));
+
+        return $config;
+    }
+
+    /**
      * Add content item
      *
      * @param string $pageSlug
@@ -446,13 +485,7 @@ trait ContentItemsParse
 
         # check page slug
         # ===================
-        $langErrPage = Lang::get('wbry.content::content.errors.no_page', ['pageSlug' => $pageSlug]);
-        if (! $pageSlug || ! isset($this->contentItemFiles[$pageSlug]))
-            throw new ApplicationException($langErrPage);
-
-        $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug];
-        if (! file_exists($configPath))
-            throw new ApplicationException($langErrPage);
+        $configPath = $this->getContentItemPageConfigPath($pageSlug);
 
         # check item slug
         # ===================
@@ -471,10 +504,7 @@ trait ContentItemsParse
         # ==============
         if ($addType != 'ready')
         {
-            $config = Yaml::parseFile($configPath);
-            if (! is_array($config) || ! isset($config['items']))
-                throw new ApplicationException(Lang::get('wbry.content::content.errors.page_config', ['fileName' => $this->contentItemFiles[$pageSlug]]));
-
+            $config = $this->getContentItemPageConfig($pageSlug, $configPath);
             $addItemConfig = [];
             if (! empty($parameters['item_title']) && is_string($parameters['item_title']))
                 $addItemConfig['label'] = $parameters['item_title'];
@@ -529,6 +559,86 @@ trait ContentItemsParse
                 'name' => $itemSlug,
             ]);
         }
+    }
+
+    /**
+     * Rename content item block
+     *
+     * @param string $pageSlug
+     * @param string $itemSlug
+     * @param array  $parameters
+     *          [
+     *              new_title => (required) new item title,
+     *              new_slug => (required) new item slug,
+     *          ]
+     *
+     * @return bool
+     * @throws
+     */
+    public function renameContentItem(string $pageSlug, string $itemSlug, array $parameters = [])
+    {
+        /*
+         * Validate
+         */
+        $newTitle = $parameters['new_title'] ?? '';
+        $newSlug  = $parameters['new_slug'] ?? '';
+        if ((empty($newTitle) && empty($newSlug)) || ! is_string($newTitle) || ! is_string($newSlug))
+            return false;
+
+        $configPath = $this->getContentItemPageConfigPath($pageSlug);
+
+        if (!$itemSlug || ! isset($this->contentItemList[$pageSlug][$itemSlug]))
+            throw new ApplicationException(Lang::get('wbry.content::content.errors.no_item', ['itemSlug' => $itemSlug]));
+
+        $rules   = [];
+        $isTitle = (! empty($newTitle) && $newTitle !== $this->contentItemList[$pageSlug][$itemSlug]['title']);
+        $isSlug  = (! empty($newSlug) && $newSlug !== $itemSlug);
+        if (! $isTitle && ! $isSlug)
+            return true;
+
+        if ($isTitle)
+            $rules['title'] = 'required|between:2,255';
+        if ($isSlug)
+            $rules['name'] = 'required|between:2,255|alpha_dash';
+
+        $validator = Validator::make([
+            'title' => $newTitle,
+            'name'  => $newSlug,
+        ], $rules);
+        $validator->setAttributeNames([
+            'title' => Lang::get('wbry.content::content.items.title_label'),
+            'name'  => Lang::get('wbry.content::content.items.name_label'),
+        ]);
+        if ($validator->fails())
+            throw new ValidationException($validator);
+
+        /*
+         * Save
+         */
+        $config = $this->getContentItemPageConfig($pageSlug, $configPath);
+        if ($isTitle)
+            $config['items'][$itemSlug]['label'] = $newTitle;
+        if ($isSlug)
+        {
+            $config['items'][$newSlug] = $config['items'][$itemSlug];
+            unset($config['items'][$itemSlug]);
+        }
+
+        Db::transaction(function () use (&$config, $configPath, $pageSlug, $itemSlug, $newSlug, $isSlug)
+        {
+            if ($isSlug)
+            {
+                ItemModel::where('page', $pageSlug)->where('name', $itemSlug)->update([
+                    'name' => $newSlug,
+                ]);
+            }
+            $this->saveContentItemConfigFile($config, $configPath);
+        });
+
+        try {
+            $this->reParseContentItems();
+        }
+        catch (\Exception $e){}
     }
 
     /**

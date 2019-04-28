@@ -43,6 +43,9 @@
             'optgroup_ready_tmp_current' => 'Для текущей странице',
             'optgroup_ready_tmp_global'  => 'Общие шаблоны',
         ],
+        'rename_block' => [
+            'title_rename' => 'Переименовать блок',
+        ],
     ],
     'errors' => [
         'pages_menu'  => 'Правильно объявите пункт меню страницы в файле ":fileName"',
@@ -51,12 +54,14 @@
         'section_config'  => 'Неверный синтаксис в конфигурационном файле секций ":fileName"',
         'file_item_slug'  => 'Неверный синтаксис в название секций ":fileName" -> ":itemSlug"',
         'no_page'         => 'Не найдена страница настроек ":pageSlug"',
+        'no_item'         => 'Контент блок ":itemSlug" не найден',
         'no_item_tmp'     => 'Шаблон ":itemSlug" не найден',
         'no_exists_item'  => 'Контент блок ":itemSlug" уже существует',
         'available_item'  => 'В контент странице ":pageSlug" настройка ":itemSlug" уже имеется',
         'non_item_create' => 'Запрещено добавлять блоки',
         'non_item_create_new_tmp'   => 'Запрещено добавлять новые блоки',
         'non_item_create_ready_tmp' => 'Запрещено добавлять шаблонные блоки',
+        'non_item_rename' => 'Запрещено переименовать шаблоны',
         'non_item_delete' => 'Запрещено удалять шаблоны',
         'non_page_create' => 'Запрещено создавать страницы',
         'non_page_edit'   => 'Запрещено редактировать страницы',
@@ -69,6 +74,7 @@
     ],
     'success' => [
         'create_item' => 'Контент блок ":itemName" успешно добавлен',
+        'rename_item' => 'Контент блок успешно переименован',
         'create_page' => 'Страница ":page" успешно создана',
         'edit_page'   => 'Страница ":page" успешно изменена',
         'delete_page' => 'Страница успешно удалена',

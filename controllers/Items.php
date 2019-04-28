@@ -241,6 +241,21 @@ class Items extends Controller implements ContentItems
         return $this->getEventResult('wbry.content.isItemCreateReadyTmp');
     }
 
+    public function isItemRename()
+    {
+        return $this->getEventResult('wbry.content.isItemRename');
+    }
+
+    public function isItemRenameTitle()
+    {
+        return $this->getEventResult('wbry.content.isItemRenameTitle');
+    }
+
+    public function isItemRenameSlug()
+    {
+        return $this->getEventResult('wbry.content.isItemRenameSlug');
+    }
+
     public function isItemDelete()
     {
         return $this->getEventResult('wbry.content.isItemDelete');
@@ -485,6 +500,33 @@ class Items extends Controller implements ContentItems
         return $data;
     }
 
+    public function onRenameItem()
+    {
+        $errors = function ($langSlug)
+        {
+            Flash::error(Lang::get($langSlug));
+            return $this->listRefresh();
+        };
+
+        $isItemRenameTitle = $this->isItemRenameTitle();
+        $isItemRenameSlug  = $this->isItemRenameSlug();
+        if (! $this->isItemRename() || (! $isItemRenameTitle && ! $isItemRenameSlug))
+            return $errors('wbry.content::content.errors.non_item_rename');
+
+        $oldName = post('old_name','');
+        if (! $oldName || ! is_string($oldName))
+            return $this->listRefresh();
+
+        $result = $this->renameContentItem($this->page, $oldName, [
+            'new_title' => $isItemRenameTitle ? post('title', '') : '',
+            'new_slug' => $isItemRenameSlug ? post('name', '') : '',
+        ]);
+        if ($result)
+            Flash::success(Lang::get('wbry.content::content.success.rename_item'));
+
+        return $this->listRefresh();
+    }
+
     public function onDelete_index()
     {
         if (! $this->isItemDelete())
@@ -586,6 +628,23 @@ class Items extends Controller implements ContentItems
     public function reorderExtendQuery($query)
     {
         $query->where('page', $this->page);
+    }
+
+    public function listExtendColumns($list)
+    {
+        if ($this->isItemRename())
+        {
+            $list->addColumns(['edit_btn' => [
+                'label'      => '',
+                'type'       => 'partial',
+                'searchable' => false,
+                'sortable'   => false,
+                'clickable'  => false,
+                'width'      => '60px',
+                'cssClass'   => 'column-button contentItemRenameBtn',
+                'path'       => '$/wbry/content/controllers/items/_column_edit.htm',
+            ]]);
+        }
     }
 
     /*
