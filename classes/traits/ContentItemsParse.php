@@ -599,12 +599,17 @@ trait ContentItemsParse
         if ($isTitle)
             $rules['title'] = 'required|between:2,255';
         if ($isSlug)
-            $rules['name'] = 'required|between:2,255|alpha_dash';
+            $rules['name'] = 'required|between:2,255|alpha_dash|no_exists_item';
 
+        Validator::extend('no_exists_item', function($attr, $value) use ($pageSlug) {
+            return ($value && ! $this->contentItemList[$pageSlug][$value] && ! ItemModel::item($pageSlug, $value)->count());
+        });
         $validator = Validator::make([
             'title' => $newTitle,
             'name'  => $newSlug,
-        ], $rules);
+        ], $rules, [
+            'no_exists_item' => Lang::get('wbry.content::content.errors.no_exists_item', ['itemSlug' => $newSlug]),
+        ]);
         $validator->setAttributeNames([
             'title' => Lang::get('wbry.content::content.items.title_label'),
             'name'  => Lang::get('wbry.content::content.items.name_label'),
