@@ -6,7 +6,7 @@ columns:
         width: 100px
         invisible: true
     title:
-        lbel: 'wbry.content::content.items.title_label'
+        label: 'wbry.content::content.items.title_label'
         type: partial
         searchable: false
         sortable: false
