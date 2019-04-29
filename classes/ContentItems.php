@@ -31,6 +31,11 @@ class ContentItems implements InterfaceContentItems
         return ($pageSlug && isset($this->contentItemList[$pageSlug]));
     }
 
+    public function getItemsList(string $pageSlug)
+    {
+        return ($this->checkPageSlug($pageSlug)) ? $this->contentItemList[$pageSlug] : [];
+    }
+
     public function getPartials(string $pageSlug)
     {
         if ((! $this->checkPageSlug($pageSlug)))
