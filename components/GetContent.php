@@ -18,6 +18,8 @@ class GetContent extends ComponentBase
 
     protected $pageSlug = null;
     protected $is404 = true;
+    protected $itemData = [];
+
     /**
      * @var \Wbry\Content\Classes\ContentItems
      */
@@ -67,6 +69,13 @@ class GetContent extends ComponentBase
             return $this->response404();
     }
 
+    public function getItemData($itemSlug = null)
+    {
+        if (! $itemSlug || ! is_string($itemSlug) || ! isset($this->itemData[$itemSlug]))
+            return [];
+        return $this->itemData[$itemSlug];
+    }
+
     public function getSections()
     {
         if (is_null($this->pageSlug))
@@ -76,13 +85,15 @@ class GetContent extends ComponentBase
         if (! is_array($partials) || ! count($partials))
             return [];
 
-        $items = ItemModel::where('page', $this->pageSlug)->whereIn('name', array_keys($partials))->get();
+        $items = ItemModel::where('page', $this->pageSlug)->get();
         if (! $items)
             return [];
 
         $result = [];
         foreach ($items as $item)
         {
+            $this->itemData[$item->name] = $item->items;
+
             if (! isset($partials[$item->name]))
                 continue;
 
