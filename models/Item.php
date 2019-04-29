@@ -4,6 +4,7 @@ namespace Wbry\Content\Models;
 
 use Model;
 use October\Rain\Database\Builder;
+use Wbry\Content\Classes\ContentItems;
 
 /**
  * Item model
@@ -50,5 +51,38 @@ class Item extends Model
     public function scopeItem(Builder $query, string $page, string $name)
     {
         $query->where('page', $page)->where('name', $name);
+    }
+
+    /*
+     * Dropdown
+     */
+
+    public function formListItems($keyValue = null, $fieldName = null)
+    {
+        $return = [
+            '' => '---'
+        ];
+
+        if ($this->page && $this->name)
+        {
+            $list = self::where('page', $this->page)->where('name', '!=', $this->name)->lists('name', 'name');
+            if (! $list)
+                return $return;
+
+            $return = array_merge($return, $list);
+            $items = ContentItems::instance();
+            $itemsList = $items->getItemsList($this->page);
+
+            if (count($itemsList))
+            {
+                foreach ($return as &$item)
+                {
+                    if (isset($itemsList[$item]))
+                        $item = $itemsList[$item]['title'];
+                }
+            }
+        }
+
+        return $return;
     }
 }
