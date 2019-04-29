@@ -10,7 +10,9 @@ noRecordsMessage: 'backend::lang.list.no_records'
 recordsPerPage: 20
 showSetup: true
 showCheckboxes: true
-defaultSort: sort_order
+defaultSort:
+  column: sort_order
+  direction: asc
 toolbar:
   buttons: list_toolbar
   search:
