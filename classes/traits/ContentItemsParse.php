@@ -602,7 +602,7 @@ trait ContentItemsParse
             $rules['name'] = 'required|between:2,255|alpha_dash|no_exists_item';
 
         Validator::extend('no_exists_item', function($attr, $value) use ($pageSlug) {
-            return ($value && ! $this->contentItemList[$pageSlug][$value] && ! ItemModel::item($pageSlug, $value)->count());
+            return ($value && ! isset($this->contentItemList[$pageSlug][$value]) && ! ItemModel::item($pageSlug, $value)->count());
         });
         $validator = Validator::make([
             'title' => $newTitle,
