@@ -1,49 +1,35 @@
 <p class="flash-message static error"><?= e(trans($this->fatalError)) ?></p>
 
-<?php if ($this->isRepeaterError) : ?>
+<?php if ($this->isContentItemError) : ?>
 <h3><?=e(trans('wbry.content::content.list.page_config_example'))?></h3>
 <pre class="pre-content">
-menu:
-  label: 'Home page'   #required
-  slug: index          #required
-  icon: icon-home
-  order: 2
+# config-files-path/pages/books.yaml
+# ========================================
 
-repeater:
-  index-list:
-    label: 'Index list'   #required
-    fields:               #required and not empty
-      jobs-list:
-        label: 'Jobs list'
-        prompt: 'wbry.content::content.prompt'
-        span: auto
-        type: repeater
+menu:
+    label: Books
+    slug: books
+    icon: icon-book
+    order: 100
+items:
+    body_block:
+        label: Books list
+        section: 'book'     # config-files-path/sections/books.yaml
+    location:
+        label: Location
         form:
-          fields:
-            test1:
-              label: 'Sub jobs list'
-              prompt: 'wbry.content::content.prompt'
-              span: auto
-              type: repeater
-              form: {}
-      super-jobs-list:
-        label: 'Super jobs list'
-        prompt: 'Individual name'
-        span: auto
-        type: repeater
-        form: {}
-      text1:
-        label: Text
-        span: auto
-        type: text
-  products:
-    label: 'Product list'
-    fields:
-      product-type:
-        label: 'Product types'
-        prompt: 'wbry.content::content.prompt'
-        span: auto
-        type: repeater
-        form: {}
+            fields:
+                desc:
+                    label: Description
+                    type: text
+                    span: left
+                list:
+                    label: Choose the country
+                    type: dropdown
+                    span: right
+                    options:
+                        ru: Russia
+                        en: America
+# etc other configs
 </pre>
 <?php endif ?>
