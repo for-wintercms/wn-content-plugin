@@ -60,16 +60,7 @@ class Plugin extends PluginBase
     }
 
     public function registerMarkupTags()
-    {
-        return [
-            'filters' => [
-                'contentItem' => [ContentItems::instance(), 'filterRepeater'],
-            ],
-            'functions' => [
-                'contentItem' => [ContentItems::instance(), 'getRepeater'],
-            ],
-        ];
-    }
+    {}
 
     public function registerComponents()
     {
