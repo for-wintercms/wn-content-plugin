@@ -1,5 +1,21 @@
-<?= $this->listRender() ?>
-
+<div class="control-tabs content-tabs" data-control="tab">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="javascript:;"><i class="icon-file-text-o"></i>&nbsp;&nbsp;<?= e(trans('wbry.content::content.tabs.content')) ?></a>
+        </li>
+        <li>
+            <a href="javascript:;"><i class="icon-cog"></i>&nbsp;&nbsp;<?= e(trans('wbry.content::content.tabs.settings')) ?></a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active">
+            <?= $this->listRender() ?>
+        </div>
+        <div class="tab-pane">
+            <?= $this->formRender() ?>
+        </div>
+    </div>
+</div>
 <div id="createItemPopup">
     <?= $this->makePartial('create_item_popup') ?>
 </div>

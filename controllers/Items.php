@@ -17,6 +17,7 @@ use Exception;
 use BackendMenu;
 use Backend\Classes\Controller;
 use Wbry\Content\Models\Item as ItemModel;
+use Wbry\Content\Models\Page as PageModel;
 use Wbry\Content\Classes\IconList;
 use Wbry\Content\Classes\Interfaces\ContentItems;
 use October\Rain\Exception\ValidationException;
@@ -596,7 +597,7 @@ class Items extends Controller implements ContentItems
 
     public function formExtendFields($form, $fields)
     {
-        $activeForm = $this->getActiveContentItemForm($this->page, $form->data->name);
+        $activeForm = isset($form->data->name) ? $this->getActiveContentItemForm($this->page, $form->data->name) : null;
 
         if (! empty($activeForm))
         {
@@ -705,8 +706,9 @@ class Items extends Controller implements ContentItems
     protected function actionListView()
     {
         $this->pageTitle = $this->getListPageTitle();
-        $this->bodyClass = 'slim-container';
+        $this->bodyClass = 'compact-container';
         $this->makeLists();
+        $this->initForm(PageModel::make());
 
         return $this->makeViewContentFile('list');
     }

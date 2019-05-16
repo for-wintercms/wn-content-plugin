@@ -22,6 +22,10 @@
         'items_empty'   => 'Форма пустая',
         'items_missing' => 'Форма отсутствует',
     ],
+    'tabs' => [
+        'content'  => 'Контент',
+        'settings' => 'Настройки',
+    ],
     'submenu' => [
         'create_page_btn' => 'Создать',
     ],

@@ -22,6 +22,10 @@
         'items_missing' => 'No form',
         'items_empty'   => 'Form is empty',
     ],
+    'tabs' => [
+        'content'  => 'Content',
+        'settings' => 'Settings',
+    ],
     'submenu' => [
         'create_page_btn' => 'Create',
     ],
