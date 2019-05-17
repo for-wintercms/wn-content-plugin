@@ -61,3 +61,17 @@
     border: 1px solid #8D97A1;
     border-radius: 4px;
 }
+
+/*
+ * Main tabs
+ */
+.main-tabs-content {
+    padding: 10px 4px 0;
+    background: white;
+}
+.main-tabs-content-form {
+    padding: 16px;
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+    background: #F9F9F9;
+}

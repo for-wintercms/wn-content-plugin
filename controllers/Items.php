@@ -618,32 +618,121 @@ class Items extends Controller implements ContentItems
 
     public function formExtendFields($form, $fields)
     {
-        $activeForm = isset($form->data->name) ? $this->getActiveContentItemForm($this->page, $form->data->name) : null;
-
-        if (! empty($activeForm))
+        if ($form->arrayName === 'Item')
         {
-            $itemForm = [
-                'type' => 'nestedform',
-                'usePanelStyles' => false,
-                'form' => $activeForm,
-            ];
-
-            if ($this->transLocales)
+            $activeForm = isset($form->data->name) ? $this->getActiveContentItemForm($this->page, $form->data->name) : null;
+            if (! empty($activeForm))
             {
-                $form->addTabFields(['items' => array_merge($itemForm, ['tab' => strtoupper($this->defaultLocale)])]);
-                foreach ($this->transLocales as $langCode)
-                    $form->addTabFields([$langCode => array_merge($itemForm, ['tab' => strtoupper($langCode)])]);
+                $itemForm = [
+                    'type' => 'nestedform',
+                    'usePanelStyles' => false,
+                    'form' => $activeForm,
+                ];
+                if ($this->transLocales)
+                {
+                    $form->addTabFields(['items' => array_merge($itemForm, ['tab' => strtoupper($this->defaultLocale)])]);
+                    foreach ($this->transLocales as $langCode)
+                        $form->addTabFields([$langCode => array_merge($itemForm, ['tab' => strtoupper($langCode)])]);
+                }
+                else
+                    $form->addFields(['items' => $itemForm]);
             }
             else
-                $form->addFields(['items' => $itemForm]);
+            {
+                $form->addFields(['no_item' => [
+                    'type' => 'partial',
+                    'span' => 'full',
+                    'path' => is_array($activeForm) ? 'content_item_form_empty' : 'content_item_form_missing',
+                ]]);
+            }
         }
-        else
+        elseif ($form->arrayName === 'Page')
         {
-            $form->addFields(['no_item' => [
-                'type' => 'partial',
-                'span' => 'full',
-                'path' => is_array($activeForm) ? 'content_item_form_empty' : 'content_item_form_missing',
-            ]]);
+            $form->addFields([
+                'show_on_sidebar' => [
+                    'label' => 'Показывать на сайдбаре',
+                    'span' => 'left',
+                    'type' => 'switch',
+                    'tab' => 'Настройки',
+                ],
+                'show_on_horizontal_bar' => [
+                    'label' => 'Показывать на горизонтальной панели',
+                    'span' => 'left',
+                    'type' => 'switch',
+                    'tab' => 'Настройки',
+                ],
+//                'card_image_h' => [
+//                    'label' => 'Изображение горизонтальное',
+//                    'mode' => 'image',
+//                    'useCaption' => 'true',
+//                    'thumbOptions' => [
+//                        'mode' => 'crop',
+//                        'extension' => 'auto',
+//                    ],
+//                    'span' => 'left',
+//                    'type' => 'fileupload',
+//                    'tab'  => 'Настройки',
+//                ],
+//                'card_image_v' => [
+//                    'label' => 'Изображение вертикальное',
+//                    'mode' => 'image',
+//                    'useCaption' => 'true',
+//                    'thumbOptions' => [
+//                        'mode' => 'crop',
+//                        'extension' => 'auto',
+//                    ],
+//                    'span' => 'auto',
+//                    'type' => 'fileupload',
+//                    'tab' => 'Настройки',
+//                ],
+//                'head_image' => [
+//                    'label' => 'Изображение на странице курса',
+//                    'mode' => 'image',
+//                    'useCaption' => 'true',
+//                    'thumbOptions' => [
+//                        'mode' => 'crop',
+//                        'extension' => 'auto',
+//                    ],
+//                    'span' =>  'auto',
+//                    'type' =>  'fileupload',
+//                    'tab' =>  'Настройки',
+//                ],
+                'section_show_in_menu' => [
+                    'label' => 'Отображение в меню',
+                    'span' => 'full',
+                    'type' => 'section',
+                    'tab' => 'Настройки',
+                ],
+                'show_in_menu' => [
+                    'label' => 'Отображать в меню',
+                    'span' => 'auto',
+                    'type' => 'switch',
+                    'tab' => 'Настройки',
+                ],
+                'show_in_menu_priority' => [
+                    'label' => 'Приоритет отображения',
+                    'span' => 'auto',
+                    'type' => 'number',
+                    'tab' => 'Настройк',
+                ],
+                'section1' => [
+                    'label' => 'Кнопка',
+                    'span' => 'full',
+                    'type' => 'section',
+                    'tab' => 'Настройки',
+                ],
+                'button_text' => [
+                    'label' => 'Текст',
+                    'span' => 'left',
+                    'type' => 'text',
+                    'tab' => 'Настройки',
+                ],
+                'button_link' => [
+                    'label' => 'Ссылка',
+                    'span' => 'auto',
+                    'type' => 'text',
+                    'tab' => 'Настройки',]
+            ]);
         }
     }
 
