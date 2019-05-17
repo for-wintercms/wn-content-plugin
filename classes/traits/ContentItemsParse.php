@@ -2,6 +2,7 @@
 
 namespace Wbry\Content\Classes\Traits;
 
+use Cms\Classes\Page;
 use Db;
 use Lang;
 use File;
@@ -11,6 +12,7 @@ use Backend;
 use Validator;
 use Cms\Classes\Theme as CmsTheme;
 use Wbry\Content\Models\Item as ItemModel;
+use Wbry\Content\Models\Page as PageModel;
 use October\Rain\Exception\SystemException;
 use October\Rain\Exception\ValidationException;
 use October\Rain\Exception\ApplicationException;
@@ -377,7 +379,7 @@ trait ContentItemsParse
                         $configPath = null;
                 }
 
-                ItemModel::where('page', $old_slug)->update(['page' => $pageAttr['slug']]);
+                PageModel::slug($old_slug)->update(['slug' => $pageAttr['slug']]);
             }
 
             if (! $configPath)
@@ -414,7 +416,7 @@ trait ContentItemsParse
 
         Db::transaction(function () use ($pageSlug)
         {
-            ItemModel::where('page', $pageSlug)->delete();
+            PageModel::slug($pageSlug)->delete();
 
             if (isset($this->contentItemFiles[$pageSlug]))
             {
@@ -537,7 +539,7 @@ trait ContentItemsParse
             Db::transaction(function () use (&$config, $configPath, $pageSlug, $itemSlug)
             {
                 $result = ItemModel::firstOrCreate([
-                    'page' => $pageSlug,
+                    'page_id' => PageModel::getId($pageSlug),
                     'name' => $itemSlug,
                 ]);
                 if (! isset($config['items'][$itemSlug]['label']))
@@ -555,7 +557,7 @@ trait ContentItemsParse
             # save
             # =======
             ItemModel::create([
-                'page' => $pageSlug,
+                'page_id' => PageModel::getId($pageSlug),
                 'name' => $itemSlug,
             ]);
         }
@@ -633,7 +635,7 @@ trait ContentItemsParse
         {
             if ($isSlug)
             {
-                ItemModel::where('page', $pageSlug)->where('name', $itemSlug)->update([
+                ItemModel::item($pageSlug, $itemSlug)->update([
                     'name' => $newSlug,
                 ]);
             }

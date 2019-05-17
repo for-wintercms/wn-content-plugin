@@ -5,6 +5,7 @@ namespace Wbry\Content\Models;
 use Model;
 use October\Rain\Database\Builder;
 use Wbry\Content\Classes\ContentItems;
+use Wbry\Content\Models\Page as PageModel;
 
 /**
  * Item model
@@ -25,14 +26,14 @@ class Item extends Model
 
     public $translatable = ['items'];
 
-    public $fillable = ['page', 'name', 'items'];
+    public $fillable = ['page_id', 'name', 'items'];
 
     /**
      * @var array Validation rules
      */
     public $rules = [
-        'page' => 'required|between:1,256',
-        'name' => 'required|between:1,256|alpha_dash',
+        'page_id' => 'required|numeric',
+        'name'    => 'required|between:1,256|alpha_dash',
     ];
 
     public $attributeNames = [
@@ -45,12 +46,12 @@ class Item extends Model
 
     public function scopePage(Builder $query, string $page)
     {
-        $query->where('page', $page);
+        $query->where('page_id', PageModel::where('slug', $page)->value('id'));
     }
 
     public function scopeItem(Builder $query, string $page, string $name)
     {
-        $query->where('page', $page)->where('name', $name);
+        $query->page($page)->where('name', $name);
     }
 
     /*
@@ -63,15 +64,15 @@ class Item extends Model
             '' => '---'
         ];
 
-        if ($this->page && $this->name)
+        if ($this->page_id && $this->name)
         {
-            $list = self::where('page', $this->page)->where('name', '!=', $this->name)->lists('name', 'name');
+            $list = self::where('page_id', $this->page_id)->where('name', '!=', $this->name)->lists('name', 'name');
             if (! $list)
                 return $return;
 
             $return = array_merge($return, $list);
             $items = ContentItems::instance();
-            $itemsList = $items->getItemsList($this->page);
+            $itemsList = $items->getItemsList(PageModel::where('id', $this->page_id)->value('slug'));
 
             if (count($itemsList))
             {

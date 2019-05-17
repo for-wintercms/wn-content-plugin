@@ -7,10 +7,10 @@ modelClass: Wbry\Content\Models\Item
 form: $/wbry/content/models/item/fields.yaml
 
 create:
-  redirect: wbry/content/items/:page/update/:id
-  redirectClose: wbry/content/items/:page
+  redirect: wbry/content/items/:page_slug/update/:id
+  redirectClose: wbry/content/items/:page_slug
 update:
-  redirectClose: wbry/content/items/:page
+  redirectClose: wbry/content/items/:page_slug
 delete:
-  redirectClose: wbry/content/items/:page
+  redirectClose: wbry/content/items/:page_slug
 preview: {}

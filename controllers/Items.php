@@ -70,6 +70,7 @@ class Items extends Controller implements ContentItems
         $this->parseContentItemsData();
         $this->addActionMenu();
         $this->addDynamicActionMethods();
+        $this->extendItemModel();
         $this->addAssets();
     }
 
@@ -210,6 +211,21 @@ class Items extends Controller implements ContentItems
             if (! $this->methodExists($this->actionAjax))
                 $this->addDynamicMethod($this->actionAjax, self::class);
         }
+    }
+
+    protected function extendItemModel()
+    {
+        ItemModel::extend(function($model) {
+            $model->bindEvent('model.beforeSave', function() use ($model) {
+                unset($model->attributes['page_slug']);
+            });
+            $model->bindEvent('model.afterSave', function() use ($model) {
+                $model->attributes['page_slug'] = $this->page;
+            });
+            $model->bindEvent('model.afterFetch', function() use ($model) {
+                $model->attributes['page_slug'] = $this->page;
+            });
+        });
     }
 
     protected function addAssets()
@@ -592,7 +608,12 @@ class Items extends Controller implements ContentItems
 
     public function listExtendQuery($query)
     {
-        $query->where('page', $this->page);
+        $query->page($this->page);
+    }
+
+    public function reorderExtendQuery($query)
+    {
+        $query->page($this->page);
     }
 
     public function formExtendFields($form, $fields)
@@ -624,11 +645,6 @@ class Items extends Controller implements ContentItems
                 'path' => is_array($activeForm) ? 'content_item_form_empty' : 'content_item_form_missing',
             ]]);
         }
-    }
-
-    public function reorderExtendQuery($query)
-    {
-        $query->where('page', $this->page);
     }
 
     public function listExtendColumns($list)

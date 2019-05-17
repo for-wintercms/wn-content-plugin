@@ -85,7 +85,7 @@ class GetContent extends ComponentBase
         if (! is_array($partials) || ! count($partials))
             return [];
 
-        $items = ItemModel::where('page', $this->pageSlug)->get();
+        $items = ItemModel::page($this->pageSlug)->get();
         if (! $items)
             return [];
 
