@@ -3,6 +3,8 @@
 namespace Wbry\Content\Models;
 
 use Model;
+use October\Rain\Database\Builder;
+use Wbry\Content\Classes\IconList;
 
 /**
  * Page Model
@@ -28,6 +30,14 @@ class Page extends Model
     public static function getId(string $page)
     {
         return self::where('slug', $page)->value('id');
+    }
+
+    public function getIconListDropDown()
+    {
+        $iconList = [];
+        foreach (IconList::getList() as $itemV)
+            $iconList['icon-'.$itemV] = $itemV;
+        return $iconList;
     }
 
     /*

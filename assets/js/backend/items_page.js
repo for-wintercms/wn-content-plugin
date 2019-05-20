@@ -28,41 +28,6 @@ var wd_items = wd_items || {
         });
     },
 
-    addSubmenuControlPanels: function()
-    {
-        var panelOpen  = '<span class="page-control">',
-            panelClose = '</span>';
-
-        var btnEdit = ''+
-            '<button class="btn btn-primary btn-xs" ' +
-                    'data-btn-type="edit">' +
-                '<i class="icon-pencil"></i>' +
-            '</button>';
-
-        var deleteConfirmMsg = (typeof this.deletePageConfirmMsg !== "undefined") ? this.deletePageConfirmMsg : '';
-        var btnDelete = '' +
-            '<button class="btn btn-primary btn-xs" ' +
-                    'data-btn-type="delete" ' +
-                    'data-request="onDeletePage" ' +
-                    'data-request-data="" ' +
-                    'data-request-confirm="'+ deleteConfirmMsg +'">' +
-                '<i class="icon-trash-o"></i>' +
-            '</button>';
-
-        $('#layout-sidenav ul li[data-submenu-slug]').each(function(i, el)
-        {
-            var $this = $(this),
-                panelBtns = '';
-
-            if ($this.data('submenu-edit'))
-                panelBtns += btnEdit;
-            if ($this.data('submenu-delete'))
-                panelBtns += btnDelete;
-
-            $(el).append(panelOpen + panelBtns + panelClose);
-        });
-    },
-
     popupChangePage: function()
     {
         var me = this;
@@ -160,7 +125,6 @@ var wd_items = wd_items || {
 
     init: function()
     {
-        this.addSubmenuControlPanels();
         this.popupChangePage();
         this.events();
     }

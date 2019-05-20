@@ -9,6 +9,13 @@
         'create_at'   => 'Created',
         'updated_at'  => 'Updated',
     ],
+    'pages' => [
+        'section_settings' => 'Page',
+        'field_title' => 'Title',
+        'field_slug'  => 'Slug (part URN)',
+        'field_icon'  => 'Icon',
+        'field_order' => 'Order',
+    ],
     'list' => [
         'title'      => 'List',
         'create_btn' => 'Create block',
@@ -33,10 +40,6 @@
         'page' => [
             'title_create' => 'Create page',
             'title_edit'   => 'Edit page',
-            'field_title'  => 'Title',
-            'field_slug'   => 'Slug (part URN)',
-            'field_icon'   => 'Icon',
-            'field_order'  => 'Order',
         ],
         'block' => [
             'title_create'   => 'Create block for page - :page',

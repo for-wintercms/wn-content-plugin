@@ -338,10 +338,10 @@ trait ContentItemsParse
             'no_exists_page' => Lang::get('wbry.content::content.errors.no_exists_page', ['slug' => $slug]),
         ]);
         $validator->setAttributeNames([
-            'title' => Lang::get('wbry.content::content.popup.page.field_title'),
-            'slug'  => Lang::get('wbry.content::content.popup.page.field_slug'),
-            'icon'  => Lang::get('wbry.content::content.popup.page.field_icon'),
-            'order' => Lang::get('wbry.content::content.popup.page.field_order'),
+            'title' => Lang::get('wbry.content::content.pages.field_title'),
+            'slug'  => Lang::get('wbry.content::content.pages.field_slug'),
+            'icon'  => Lang::get('wbry.content::content.pages.field_icon'),
+            'order' => Lang::get('wbry.content::content.pages.field_order'),
         ]);
 
         if ($validator->fails())

@@ -9,6 +9,13 @@
         'create_at'   => 'Создано',
         'updated_at'  => 'Обновлено',
     ],
+    'pages' => [
+        'section_settings' => 'Страница',
+        'field_title' => 'Название',
+        'field_slug'  => 'Слаг (часть URN)',
+        'field_icon'  => 'Иконка',
+        'field_order' => 'Порядок',
+    ],
     'list' => [
         'title'      => 'Список',
         'create_btn' => 'Создать блок',
@@ -33,10 +40,6 @@
         'page' => [
             'title_create' => 'Создать страницу',
             'title_edit'   => 'Редактировать страницу',
-            'field_title'  => 'Название',
-            'field_slug'   => 'Слаг (часть URN)',
-            'field_icon'   => 'Иконка',
-            'field_order'  => 'Порядок',
         ],
         'block' => [
             'title_create'   => 'Создать блок для страницы - :page',

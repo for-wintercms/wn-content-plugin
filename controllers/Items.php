@@ -406,10 +406,11 @@ class Items extends Controller implements ContentItems
         if (! $this->isPageEdit())
             Flash::error(Lang::get('wbry.content::content.errors.non_page_edit'));
 
-        $pageSlug    = post('slug');
-        $oldPageSlug = post('old_slug');
+        $pageData    = post('Page');
+        $pageSlug    = $pageData['slug'] ?? '';
+        $oldPageSlug = $pageData['old_slug'] ?? '';
 
-        $this->buildContentItemPage(post(), true, $oldPageSlug);
+        $this->buildContentItemPage($pageData, true, $oldPageSlug);
 
         Flash::success(Lang::get('wbry.content::content.success.edit_page', ['page' => post('title')]));
 
@@ -648,7 +649,51 @@ class Items extends Controller implements ContentItems
         }
         elseif ($form->arrayName === 'Page')
         {
-            #
+            if ($this->isPageEdit())
+            {
+                $pageData = $this->menuList[$this->page] ?? null;
+                if ($pageData)
+                {
+                    $form->model->setAttribute('title', ($pageData['label'] ?? ''));
+                    $form->model->setAttribute('icon', ($pageData['icon'] ?? ''));
+                    $form->model->setAttribute('order', ($pageData['order'] ?? ''));
+                    $form->model->setAttribute('old_slug', ($form->model->slug ?? ''));
+                }
+
+                $form->addFields([
+                    'section_settings_page' => [
+                        'label' => Lang::get('wbry.content::content.pages.section_settings'),
+                        'span'  => 'full',
+                        'type'  => 'section',
+                    ],
+                    'title' => [
+                        'label' => Lang::get('wbry.content::content.pages.field_title'),
+                        'span'  => 'left',
+                        'type'  => 'text',
+                    ],
+                    'slug' => [
+                        'label' => Lang::get('wbry.content::content.pages.field_slug'),
+                        'span'  => 'right',
+                        'type'  => 'text',
+                        'preset' => 'title',
+                    ],
+                    'icon' => [
+                        'label' => Lang::get('wbry.content::content.pages.field_icon'),
+                        'span'  => 'left',
+                        'type'  => 'dropdown',
+                        'options' => 'getIconListDropDown',
+                    ],
+                    'order' => [
+                        'label' => Lang::get('wbry.content::content.pages.field_order'),
+                        'span'  => 'right',
+                        'type'  => 'number',
+                    ],
+                    'old_slug' => [
+                        'type' => 'text',
+                        'attributes' => ['style' => 'display:none;'],
+                    ],
+                ]);
+            }
         }
     }
 
@@ -729,7 +774,7 @@ class Items extends Controller implements ContentItems
         $this->pageTitle = $this->getListPageTitle();
         $this->bodyClass = 'compact-container';
         $this->makeLists();
-        $this->initForm(PageModel::make());
+        $this->initForm(PageModel::slug($this->page)->first());
 
         return $this->makeViewContentFile('list');
     }
