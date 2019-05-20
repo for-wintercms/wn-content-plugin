@@ -1,4 +1,4 @@
-<div class="control-tabs content-tabs" data-control="tab">
+<div class="control-tabs content-tabs main-tabs-content" data-control="tab">
     <ul class="nav nav-tabs">
         <li class="active">
             <a href="javascript:;"><i class="icon-file-text-o"></i>&nbsp;&nbsp;<?= e(trans('wbry.content::content.tabs.content')) ?></a>
@@ -11,12 +11,8 @@
         <div class="tab-pane active">
             <?= $this->listRender() ?>
         </div>
-        <div class="tab-pane">
-            <div class="main-tabs-content">
-                <div class="main-tabs-content-form">
-                    <?= $this->formRender() ?>
-                </div>
-            </div>
+        <div class="tab-pane p-a">
+            <?= $this->formRender() ?>
         </div>
     </div>
 </div>
