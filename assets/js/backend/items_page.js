@@ -127,6 +127,7 @@ var wd_items = wd_items || {
     {
         this.popupChangePage();
         this.events();
+        this.select2Icons('#editPageForm select[name="Page[icon]"]');
     }
 };
 
