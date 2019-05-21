@@ -164,6 +164,9 @@ trait ContentItemsParse
             if (! $this->validateAlphaDash('slug', $menuSlug))
                 throw new ApplicationException(Lang::get('wbry.content::content.errors.file_item_slug', ['fileName' => $fileName, 'itemSlug' => $menuSlug]));
 
+            if (! PageModel::slug($menuSlug)->count())
+                continue;
+
             $this->menuList[$menuSlug] = array_merge($config['menu'], [
                 'url' => Backend::url('wbry/content/items/'. $menuSlug),
             ]);
