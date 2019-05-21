@@ -5,7 +5,6 @@ namespace Wbry\Content;
 use Event;
 use Backend;
 use System\Classes\PluginBase;
-use Wbry\Content\Classes\ContentItems;
 use Wbry\Content\Models\Item as ItemModel;
 
 /**
