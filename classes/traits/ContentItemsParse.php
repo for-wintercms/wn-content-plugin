@@ -381,6 +381,8 @@ trait ContentItemsParse
 
                 PageModel::slug($old_slug)->update(['slug' => $pageAttr['slug']]);
             }
+            else
+                PageModel::create(['slug' => $pageAttr['slug']]);
 
             if (! $configPath)
                 $configPath = $this->newConfigFilePath($pageAttr['slug']);
@@ -391,10 +393,11 @@ trait ContentItemsParse
                 'icon'  => $pageAttr['icon'] ?? '',
                 'order' => $pageAttr['order'] ?? '100',
             ];
+            $pageId = PageModel::slug($pageAttr['slug'])->value('id');
 
-            Event::fire('wbry.content.buildContentItemsPageSave.before', [&$saveConfig, $isEditPage]);
+            Event::fire('wbry.content.buildContentItemsPageSave.before', [&$saveConfig, $pageId, $isEditPage]);
             $this->saveContentItemConfigFile($saveConfig, $configPath);
-            Event::fire('wbry.content.buildContentItemsPageSave.after', [&$saveConfig, $isEditPage]);
+            Event::fire('wbry.content.buildContentItemsPageSave.after', [&$saveConfig, $pageId, $isEditPage]);
         });
 
         try {
