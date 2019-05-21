@@ -6,6 +6,7 @@ use Cms\Classes\Page;
 use Db;
 use Lang;
 use File;
+use Wbry\Content\Models\Item;
 use Yaml;
 use Event;
 use Backend;
@@ -419,7 +420,9 @@ trait ContentItemsParse
 
         Db::transaction(function () use ($pageSlug)
         {
+            $pageId = PageModel::slug($pageSlug)->value('id');
             PageModel::slug($pageSlug)->delete();
+            ItemModel::where('page_id', $pageId)->delete();
 
             if (isset($this->contentItemFiles[$pageSlug]))
             {
