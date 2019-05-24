@@ -35,7 +35,7 @@ class Items extends Controller implements ContentItems
 
     public $implement = [
         'Backend\Behaviors\ListController',
-        'Backend\Behaviors\FormController',
+        'Wbry\Content\Classes\Behaviors\FormController',
         'Backend\Behaviors\ReorderController',
     ];
 
@@ -411,6 +411,7 @@ class Items extends Controller implements ContentItems
         $oldPageSlug = $pageData['old_slug'] ?? '';
 
         $this->buildContentItemPage($pageData, true, $oldPageSlug);
+        $this->pageSave(PageModel::slug($this->page)->first());
 
         Flash::success(Lang::get('wbry.content::content.success.edit_page', ['page' => post('title')]));
 
