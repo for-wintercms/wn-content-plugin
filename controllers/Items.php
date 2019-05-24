@@ -659,40 +659,46 @@ class Items extends Controller implements ContentItems
                     $form->model->setAttribute('order', ($pageData['order'] ?? ''));
                     $form->model->setAttribute('old_slug', ($form->model->slug ?? ''));
                 }
-
+                $mainTab = Lang::get('wbry.content::content.pages.tab_main');
                 $form->addFields([
                     'section_settings_page' => [
                         'label' => Lang::get('wbry.content::content.pages.section_settings'),
                         'span'  => 'full',
                         'type'  => 'section',
+                        'tab'  => $mainTab,
                     ],
                     'title' => [
                         'label' => Lang::get('wbry.content::content.pages.field_title'),
                         'span'  => 'left',
                         'type'  => 'text',
+                        'tab'  => $mainTab,
                     ],
                     'slug' => [
                         'label' => Lang::get('wbry.content::content.pages.field_slug'),
                         'span'  => 'right',
                         'type'  => 'text',
                         'preset' => 'title',
+                        'tab'  => $mainTab,
                     ],
                     'icon' => [
                         'label' => Lang::get('wbry.content::content.pages.field_icon'),
                         'span'  => 'left',
                         'type'  => 'dropdown',
                         'options' => 'getIconListDropDown',
+                        'tab'  => $mainTab,
                     ],
                     'order' => [
                         'label' => Lang::get('wbry.content::content.pages.field_order'),
                         'span'  => 'right',
                         'type'  => 'number',
+                        'tab'  => $mainTab,
                     ],
                     'old_slug' => [
                         'type' => 'text',
                         'attributes' => ['style' => 'display:none;'],
+                        'tab'  => $mainTab,
                     ],
-                ]);
+                ], Event::fire('wbry.content.pageSettingsMainTab', [], true));
             }
         }
     }

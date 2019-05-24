@@ -10,6 +10,7 @@
         'updated_at'  => 'Updated',
     ],
     'pages' => [
+        'tab_main'    => 'Main',
         'section_settings' => 'Page',
         'field_title' => 'Title',
         'field_slug'  => 'Slug (part URN)',

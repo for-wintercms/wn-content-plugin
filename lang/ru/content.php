@@ -10,6 +10,7 @@
         'updated_at'  => 'Обновлено',
     ],
     'pages' => [
+        'tab_main'    => 'Основные',
         'section_settings' => 'Страница',
         'field_title' => 'Название',
         'field_slug'  => 'Слаг (часть URN)',
