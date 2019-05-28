@@ -50,6 +50,7 @@
             'field_ready_tmp_empty' => 'Готовые шаблоны отсутствуют',
             'optgroup_ready_tmp_current' => 'Для текущей странице',
             'optgroup_ready_tmp_global'  => 'Общие шаблоны',
+            'field_ready_tmp_name'  => 'Название шаблона',
         ],
         'rename_block' => [
             'title_rename' => 'Переименовать блок',

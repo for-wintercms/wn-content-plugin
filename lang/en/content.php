@@ -50,6 +50,7 @@
             'field_ready_tmp_empty' => 'No pre-made templates',
             'optgroup_ready_tmp_current' => 'For the current page',
             'optgroup_ready_tmp_global'  => 'General templates',
+            'field_ready_tmp_name'  => 'Template name',
         ],
         'rename_block' => [
             'title_rename' => 'Rename block',

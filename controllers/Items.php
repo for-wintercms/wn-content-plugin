@@ -503,6 +503,7 @@ class Items extends Controller implements ContentItems
                     $attr['section_name'] = $name;
                     $name .= '_'. str_random(8);
                 }
+                $attr['item_title'] = post('block_name');
 
                 $this->addContentItem($this->page, $name, $formType, $attr);
                 $title = $this->getListTitle($name, null);
