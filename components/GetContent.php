@@ -98,9 +98,9 @@ class GetContent extends ComponentBase
                 continue;
 
             $result[] = [
-                'item_slug' => $item->name,
-                'partial'   => $partials[$item->name],
-                'data'      => $item->items,
+                'item_slug'    => $item->name,
+                'partial'      => $partials[$item->name],
+                'content_data' => $item->items,
             ];
         }
         return $result;
@@ -114,7 +114,7 @@ class GetContent extends ComponentBase
         {
             $content .= $twig
                 ->loadTemplate($this->contentItem->getPartialPath($section['partial']))
-                ->render(array_merge($this->controller->vars, $this->getProperties(), ['content_data' => $section['data']]));
+                ->render(array_merge($this->controller->vars, $this->getProperties(), $section));
         }
         return $content;
     }
