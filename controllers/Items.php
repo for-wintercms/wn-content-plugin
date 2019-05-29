@@ -411,11 +411,11 @@ class Items extends Controller implements ContentItems
         $oldPageSlug = $pageData['old_slug'] ?? '';
 
         $this->buildContentItemPage($pageData, true, $oldPageSlug);
-        $this->pageSave(PageModel::slug($this->page)->first());
+        $this->pageSave(PageModel::slug($pageSlug)->first());
 
         Flash::success(Lang::get('wbry.content::content.success.edit_page', ['page' => post('title')]));
 
-        if ($this->page == $oldPageSlug && $pageSlug && ! empty($this->menuList[$pageSlug]))
+        if ($pageSlug && ! empty($this->menuList[$pageSlug]))
             return redirect($this->menuList[$pageSlug]['url']);
         else
             return back();
