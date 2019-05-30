@@ -256,19 +256,19 @@ trait ContentItemsParse
      *              icon  => (optional) menu icon, default ''
      *              order => (optional) menu order, default '100'
      *          ]
-     * @param bool    $isEditPage - default false = create page
-     * @param string  $old_slug   - (required for edit page) old menu slug and\or URN slug,
+     * @param string  $action    - create, clone or edit. Default 'create'
+     * @param string  $old_slug  - (required for edit page) old menu slug and\or URN slug,
      * @throws
      */
-    public function buildContentItemPage(array $pageAttr, bool $isEditPage = false, string $old_slug = null)
+    public function buildContentItemPage(array $pageAttr, string $action = self::CONTENT_ITEM_ACTION_CREATE, string $old_slug = null)
     {
         /*
          * Validate
          */
 
-        Validator::extend('no_exists_page', function($attr, $value) use ($isEditPage, $old_slug)
+        Validator::extend('no_exists_page', function($attr, $value) use ($action, $old_slug)
         {
-            if ($isEditPage && $old_slug === $value)
+            if ($action === self::CONTENT_ITEM_ACTION_EDIT && $old_slug === $value)
                 return true;
             return (! PageModel::slug($value)->count());
         });
@@ -283,10 +283,10 @@ trait ContentItemsParse
         ];
         $slug = $pageAttr['slug'] ?? '';
 
-        if ($isEditPage)
-            $pageAttr['old_slug'] = $old_slug;
-        else
+        if ($action === self::CONTENT_ITEM_ACTION_CREATE)
             unset($rules['old_slug']);
+        else
+            $pageAttr['old_slug'] = $old_slug;
 
         $validator = Validator::make($pageAttr, $rules, [
             'no_exists_page' => Lang::get('wbry.content::content.errors.no_exists_page', ['slug' => $slug]),
@@ -305,19 +305,27 @@ trait ContentItemsParse
          * Produce
          */
 
-        Db::transaction(function() use (&$pageAttr, $isEditPage, $old_slug)
+        Db::transaction(function() use (&$pageAttr, $action, $old_slug)
         {
             $configPath = null;
             $saveConfig = ['items' => []];
+            $saveData   = [
+                'title' => $pageAttr['title'],
+                'slug'  => $pageAttr['slug'],
+                'icon'  => $pageAttr['icon'],
+                'order' => $pageAttr['order'],
+            ];
 
-            if ($isEditPage)
+            if ($action === self::CONTENT_ITEM_ACTION_CREATE)
+                PageModel::create($saveData);
+            else
             {
                 if (isset($this->contentItemFiles[$old_slug]))
                 {
                     $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$old_slug];
                     if (file_exists($configPath))
                     {
-                        if ($old_slug !== $pageAttr['slug'])
+                        if ($action === self::CONTENT_ITEM_ACTION_EDIT && $old_slug !== $pageAttr['slug'])
                         {
                             $oldConfigPath = $configPath;
                             $configPath    = $this->newConfigFilePath($pageAttr['slug']);
@@ -333,30 +341,42 @@ trait ContentItemsParse
                         $configPath = null;
                 }
 
-                PageModel::slug($old_slug)->update([
-                    'title' => $pageAttr['title'],
-                    'slug'  => $pageAttr['slug'],
-                    'icon'  => $pageAttr['icon'],
-                    'order' => $pageAttr['order'],
-                ]);
-            }
-            else
-            {
-                PageModel::create([
-                    'title' => $pageAttr['title'],
-                    'slug'  => $pageAttr['slug'],
-                    'icon'  => $pageAttr['icon'],
-                    'order' => $pageAttr['order'],
-                ]);
+                if ($action === self::CONTENT_ITEM_ACTION_CLONE)
+                {
+                    $configPath = null;
+                    $page = PageModel::slug($old_slug)->first();
+
+                    if (! $page)
+                        PageModel::create($saveData);
+                    else
+                    {
+                        $newPage = $page->replicate();
+                        $newPage->title = $pageAttr['title'];
+                        $newPage->slug  = $pageAttr['slug'];
+                        $newPage->icon  = $pageAttr['icon'];
+                        $newPage->order = $pageAttr['order'];
+                        $newPage->save();
+
+                        $newPageId = $newPage->id;
+                        foreach (ItemModel::where('page_id', $page->id)->get() as $item)
+                        {
+                            $newItem = $item->replicate();
+                            $newItem->page_id = $newPageId;
+                            $newItem->save();
+                        }
+                    }
+                }
+                else
+                    PageModel::slug($old_slug)->update($saveData);
             }
 
             if (! $configPath)
                 $configPath = $this->newConfigFilePath($pageAttr['slug']);
             $pageId = PageModel::slug($pageAttr['slug'])->value('id');
 
-            Event::fire('wbry.content.buildContentItemsPageSave.before', [&$saveConfig, $pageId, $isEditPage]);
+            Event::fire('wbry.content.buildContentItemsPageSave.before', [&$saveConfig, $pageId, $action]);
             $this->saveContentItemConfigFile($saveConfig, $configPath);
-            Event::fire('wbry.content.buildContentItemsPageSave.after', [&$saveConfig, $pageId, $isEditPage]);
+            Event::fire('wbry.content.buildContentItemsPageSave.after', [&$saveConfig, $pageId, $action]);
         });
 
         try {

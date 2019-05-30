@@ -216,15 +216,14 @@ class Items extends Controller implements ContentItems
     {
         ItemModel::extend(function($model) {
             $model->bindEvent('model.beforeSave', function() use ($model) {
-                unset($model->attributes['page_slug']);
+                unset($model->attributes['page_slug'], $model->attributes['title']);
             });
-            $model->bindEvent('model.afterSave', function() use ($model) {
-                $model->attributes['page_slug'] = $this->page;
-            });
-            $model->bindEvent('model.afterFetch', function() use ($model) {
+            $funAfterData = function() use ($model) {
                 $model->attributes['page_slug'] = $this->page;
                 $model->attributes['title'] = $this->getListTitle($model->name, $model->name);
-            });
+            };
+            $model->bindEvent('model.afterSave', $funAfterData);
+            $model->bindEvent('model.afterFetch', $funAfterData);
         });
     }
 
@@ -420,18 +419,18 @@ class Items extends Controller implements ContentItems
      */
     public function onClonePage()
     {
-//        if (! $this->isPageClone())
-//            Flash::error(Lang::get('wbry.content::content.errors.non_page_clone'));
-//
-//        $this->buildContentItemPage(post());
-//
-//        Flash::success(Lang::get('wbry.content::content.success.clone_page', ['page' => post('title')]));
-//
-//        $pageSlug = post('slug');
-//        if ($this->getPageModel($pageSlug))
-//            return redirect($this->getPageUrl($pageSlug));
-//        else
-//            return back();
+        if (! $this->isPageClone())
+            Flash::error(Lang::get('wbry.content::content.errors.non_page_clone'));
+
+        $this->buildContentItemPage(post(), self::CONTENT_ITEM_ACTION_CLONE, post('old_slug'));
+
+        Flash::success(Lang::get('wbry.content::content.success.clone_page', ['page' => post('title')]));
+
+        $pageSlug = post('slug');
+        if ($this->getPageModel($pageSlug))
+            return redirect($this->getPageUrl($pageSlug));
+        else
+            return back();
     }
 
     /**
@@ -446,7 +445,7 @@ class Items extends Controller implements ContentItems
         $pageSlug    = $pageData['slug'] ?? '';
         $oldPageSlug = $pageData['old_slug'] ?? '';
 
-        $this->buildContentItemPage($pageData, true, $oldPageSlug);
+        $this->buildContentItemPage($pageData, self::CONTENT_ITEM_ACTION_EDIT, $oldPageSlug);
 
         $page = $this->getPageModel($pageSlug);
         $this->pageSave($page);
