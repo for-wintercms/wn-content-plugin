@@ -10,6 +10,7 @@
     'form' => [
         'change' => 'Change',
         'rename' => 'Rename',
+        'clone'  => 'Clone',
     ],
     'menu' => [
         'items' => 'Content',

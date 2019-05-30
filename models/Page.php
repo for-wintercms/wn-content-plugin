@@ -14,7 +14,7 @@ use Wbry\Content\Classes\IconList;
 class Page extends Model
 {
     public $table = 'wbry_content_pages';
-    public $fillable = ['slug'];
+    public $fillable = ['title','slug','icon','order'];
 
     /**
      * @var array Validation rules
