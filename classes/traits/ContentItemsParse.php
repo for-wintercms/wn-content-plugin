@@ -47,17 +47,6 @@ trait ContentItemsParse
     protected $contentItemFiles = [];
 
     /**
-     * @var array - [page_slug => [
-     *                  label => menu title,
-     *                  slug => menu slug,
-     *                  url => menu url,
-     *                  icon => menu icon,
-     *                  order => menu order,
-     *              ]]
-     */
-    protected $menuList = null;
-
-    /**
      * @var array - [page_slug => [item_slug => [title => item_name, section => section_name]]]
      */
     protected $contentItemList = [];
@@ -152,28 +141,15 @@ trait ContentItemsParse
             if ($fileExt !== 'yaml')
                 continue;
 
-            $fileName = $file->getFilename();
-            $config   = Yaml::parseFile($file->getRealPath());
-
-            # menu
-            #========
-            if (! is_array($config) || empty($config['menu']) || empty($config['menu']['label']) || empty($config['menu']['slug']))
-                throw new ApplicationException(Lang::get('wbry.content::content.errors.pages_menu', ['fileName' => $fileName]));
-
-            $menuSlug = $config['menu']['slug'];
-            if (! $this->validateAlphaDash('slug', $menuSlug))
-                throw new ApplicationException(Lang::get('wbry.content::content.errors.file_item_slug', ['fileName' => $fileName, 'itemSlug' => $menuSlug]));
-
-            if (! PageModel::slug($menuSlug)->count())
+            $menuSlug = $file->getBasename('.'.$fileExt);
+            if (! $this->validateAlphaDash('file', $menuSlug) || ! PageModel::slug($menuSlug)->count())
                 continue;
-
-            $this->menuList[$menuSlug] = array_merge($config['menu'], [
-                'url' => Backend::url('wbry/content/items/'. $menuSlug),
-            ]);
 
             # content items
             #================
-            $errItem = Lang::get('wbry.content::content.errors.pages_list', ['fileName' => $fileName]);
+            $fileName = $file->getFilename();
+            $config   = Yaml::parseFile($file->getRealPath());
+            $errItem  = Lang::get('wbry.content::content.errors.pages_list', ['fileName' => $fileName]);
 
             if (! isset($config['items']) || ! is_array($config['items']))
                 throw new ApplicationException($errItem);
@@ -221,33 +197,11 @@ trait ContentItemsParse
     public function reParseContentItems()
     {
         $this->isContentItemsParse = false;
-        $this->menuList = null;
         $this->contentItemFiles = [];
         $this->contentItemList = [];
         $this->contentItemSectionsList = [];
 
         $this->parseContentItems();
-    }
-
-    /**
-     * @return string
-     */
-    public function getContentItemDefaultPage()
-    {
-        $page = 'index';
-        if (! $this->menuList || isset($this->menuList[$page]))
-            return $page;
-
-        $min = null;
-        foreach ($this->menuList as $menu)
-        {
-            if (isset($menu['order']) && is_numeric($menu['order']) && (is_null($min) || $menu['order'] < $min))
-            {
-                $page = $menu['slug'];
-                $min  = $menu['order'];
-            }
-        }
-        return $page;
     }
 
     /**
@@ -297,7 +251,7 @@ trait ContentItemsParse
      *
      * @param array  $pageAttr
      *          [
-     *              label => (required) menu title,
+     *              title => (required) menu title,
      *              slug  => (required) menu slug and\or URN slug,
      *              icon  => (optional) menu icon, default ''
      *              order => (optional) menu order, default '100'
@@ -312,19 +266,16 @@ trait ContentItemsParse
          * Validate
          */
 
-        Validator::extend('check_old_slug', function($attr, $value) {
-            return (! empty($value) && isset($this->menuList[$value]));
-        });
-
         Validator::extend('no_exists_page', function($attr, $value) use ($isEditPage, $old_slug)
         {
             if ($isEditPage && $old_slug === $value)
                 return true;
-            return (! isset($this->menuList[$value]));
+            return (! PageModel::slug($value)->count());
         });
 
+        $pageTableName = PageModel::make()->getTable();
         $rules = [
-            'old_slug' => 'required|alpha_dash|min:2|check_old_slug',
+            'old_slug' => 'required|alpha_dash|min:2|exists:'. $pageTableName .',slug',
             'title' => 'required',
             'slug'  => 'required|alpha_dash|between:2,255|no_exists_page',
             'icon'  => 'alpha_dash|min:2',
@@ -338,7 +289,6 @@ trait ContentItemsParse
             unset($rules['old_slug']);
 
         $validator = Validator::make($pageAttr, $rules, [
-            'check_old_slug' => Lang::get('wbry.content::content.errors.exists_old_page', ['slug' => $old_slug]),
             'no_exists_page' => Lang::get('wbry.content::content.errors.no_exists_page', ['slug' => $slug]),
         ]);
         $validator->setAttributeNames([
@@ -355,10 +305,10 @@ trait ContentItemsParse
          * Produce
          */
 
-        Db::transaction(function () use (&$pageAttr, $isEditPage, $old_slug)
+        Db::transaction(function() use (&$pageAttr, $isEditPage, $old_slug)
         {
             $configPath = null;
-            $saveConfig = ['menu' => [], 'items' => []];
+            $saveConfig = ['items' => []];
 
             if ($isEditPage)
             {
@@ -383,20 +333,25 @@ trait ContentItemsParse
                         $configPath = null;
                 }
 
-                PageModel::slug($old_slug)->update(['slug' => $pageAttr['slug']]);
+                PageModel::slug($old_slug)->update([
+                    'title' => $pageAttr['title'],
+                    'slug'  => $pageAttr['slug'],
+                    'icon'  => $pageAttr['icon'],
+                    'order' => $pageAttr['order'],
+                ]);
             }
             else
-                PageModel::create(['slug' => $pageAttr['slug']]);
+            {
+                PageModel::create([
+                    'title' => $pageAttr['title'],
+                    'slug'  => $pageAttr['slug'],
+                    'icon'  => $pageAttr['icon'],
+                    'order' => $pageAttr['order'],
+                ]);
+            }
 
             if (! $configPath)
                 $configPath = $this->newConfigFilePath($pageAttr['slug']);
-
-            $saveConfig['menu'] = [
-                'label' => $pageAttr['title'],
-                'slug'  => $pageAttr['slug'],
-                'icon'  => $pageAttr['icon'] ?? '',
-                'order' => $pageAttr['order'] ?? '100',
-            ];
             $pageId = PageModel::slug($pageAttr['slug'])->value('id');
 
             Event::fire('wbry.content.buildContentItemsPageSave.before', [&$saveConfig, $pageId, $isEditPage]);
@@ -698,26 +653,25 @@ trait ContentItemsParse
     /**
      * @param array  $config
      * @param string $configPath
+     * @param string $newConfigPath
      *
      * @throws
      */
-    private function saveContentItemConfigFile(array $config, string $configPath)
+    private function saveContentItemConfigFile(array $config, string $configPath, string $newConfigPath = NULL)
     {
         @File::chmod($this->contentItemsPagesPath);
 
         $configStr = Yaml::render($config);
         if (! File::put($configPath, $configStr))
             throw new SystemException(sprintf('Error saving file %s', $configPath));
+        if ($newConfigPath && ! File::put($configPath, $newConfigPath))
+            throw new SystemException(sprintf('Error rename file %s', $configPath));
 
         @File::chmod($configPath);
     }
 
     private function newConfigFilePath(string $pageSlug)
     {
-        $configPath = $this->contentItemsPagesPath .'/'. $pageSlug .'.yaml';
-        if (file_exists($configPath))
-            $configPath = $this->contentItemsPagesPath .'/'. $pageSlug .'_'. str_random(8) .'.yaml';
-
-        return $configPath;
+        return $this->contentItemsPagesPath .'/'. $pageSlug .'.yaml';
     }
 }

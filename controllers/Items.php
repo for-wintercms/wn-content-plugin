@@ -49,11 +49,11 @@ class Items extends Controller implements ContentItems
     public $locales       = null;
     public $defaultLocale = null;
     public $transLocales  = null;
-    public $menuName      = null;
     public $listTitle     = null;
     public $actionAjax    = null;
     public $actionId      = null;
     public $ajaxHandler   = null;
+    public $currentPage   = null;
 
     public $isContentItemError = false;
 
@@ -139,10 +139,15 @@ class Items extends Controller implements ContentItems
 
     protected function addActionMenu()
     {
-        $this->page = request()->segment(5);
-        if (! $this->page)
-            $this->page = $this->getContentItemDefaultPage();
-        $this->menuName = isset($this->menuList[$this->page]) ? $this->menuList[$this->page]['label'] : '';
+        $this->page = request()->segment(5) ?: 'index';
+        $this->currentPage = $this->getPageModel($this->page);
+
+        if (! $this->currentPage)
+        {
+            $this->currentPage = PageModel::orderBy('order', 'asc')->first();
+            if ($this->currentPage)
+                $this->page = $this->currentPage->slug;
+        }
 
         BackendMenu::setContext('Wbry.Content', 'items');
         BackendMenu::setContextSideMenu($this->page);
@@ -152,30 +157,24 @@ class Items extends Controller implements ContentItems
             # submenu attributes
             # ======================
             $submenu = [];
-            if ($this->menuList)
+            $isClonePage = $this->isPageClone();
+
+            foreach (PageModel::select('title','slug','icon','order')->get() as $page)
             {
-                $submenu      = $this->menuList;
-                $isEditPage   = $this->isPageEdit();
-                $isEditDelete = $this->isPageDelete();
-
-                foreach ($submenu as &$menuItem)
-                {
-                    $menuAttr = [
-                        'data-submenu-title'  => $menuItem['label'],
-                        'data-submenu-slug'   => $menuItem['slug'],
-                        'data-submenu-icon'   => $menuItem['icon'] ?? '',
-                        'data-submenu-order'  => $menuItem['order'] ?? '',
-                        'data-submenu-edit'   => $isEditPage,
-                        'data-submenu-delete' => $isEditDelete,
-                    ];
-
-                    if (! isset($menuItem['attributes']))
-                        $menuItem['attributes'] = $menuAttr;
-                    elseif (is_array($menuItem['attributes']))
-                        $menuItem['attributes'] = array_merge($menuItem['attributes'], $menuAttr);
-                    else
-                        $menuItem['attributes'] = $menuAttr[] = $menuItem['attributes'];
-                }
+                $submenu[$page->slug] = [
+                    'label' => $page->title,
+                    'slug'  => $page->slug,
+                    'icon'  => $page->icon,
+                    'order' => $page->order,
+                    'url'   => $this->getPageUrl($page->slug),
+                    'attributes' => [
+                        'data-submenu-title' => $page->title,
+                        'data-submenu-slug'  => $page->slug,
+                        'data-submenu-icon'  => $page->icon,
+                        'data-submenu-order' => $page->order,
+                        'data-submenu-clone' => $isClonePage,
+                    ],
+                ];
             }
 
             # add new page btn
@@ -201,7 +200,7 @@ class Items extends Controller implements ContentItems
 
     protected function addDynamicActionMethods()
     {
-        if (! $this->menuList)
+        if (! $this->currentPage)
             return;
 
         $this->addDynamicMethod($this->action, self::class);
@@ -224,6 +223,7 @@ class Items extends Controller implements ContentItems
             });
             $model->bindEvent('model.afterFetch', function() use ($model) {
                 $model->attributes['page_slug'] = $this->page;
+                $model->attributes['title'] = $this->getListTitle($model->name, $model->name);
             });
         });
     }
@@ -288,6 +288,11 @@ class Items extends Controller implements ContentItems
         return $this->getEventResult('wbry.content.isPageCreate');
     }
 
+    public function isPageClone()
+    {
+        return $this->getEventResult('wbry.content.isPageClone');
+    }
+
     public function isPageEdit()
     {
         return $this->getEventResult('wbry.content.isPageEdit');
@@ -324,14 +329,19 @@ class Items extends Controller implements ContentItems
             return $default;
     }
 
-    public function getPageUrl()
+    public function getPageUrl(string $pageSlug = NULL)
     {
-        return $this->menuList[$this->page]['url'] ?? Backend::url('wbry/content/items');
+        return Backend::url('wbry/content/items/'. ($pageSlug ?: $this->page));
     }
 
     public function getListPageTitle()
     {
-        return $this->menuName ?: Lang::get('wbry.content::content.list.title');
+        static $menuName;
+        if ($menuName)
+            return $menuName;
+
+        $menuName = $this->currentPage->title ?? Lang::get('wbry.content::content.list.title');
+        return $menuName;
     }
 
     public function getReadyItemsList()
@@ -375,6 +385,13 @@ class Items extends Controller implements ContentItems
         }
     }
 
+    public function getPageModel($pageSlug)
+    {
+        if (empty($pageSlug) || ! is_string($pageSlug))
+            return null;
+        return PageModel::slug($pageSlug)->first();
+    }
+
     /*
      * Ajax
      */
@@ -392,10 +409,29 @@ class Items extends Controller implements ContentItems
         Flash::success(Lang::get('wbry.content::content.success.create_page', ['page' => post('title')]));
 
         $pageSlug = post('slug');
-        if ($pageSlug && ! empty($this->menuList[$pageSlug]))
-            return redirect($this->menuList[$pageSlug]['url']);
+        if ($this->getPageModel($pageSlug))
+            return redirect($this->getPageUrl($pageSlug));
         else
             return back();
+    }
+
+    /**
+     * @throws
+     */
+    public function onClonePage()
+    {
+//        if (! $this->isPageClone())
+//            Flash::error(Lang::get('wbry.content::content.errors.non_page_clone'));
+//
+//        $this->buildContentItemPage(post());
+//
+//        Flash::success(Lang::get('wbry.content::content.success.clone_page', ['page' => post('title')]));
+//
+//        $pageSlug = post('slug');
+//        if ($this->getPageModel($pageSlug))
+//            return redirect($this->getPageUrl($pageSlug));
+//        else
+//            return back();
     }
 
     /**
@@ -411,12 +447,14 @@ class Items extends Controller implements ContentItems
         $oldPageSlug = $pageData['old_slug'] ?? '';
 
         $this->buildContentItemPage($pageData, true, $oldPageSlug);
-        $this->pageSave(PageModel::slug($pageSlug)->first());
+
+        $page = $this->getPageModel($pageSlug);
+        $this->pageSave($page);
 
         Flash::success(Lang::get('wbry.content::content.success.edit_page', ['page' => post('title')]));
 
-        if ($pageSlug && ! empty($this->menuList[$pageSlug]))
-            return redirect($this->menuList[$pageSlug]['url']);
+        if ($page)
+            return redirect($this->getPageUrl($pageSlug));
         else
             return back();
     }
@@ -653,14 +691,7 @@ class Items extends Controller implements ContentItems
         {
             if ($this->isPageEdit())
             {
-                $pageData = $this->menuList[$this->page] ?? null;
-                if ($pageData)
-                {
-                    $form->model->setAttribute('title', ($pageData['label'] ?? ''));
-                    $form->model->setAttribute('icon', ($pageData['icon'] ?? ''));
-                    $form->model->setAttribute('order', ($pageData['order'] ?? ''));
-                    $form->model->setAttribute('old_slug', ($form->model->slug ?? ''));
-                }
+                $form->model->setAttribute('old_slug', ($form->model->slug ?? ''));
                 $mainTab = Lang::get('wbry.content::content.pages.tab_main');
                 $form->addFields([
                     'section_settings_page' => [
@@ -771,7 +802,7 @@ class Items extends Controller implements ContentItems
             return $this->makeView404();
         elseif ((! $this->actionId || $this->isContentItemError) && $this->fatalError)
             return $this->makeViewContentFile('fatal-error');
-        elseif (! $this->menuList)
+        elseif (! $this->currentPage)
             return $this->makeViewContentFile('no-content');
         else
             return $this->actionId ? $this->actionFormView() : $this->actionListView();
@@ -782,7 +813,7 @@ class Items extends Controller implements ContentItems
         $this->pageTitle = $this->getListPageTitle();
         $this->bodyClass = 'compact-container';
         $this->makeLists();
-        $this->initForm(PageModel::slug($this->page)->first());
+        $this->initForm($this->currentPage);
 
         return $this->makeViewContentFile('list');
     }
@@ -791,6 +822,13 @@ class Items extends Controller implements ContentItems
     {
         if (! $this->isItemSort())
             return $this->makeView404();
+
+//        ItemModel::extend(function($model)
+//        {
+//            $model->bindEvent('model.afterFetch', function () use ($model) {
+//                dd($model);
+//            });
+//        });
 
         $this->listTitle = $this->getListPageTitle();
         $this->pageTitle = Lang::get('wbry.content::content.list.sort_btn');

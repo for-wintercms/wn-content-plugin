@@ -40,7 +40,7 @@
     'popup' => [
         'page' => [
             'title_create' => 'Create page',
-            'title_edit'   => 'Edit page',
+            'title_clone'  => 'Clone page',
         ],
         'block' => [
             'title_create'   => 'Create block for page - :page',
@@ -57,11 +57,9 @@
         ],
     ],
     'errors' => [
-        'pages_menu'  => 'Correctly declare the page menu item in the file :fileName',
         'pages_list'  => 'Correctly declare the block list item in the file :fileName',
         'page_config' => 'Incorrect syntax in page configuration file ":fileName"',
         'section_config'  => 'Incorrect syntax in section configuration file ":fileName"',
-        'file_item_slug'  => 'Invalid syntax in section name ":fileName" -> ":itemSlug"',
         'no_page'         => 'Not found the settings page ":pageSlug"',
         'no_item'         => 'Content block ":itemSlug" not found',
         'no_item_tmp'     => 'Template ":itemSlug" not found',
@@ -73,9 +71,9 @@
         'non_item_rename' => 'Forbidden to rename templates',
         'non_item_delete' => 'It is forbidden to delete templates',
         'non_page_create' => 'It is forbidden to create pages',
+        'non_page_clone'  => 'Forbidden to clone pages',
         'non_page_edit'   => 'Forbidden to edit pages',
         'non_page_delete' => 'It is forbidden to delete pages',
-        'exists_old_page' => 'Old slug ":slug" not found',
         'no_exists_page'  => 'The page with slug ":itemSlug" already exists',
         'add_item_type'   => 'Wrong type of added block',
         'item_slug'       => 'Invalid block key name ":itemSlug"',
@@ -85,6 +83,7 @@
         'create_item' => 'Content block ":itemName" successfully added',
         'rename_item' => 'Content block successfully renamed',
         'create_page' => 'Page ":page" successfully created',
+        'clone_page'  => 'Page ":page" successfully cloned',
         'edit_page'   => 'Page ":page" successfully changed',
         'delete_page' => 'Page successfully deleted',
     ],

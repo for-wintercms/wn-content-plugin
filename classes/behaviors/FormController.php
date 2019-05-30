@@ -19,9 +19,6 @@ class FormController extends FormControllerMain
         $this->initForm($model);
 
         $delAttr = [
-            'title',
-            'icon',
-            'order',
             'old_slug',
         ];
 

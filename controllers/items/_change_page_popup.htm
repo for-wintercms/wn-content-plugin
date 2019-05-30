@@ -1,4 +1,4 @@
-<?php if ($this->isPageCreate() || $this->isPageEdit()): ?>
+<?php if ($this->isPageCreate() || $this->isPageClone()): ?>
 <div class="control-popup modal fade" id="popupChangePage" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -8,7 +8,7 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title toggle-change toggle-create"><?= e(trans('wbry.content::content.popup.page.title_create')) ?></h4>
-                    <h4 class="modal-title toggle-change toggle-edit"><?= e(trans('wbry.content::content.popup.page.title_edit')) ?></h4>
+                    <h4 class="modal-title toggle-change toggle-clone"><?= e(trans('wbry.content::content.popup.page.title_clone')) ?></h4>
                 </div>
                 <div class="modal-body form-elements">
 
@@ -48,7 +48,7 @@
                             class="btn btn-primary"
                             data-attach-loading>
                         <span class="toggle-change toggle-create"><?= e(trans('backend::lang.form.create')) ?></span>
-                        <span class="toggle-change toggle-edit"><?= e(trans('wbry.content::lang.form.change')) ?></span>
+                        <span class="toggle-change toggle-clone"><?= e(trans('wbry.content::lang.form.clone')) ?></span>
                     </button>
                 </div>
             </form>

@@ -3,7 +3,7 @@
 # ===================================
 
 title: 'wbry.content::content.list.create_btn'
-nameFrom: name
+nameFrom: title
 modelClass: Wbry\Content\Models\Item
 toolbar:
   buttons: reorder_toolbar

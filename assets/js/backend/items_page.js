@@ -28,6 +28,26 @@ var wd_items = wd_items || {
         });
     },
 
+    addSubmenuControlPanels: function()
+    {
+        var btnClone = ''+
+            '<button class="btn btn-primary btn-xs" ' +
+                    'data-btn-type="clone">' +
+                '<i class="icon-clone"></i>' +
+            '</button>';
+
+        $('#layout-sidenav ul li[data-submenu-slug]').each(function(i, el)
+        {
+            var $this = $(this),
+                panelBtns = '';
+
+            if ($this.data('submenu-clone'))
+                panelBtns += btnClone;
+
+            $(el).append('<span class="page-control">' + panelBtns + '</span>');
+        });
+    },
+
     popupChangePage: function()
     {
         var me = this;
@@ -49,9 +69,9 @@ var wd_items = wd_items || {
 
         // submenu control panel
         $('#layout-sidenav ul li').mouseover(function() {
-            $(this).children('.page-control:eq(0)').show();
+            $(this).children('.page-control:eq(0)').css({'opacity': '1'});
         }).mouseout(function() {
-            $(this).children('.page-control:eq(0)').hide();
+            $(this).children('.page-control:eq(0)').css({'opacity': '0.4'});
         });
         $('#layout-sidenav ul').on('mouseover mouseout click', 'li .page-control button', function(e)
         {
@@ -59,24 +79,15 @@ var wd_items = wd_items || {
             switch (e.type)
             {
                 case 'mouseover': $this.css({'opacity': '1'});   break;
-                case 'mouseout':  $this.css({'opacity': '0.4'}); break;
+                case 'mouseout':  $this.css({'opacity': '0.8'}); break;
 
                 case 'click':
                 {
                     var $parentLi = $this.closest('li');
                     switch ($this.data('btn-type'))
                     {
-                        case 'edit':
-                            me.show_changePageModalData('edit', $parentLi);
-                            break;
-
-                        case 'delete':
-                            var submenuTitle = $parentLi.data('submenu-title'),
-                                submenuSlug  = $parentLi.data('submenu-slug'),
-                                confirmMsg   = $this.data('request-confirm').replace(/:page/, submenuTitle);
-
-                            $this.data('request-data', "slug: '"+ submenuSlug +"'");
-                            $this.data('request-confirm', confirmMsg);
+                        case 'clone':
+                            me.show_changePageModalData('clone', $parentLi);
                             break;
                     }
                 }
@@ -103,15 +114,15 @@ var wd_items = wd_items || {
     show_changePageModalData: function(modalType, liObj)
     {
         var $modal  = $('#popupChangePage'),
-            isEdit  = modalType === 'edit',
-            iconVal = isEdit ? liObj.data('submenu-icon') : 'icon-plus',
+            isClone = modalType === 'clone',
+            iconVal = isClone ? liObj.data('submenu-icon') : 'icon-plus',
             request = 'on'+ modalType.substring(0, 1).toUpperCase() + modalType.substring(1) +'Page',
             valData = {};
 
-        valData.title    = isEdit ? liObj.data('submenu-title') : '';
-        valData.slug     = isEdit ? liObj.data('submenu-slug')  : '';
-        valData.order    = isEdit ? liObj.data('submenu-order') : '100';
-        valData.old_slug = isEdit ? valData.slug : '';
+        valData.title    = isClone ? liObj.data('submenu-title') : '';
+        valData.slug     = isClone ? liObj.data('submenu-slug')  : '';
+        valData.order    = isClone ? liObj.data('submenu-order') : '100';
+        valData.old_slug = isClone ? valData.slug : '';
 
         for (var k in valData)
             $modal.find('input[name="' + k + '"]').val(valData[k]);
@@ -125,6 +136,7 @@ var wd_items = wd_items || {
 
     init: function()
     {
+        this.addSubmenuControlPanels();
         this.popupChangePage();
         this.events();
         this.select2Icons('#editPageForm select[name="Page[icon]"]');

@@ -24,16 +24,16 @@
 }
 #layout-sidenav ul li .page-control {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: -4px;
+    left: -2px;
     padding: 1.215em .714em 1.429em;
-    display: none;
+    opacity: 0.4;
 }
 #layout-sidenav ul li .page-control button {
     display: block;
     margin-bottom: 3px;
     padding: 1px 4px;
-    opacity: 0.4;
+    opacity: 0.8;
 }
 
 /*
