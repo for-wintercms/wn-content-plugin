@@ -113,7 +113,7 @@ class GetContent extends ComponentBase
         foreach ($this->getSections() as $section)
         {
             $content .= $twig
-                ->loadTemplate($this->contentItem->getPartialPath($section['partial']))
+                ->loadTemplate($section['partial'])
                 ->render(array_merge($this->controller->vars, $this->getProperties(), $section));
         }
         return $content;

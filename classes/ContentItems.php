@@ -44,20 +44,18 @@ class ContentItems implements InterfaceContentItems
         {
             if (empty($v['section']) || ! is_string($v['section']))
                 continue;
-
-            $partial = $this->contentItemSectionsList[$v['section']]['partial'] ?? null;
-            if (! is_string($partial))
-                continue;
-
-            $partial = preg_replace("/\.htm$/i", '', $partial) .'.htm';
-            if (file_exists($this->contentItemsContentPath.'/'. $partial))
+            if ($partial = $this->getSectionPartialPath($v['section']))
                 $result[$k] = $partial;
         }
         return $result;
     }
 
-    public function getPartialPath(string $partial)
+    public function getSectionPartialPath(string $section)
     {
-        return $this->contentItemsContentPath.'/'. $partial;
+        $partial = $this->contentItemSectionsList[$section]['partial'] ?? null;
+        if (! is_string($partial))
+            return null;
+        $partial = $this->contentItemsContentPath .'/'. preg_replace("/\.htm$/i", '', $partial) .'.htm';
+        return file_exists($partial) ? $partial : null;
     }
 }
