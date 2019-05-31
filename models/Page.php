@@ -23,6 +23,10 @@ class Page extends Model
         'slug' => 'required|between:1,256',
     ];
 
+    public $hasMany = [
+        'items' => 'Wbry\Content\Models\Item'
+    ];
+
     /*
      * Helpers
      */

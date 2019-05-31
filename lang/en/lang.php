@@ -24,5 +24,9 @@
             'is404_title' => 'Page 404',
             'is404_desc'  => 'If the configuration page is not found, showing 404 page.',
         ],
+        'get_items' => [
+            'name' => 'Content items',
+            'desc' => 'Receives pre-made content blocks',
+        ],
     ],
 ];

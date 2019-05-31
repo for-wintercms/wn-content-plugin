@@ -35,13 +35,16 @@ class ContentItems implements InterfaceContentItems
         return ($this->checkPageSlug($pageSlug)) ? $this->contentItemList[$pageSlug] : [];
     }
 
-    public function getPartials(string $pageSlug)
+    public function getPartials(string $pageSlug, array $itemSlugs = null)
     {
         if ((! $this->checkPageSlug($pageSlug)))
             return [];
         $result = [];
+        $isSlugs = !empty($itemSlugs);
         foreach ($this->contentItemList[$pageSlug] as $k => $v)
         {
+            if ($isSlugs && ! in_array($k, $itemSlugs))
+                continue;
             if (empty($v['section']) || ! is_string($v['section']))
                 continue;
             if ($partial = $this->getSectionPartialPath($v['section']))

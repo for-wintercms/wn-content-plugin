@@ -58,13 +58,11 @@ class Plugin extends PluginBase
         ];
     }
 
-    public function registerMarkupTags()
-    {}
-
     public function registerComponents()
     {
         return [
-            'Wbry\Content\Components\GetContent' => 'getContent'
+            'Wbry\Content\Components\GetContent' => 'getContent',
+            'Wbry\Content\Components\GetItems'   => 'getItems',
         ];
     }
 
