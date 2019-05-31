@@ -63,17 +63,7 @@ Yaml files with page margin settings.
 
  Field    | Importance   | Description
  -------- | ------------ | -------------
- menu     | required     | Page configurations. See more below.
  items    | required     | Page fields and sections. See more below.
-
-##### *[menu]* page configurations:
-
- Field    | Importance   | Description
- -------- | ------------ | -------------
- label    | required     | Page title (for backend)
- slug     | required     | Page unique slug (to control the page)
- icon     | optional     | Page fa awesome icon (for backend)
- order    | optional     | Page order (for backend)
 
 ##### *[items]* page fields and sections:
 
@@ -91,11 +81,6 @@ Declare a key-value pair. Value settings:
 # config-files-path/pages/books.yaml
 # ========================================
 
-menu:
-    label: Books
-    slug: books
-    icon: icon-book
-    order: 100
 items:
     body_block:
         label: Books list
