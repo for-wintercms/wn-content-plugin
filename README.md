@@ -108,3 +108,43 @@ items:
 
 The plugin has various events for extend the logic.
 All events begin with a prefix ```wbry.content.*```
+
+
+## Components
+
+#### "GetContent" component
+
+```
+Example
+...
+
+[getContent]
+==
+{% component 'getContent' %}
+
+...
+```
+
+#### "GetItems" component
+
+```
+Example
+...
+
+[getItems]
+==
+
+get fields
+{% set testData1 = getItems.item('page-slug', 'header') %}
+
+or for multiple items fields
+{% set testData2 = getItems.items('page-slug', ['header', 'menu']) %}
+
+or ready content
+{{ getItems.item('page-slug', 'header', true) }}
+
+or multiple ready content
+{{ getItems.items('page-slug', ['header', 'menu'], true) }}
+
+...
+```
