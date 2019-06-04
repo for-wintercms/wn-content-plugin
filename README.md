@@ -2,6 +2,10 @@
 
 # Content Management Plugin
 
+## Working integrations
+
+ - *(optional)* For a complete translation system, install the [**Rainlab.Translate**](https://octobercms.com/plugin/rainlab-translate) plugin.
+
 ## Config files
 
 Config files path: ```/themes/your-active-theme/content-items/*```
