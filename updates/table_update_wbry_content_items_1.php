@@ -24,19 +24,22 @@ class TableUpdateWbryContentItems extends Migration
             });
 
             # convert page names
-            $items = DB::table('wbry_content_items')->select('page')->distinct()->get();
-            $savePages = [];
-            foreach ($items as $item)
-                $savePages[] = ['slug' => $item->page];
-            if ($savePages)
-            {
-                DB::transaction(function() use ($savePages)
+            try {
+                $items = DB::table('wbry_content_items')->select('page')->distinct()->get();
+                $savePages = [];
+                foreach ($items as $item)
+                    $savePages[] = ['slug' => $item->page];
+                if ($savePages)
                 {
-                    PageModel::insert($savePages);
-                    foreach (PageModel::lists('slug', 'id') as $id => $page)
-                        ItemModel::where('page', $page)->update(['page_id' => $id]);
-                });
+                    DB::transaction(function() use ($savePages)
+                    {
+                        PageModel::insert($savePages);
+                        foreach (PageModel::lists('slug', 'id') as $id => $page)
+                            ItemModel::where('page', $page)->update(['page_id' => $id]);
+                    });
+                }
             }
+            catch (\Exception $e) {}
 
             # drop old column
             Schema::table(self::$tableItems, function (Blueprint $table) {

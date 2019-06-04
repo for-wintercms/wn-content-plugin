@@ -7,13 +7,14 @@ use File;
 use Lang;
 use Schema;
 use ApplicationException;
+use Wbry\Content\Classes\Interfaces\ContentItems;
 
 use October\Rain\Database\Schema\Blueprint;
 use October\Rain\Database\Updates\Migration;
 
 use Wbry\Content\Models\Page as PageModel;
 
-class TableUpdateWbryContentPages extends Migration
+class TableUpdateWbryContentPages extends Migration implements ContentItems
 {
     use \Wbry\Content\Classes\Traits\ContentItemsParse;
 
@@ -28,8 +29,11 @@ class TableUpdateWbryContentPages extends Migration
             $table->integer('order')->nullable()->default(0);
         });
 
-        $this->buildContentItemsPaths();
-        $this->updatePageAttr();
+        try {
+            $this->buildContentItemsPaths();
+            $this->updatePageAttr();
+        }
+        catch (\Exception $e) {}
     }
 
     public function down()
