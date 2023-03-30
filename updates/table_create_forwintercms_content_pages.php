@@ -6,7 +6,6 @@ use Schema;
 use Winter\Storm\Database\Schema\Blueprint;
 use Winter\Storm\Database\Updates\Migration;
 use ForWinterCms\Content\Classes\Interfaces\ContentItems;
-use ForWinterCms\Content\Models\Page as PageModel;
 
 class TableCreateForwintercmsContentPages extends Migration implements ContentItems
 {
@@ -26,7 +25,6 @@ class TableCreateForwintercmsContentPages extends Migration implements ContentIt
 
         try {
             $this->buildContentItemsPaths();
-            $this->updatePageAttr();
         }
         catch (\Exception $e) {}
     }
@@ -34,37 +32,5 @@ class TableCreateForwintercmsContentPages extends Migration implements ContentIt
     public function down()
     {
         Schema::dropIfExists('forwintercms_content_pages');
-    }
-
-    protected function updatePageAttr()
-    {
-        foreach (File::files($this->contentItemsPagesPath) as $file)
-        {
-            $fileExt = $file->getExtension();
-            if ($fileExt !== 'yaml')
-                continue;
-
-            $fileName = $file->getFilename();
-            $realPath = $file->getRealPath();
-            $config   = Yaml::parseFile($realPath);
-
-            # menu
-            #========
-            if (! is_array($config) || empty($config['menu']) || empty($config['menu']['label']) || empty($config['menu']['slug']))
-                throw new ApplicationException('Correctly declare the page menu item in the file'.$fileName);
-
-            $menuSlug = $config['menu']['slug'];
-            if (! $this->validateAlphaDash('slug', $menuSlug))
-                throw new ApplicationException('Invalid syntax in section name "'. $fileName .'" -> "'. $menuSlug .'"');
-
-            PageModel::slug($menuSlug)->update([
-                'title' => $config['menu']['label'],
-                'icon'  => $config['menu']['icon'],
-                'order' => (int)$config['menu']['order'],
-            ]);
-            unset($config['menu']);
-
-            $this->saveContentItemConfigFile($config, $realPath);
-        }
     }
 }
