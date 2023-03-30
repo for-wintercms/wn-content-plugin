@@ -11,14 +11,14 @@ Config files path: ```/themes/your-active-theme/content-items/*```
 
 #### Partials
 
-Directory: ```config-files-path/sections```
+Directory: ```content-items/sections```
 
 Regular partial files - [DOC partials](https://wintercms.com/docs/cms/partials)
 
 
 #### Sections
 
-Directory: ```config-files-path/sections```
+Directory: ```content-items/sections```
 
 Yaml files with section field settings.
 
@@ -57,7 +57,7 @@ form:
 
 #### Pages
 
-Directory: ```config-files-path/pages```
+Directory: ```content-items/pages```
 
 Yaml files with page margin settings.
 
@@ -80,13 +80,13 @@ Declare a key-value pair. Value settings:
 ##### Example:
 
 ```yaml
-# config-files-path/pages/books.yaml
+# content-items/pages/books.yaml
 # ========================================
 
 items:
     body_block:
         label: Books list
-        section: 'book'     # config-files-path/sections/books.yaml
+        section: 'book'     # content-items/sections/books.yaml
     location:
         label: Location
         form:
