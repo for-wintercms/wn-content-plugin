@@ -1,16 +1,15 @@
 <?php
 
-namespace Wbry\Content\Classes;
+namespace ForWinterCms\Content\Classes;
 
 use Lang;
 use Exception;
-use Wbry\Content\Classes\Interfaces\ContentItems as InterfaceContentItems;
+use ForWinterCms\Content\Classes\Interfaces\ContentItems as InterfaceContentItems;
 
 /**
  * ContentItems class
  *
- * @package Wbry\Content\Classes
- * @author Wbry, Diamond <me@diamondsystems.org>
+ * @package ForWinterCms\Content\Classes
  */
 class ContentItems implements InterfaceContentItems
 {

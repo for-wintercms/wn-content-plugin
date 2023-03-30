@@ -1,6 +1,6 @@
 <?php
 
-namespace Wbry\Content\Controllers;
+namespace ForWinterCms\Content\Controllers;
 
 use Db;
 use App;
@@ -16,26 +16,25 @@ use Validator;
 use Exception;
 use BackendMenu;
 use Backend\Classes\Controller;
-use Wbry\Content\Models\Item as ItemModel;
-use Wbry\Content\Models\Page as PageModel;
-use Wbry\Content\Classes\IconList;
-use Wbry\Content\Classes\Interfaces\ContentItems;
+use ForWinterCms\Content\Models\Item as ItemModel;
+use ForWinterCms\Content\Models\Page as PageModel;
+use ForWinterCms\Content\Classes\IconList;
+use ForWinterCms\Content\Classes\Interfaces\ContentItems;
 use October\Rain\Exception\ValidationException;
 use October\Rain\Exception\ApplicationException;
 
 /**
  * Items controller
  *
- * @package Wbry\Content\Controllers
- * @author Wbry, Diamond <me@diamondsystems.org>
+ * @package ForWinterCms\Content\Controllers
  */
 class Items extends Controller implements ContentItems
 {
-    use \Wbry\Content\Classes\Traits\ContentItemsParse;
+    use \ForWinterCms\Content\Classes\Traits\ContentItemsParse;
 
     public $implement = [
         'Backend\Behaviors\ListController',
-        'Wbry\Content\Classes\Behaviors\FormController',
+        'ForWinterCms\Content\Classes\Behaviors\FormController',
         'Backend\Behaviors\ReorderController',
     ];
 
@@ -43,7 +42,7 @@ class Items extends Controller implements ContentItems
     public $formConfig = 'config_form.yaml';
     public $reorderConfig = 'config_reorder.yaml';
 
-    public $requiredPermissions = ['wbry.content.items'];
+    public $requiredPermissions = ['forwintercms.content.items'];
 
     public $page          = null;
     public $locales       = null;
@@ -149,7 +148,7 @@ class Items extends Controller implements ContentItems
                 $this->page = $this->currentPage->slug;
         }
 
-        BackendMenu::setContext('Wbry.Content', 'items');
+        BackendMenu::setContext('ForWinterCms.Content', 'items');
         BackendMenu::setContextSideMenu($this->page);
 
         Event::listen('backend.menu.extendItems', function($menu)
@@ -182,7 +181,7 @@ class Items extends Controller implements ContentItems
             if ($this->isPageCreate())
             {
                 $submenu['create_new_page'] = [
-                    'label' => Lang::get('wbry.content::content.submenu.create_page_btn'),
+                    'label' => Lang::get('forwintercms.content::content.submenu.create_page_btn'),
                     'url' => 'javascript:;',
                     'icon' => 'icon-plus-circle',
                     'order' => -1000,
@@ -194,7 +193,7 @@ class Items extends Controller implements ContentItems
 
             # add submenu list
             # ======================
-            $menu->addSideMenuItems('Wbry.Content', 'items', $submenu);
+            $menu->addSideMenuItems('ForWinterCms.Content', 'items', $submenu);
         });
     }
 
@@ -230,8 +229,8 @@ class Items extends Controller implements ContentItems
     protected function addAssets()
     {
         # Custom
-        $this->addCss('/plugins/wbry/content/assets/css/backend/main.css', '1559221212');
-        $this->addJs('/plugins/wbry/content/assets/js/backend/items_page.js', '1559221212');
+        $this->addCss('/plugins/forwintercms/content/assets/css/backend/main.css', '1559221212');
+        $this->addJs('/plugins/forwintercms/content/assets/js/backend/items_page.js', '1559221212');
 
         # framework extras
         $this->addJs('/modules/system/assets/js/framework.extras.js');
@@ -244,68 +243,68 @@ class Items extends Controller implements ContentItems
 
     public function isItemCreate()
     {
-        return $this->getEventResult('wbry.content.isItemCreate');
+        return $this->getEventResult('forwintercms.content.isItemCreate');
     }
 
     public function isItemCreateNewTmp()
     {
-        return $this->getEventResult('wbry.content.isItemCreateNewTmp');
+        return $this->getEventResult('forwintercms.content.isItemCreateNewTmp');
     }
 
     public function isItemCreateReadyTmp()
     {
-        return $this->getEventResult('wbry.content.isItemCreateReadyTmp');
+        return $this->getEventResult('forwintercms.content.isItemCreateReadyTmp');
     }
 
     public function isItemRename()
     {
-        return $this->getEventResult('wbry.content.isItemRename');
+        return $this->getEventResult('forwintercms.content.isItemRename');
     }
 
     public function isItemRenameTitle()
     {
-        return $this->getEventResult('wbry.content.isItemRenameTitle');
+        return $this->getEventResult('forwintercms.content.isItemRenameTitle');
     }
 
     public function isItemRenameSlug()
     {
-        return $this->getEventResult('wbry.content.isItemRenameSlug');
+        return $this->getEventResult('forwintercms.content.isItemRenameSlug');
     }
 
     public function isItemDelete()
     {
-        return $this->getEventResult('wbry.content.isItemDelete');
+        return $this->getEventResult('forwintercms.content.isItemDelete');
     }
 
     public function isItemSort()
     {
-        return $this->getEventResult('wbry.content.isItemSort');
+        return $this->getEventResult('forwintercms.content.isItemSort');
     }
 
     public function isPageCreate()
     {
-        return $this->getEventResult('wbry.content.isPageCreate');
+        return $this->getEventResult('forwintercms.content.isPageCreate');
     }
 
     public function isPageClone()
     {
-        return $this->getEventResult('wbry.content.isPageClone');
+        return $this->getEventResult('forwintercms.content.isPageClone');
     }
 
     public function isPageEdit()
     {
-        return $this->getEventResult('wbry.content.isPageEdit');
+        return $this->getEventResult('forwintercms.content.isPageEdit');
     }
 
     public function isPageDelete()
     {
-        return $this->getEventResult('wbry.content.isPageDelete');
+        return $this->getEventResult('forwintercms.content.isPageDelete');
     }
 
     public function hasAccessItemsChanges()
     {
         static $itemsChanges;
-        return $itemsChanges ?: ($itemsChanges = $this->user->hasAccess('wbry.content.items_changes'));
+        return $itemsChanges ?: ($itemsChanges = $this->user->hasAccess('forwintercms.content.items_changes'));
     }
 
     private function getEventResult($event)
@@ -330,7 +329,7 @@ class Items extends Controller implements ContentItems
 
     public function getPageUrl(string $pageSlug = NULL)
     {
-        return Backend::url('wbry/content/items/'. ($pageSlug ?: $this->page));
+        return Backend::url('forwintercms/content/items/'. ($pageSlug ?: $this->page));
     }
 
     public function getListPageTitle()
@@ -339,7 +338,7 @@ class Items extends Controller implements ContentItems
         if ($menuName)
             return $menuName;
 
-        $menuName = $this->currentPage->title ?? Lang::get('wbry.content::content.list.title');
+        $menuName = $this->currentPage->title ?? Lang::get('forwintercms.content::content.list.title');
         return $menuName;
     }
 
@@ -401,11 +400,11 @@ class Items extends Controller implements ContentItems
     public function onCreatePage()
     {
         if (! $this->isPageCreate())
-            Flash::error(Lang::get('wbry.content::content.errors.non_page_create'));
+            Flash::error(Lang::get('forwintercms.content::content.errors.non_page_create'));
 
         $this->buildContentItemPage(post());
 
-        Flash::success(Lang::get('wbry.content::content.success.create_page', ['page' => post('title')]));
+        Flash::success(Lang::get('forwintercms.content::content.success.create_page', ['page' => post('title')]));
 
         $pageSlug = post('slug');
         if ($this->getPageModel($pageSlug))
@@ -420,11 +419,11 @@ class Items extends Controller implements ContentItems
     public function onClonePage()
     {
         if (! $this->isPageClone())
-            Flash::error(Lang::get('wbry.content::content.errors.non_page_clone'));
+            Flash::error(Lang::get('forwintercms.content::content.errors.non_page_clone'));
 
         $this->buildContentItemPage(post(), self::CONTENT_ITEM_ACTION_CLONE, post('old_slug'));
 
-        Flash::success(Lang::get('wbry.content::content.success.clone_page', ['page' => post('title')]));
+        Flash::success(Lang::get('forwintercms.content::content.success.clone_page', ['page' => post('title')]));
 
         $pageSlug = post('slug');
         if ($this->getPageModel($pageSlug))
@@ -439,7 +438,7 @@ class Items extends Controller implements ContentItems
     public function onEditPage()
     {
         if (! $this->isPageEdit())
-            Flash::error(Lang::get('wbry.content::content.errors.non_page_edit'));
+            Flash::error(Lang::get('forwintercms.content::content.errors.non_page_edit'));
 
         $pageData    = post('Page');
         $pageSlug    = $pageData['slug'] ?? '';
@@ -450,7 +449,7 @@ class Items extends Controller implements ContentItems
         $page = $this->getPageModel($pageSlug);
         $this->pageSave($page);
 
-        Flash::success(Lang::get('wbry.content::content.success.edit_page', ['page' => post('title')]));
+        Flash::success(Lang::get('forwintercms.content::content.success.edit_page', ['page' => post('title')]));
 
         if ($page)
             return redirect($this->getPageUrl($pageSlug));
@@ -464,15 +463,15 @@ class Items extends Controller implements ContentItems
     public function onDeletePage()
     {
         if (! $this->isPageDelete())
-            Flash::error(Lang::get('wbry.content::content.errors.non_page_delete'));
+            Flash::error(Lang::get('forwintercms.content::content.errors.non_page_delete'));
 
         $pageSlug = post('slug');
         $this->deleteContentItemPage($pageSlug);
 
-        Flash::success(Lang::get('wbry.content::content.success.delete_page'));
+        Flash::success(Lang::get('forwintercms.content::content.success.delete_page'));
 
         if ($this->page == $pageSlug)
-            return redirect(Backend::url('wbry/content/items'));
+            return redirect(Backend::url('forwintercms/content/items'));
         else
             return back();
     }
@@ -489,7 +488,7 @@ class Items extends Controller implements ContentItems
         };
 
         if (! $this->isItemCreate())
-            return $errors('wbry.content::content.errors.non_item_create');
+            return $errors('forwintercms.content::content.errors.non_item_create');
 
         $title = null;
         switch ($formType = post('formType'))
@@ -497,15 +496,15 @@ class Items extends Controller implements ContentItems
             case self::CONTENT_ITEM_ADD_NEW:
             {
                 if (! $this->isItemCreateNewTmp())
-                    return $errors('wbry.content::content.errors.non_item_create_new_tmp');
+                    return $errors('forwintercms.content::content.errors.non_item_create_new_tmp');
 
                 $validator = Validator::make(post(), [
                     'title' => 'required|between:2,255',
                     'name'  => 'required|between:2,255|alpha_dash',
                 ]);
                 $validator->setAttributeNames([
-                    'title' => Lang::get('wbry.content::content.items.title_label'),
-                    'name'  => Lang::get('wbry.content::content.items.name_label'),
+                    'title' => Lang::get('forwintercms.content::content.items.title_label'),
+                    'name'  => Lang::get('forwintercms.content::content.items.name_label'),
                 ]);
                 if ($validator->fails())
                     throw new ValidationException($validator);
@@ -521,10 +520,10 @@ class Items extends Controller implements ContentItems
             case self::CONTENT_ITEM_ADD_SECTION:
             {
                 if (! $this->isItemCreateReadyTmp())
-                    return $errors('wbry.content::content.errors.non_item_create_ready_tmp');
+                    return $errors('forwintercms.content::content.errors.non_item_create_ready_tmp');
 
                 if (empty($this->contentItemList) && empty($this->contentItemSectionsList))
-                    throw new ApplicationException(Lang::get('wbry.content::content.popup.block.field_ready_tmp_empty'));
+                    throw new ApplicationException(Lang::get('forwintercms.content::content.popup.block.field_ready_tmp_empty'));
 
                 $name = post('readyTmp');
                 $attr = [];
@@ -553,7 +552,7 @@ class Items extends Controller implements ContentItems
         $data['#createItemPopup'] = $this->makePartial('create_item_popup');
 
         if ($title)
-            Flash::success(Lang::get('wbry.content::content.success.create_item', ['itemName' => $title]));
+            Flash::success(Lang::get('forwintercms.content::content.success.create_item', ['itemName' => $title]));
 
         return $data;
     }
@@ -569,7 +568,7 @@ class Items extends Controller implements ContentItems
         $isItemRenameTitle = $this->isItemRenameTitle();
         $isItemRenameSlug  = $this->isItemRenameSlug();
         if (! $this->isItemRename() || (! $isItemRenameTitle && ! $isItemRenameSlug))
-            return $errors('wbry.content::content.errors.non_item_rename');
+            return $errors('forwintercms.content::content.errors.non_item_rename');
 
         $oldName = post('old_name','');
         if (! $oldName || ! is_string($oldName))
@@ -580,7 +579,7 @@ class Items extends Controller implements ContentItems
             'new_slug' => $isItemRenameSlug ? post('name', '') : '',
         ]);
         if ($result)
-            Flash::success(Lang::get('wbry.content::content.success.rename_item'));
+            Flash::success(Lang::get('forwintercms.content::content.success.rename_item'));
 
         return $this->listRefresh();
     }
@@ -589,7 +588,7 @@ class Items extends Controller implements ContentItems
     {
         if (! $this->isItemDelete())
         {
-            Flash::error(Lang::get('wbry.content::content.errors.non_item_delete'));
+            Flash::error(Lang::get('forwintercms.content::content.errors.non_item_delete'));
             return $this->listRefresh();
         }
 
@@ -618,7 +617,7 @@ class Items extends Controller implements ContentItems
         if (is_numeric($id) && $id > 0)
         {
             if (! $this->isItemDelete())
-                Flash::error(Lang::get('wbry.content::content.errors.non_item_delete'));
+                Flash::error(Lang::get('forwintercms.content::content.errors.non_item_delete'));
             else
             {
                 $return = null;
@@ -692,36 +691,36 @@ class Items extends Controller implements ContentItems
             if ($this->isPageEdit())
             {
                 $form->model->setAttribute('old_slug', ($form->model->slug ?? ''));
-                $mainTab = Lang::get('wbry.content::content.pages.tab_main');
+                $mainTab = Lang::get('forwintercms.content::content.pages.tab_main');
                 $form->addFields([
                     'section_settings_page' => [
-                        'label' => Lang::get('wbry.content::content.pages.section_settings'),
+                        'label' => Lang::get('forwintercms.content::content.pages.section_settings'),
                         'span'  => 'full',
                         'type'  => 'section',
                         'tab'  => $mainTab,
                     ],
                     'title' => [
-                        'label' => Lang::get('wbry.content::content.pages.field_title'),
+                        'label' => Lang::get('forwintercms.content::content.pages.field_title'),
                         'span'  => 'left',
                         'type'  => 'text',
                         'tab'  => $mainTab,
                     ],
                     'slug' => [
-                        'label' => Lang::get('wbry.content::content.pages.field_slug'),
+                        'label' => Lang::get('forwintercms.content::content.pages.field_slug'),
                         'span'  => 'right',
                         'type'  => 'text',
                         'preset' => 'title',
                         'tab'  => $mainTab,
                     ],
                     'icon' => [
-                        'label' => Lang::get('wbry.content::content.pages.field_icon'),
+                        'label' => Lang::get('forwintercms.content::content.pages.field_icon'),
                         'span'  => 'left',
                         'type'  => 'dropdown',
                         'options' => 'getIconListDropDown',
                         'tab'  => $mainTab,
                     ],
                     'order' => [
-                        'label' => Lang::get('wbry.content::content.pages.field_order'),
+                        'label' => Lang::get('forwintercms.content::content.pages.field_order'),
                         'span'  => 'right',
                         'type'  => 'number',
                         'tab'  => $mainTab,
@@ -731,7 +730,7 @@ class Items extends Controller implements ContentItems
                         'attributes' => ['style' => 'display:none;'],
                         'tab'  => $mainTab,
                     ],
-                ], Event::fire('wbry.content.pageSettingsMainTab', [], true));
+                ], Event::fire('forwintercms.content.pageSettingsMainTab', [], true));
             }
         }
     }
@@ -748,7 +747,7 @@ class Items extends Controller implements ContentItems
                 'clickable'  => false,
                 'width'      => '60px',
                 'cssClass'   => 'column-button contentItemRenameBtn',
-                'path'       => '$/wbry/content/controllers/items/_column_edit.htm',
+                'path'       => '$/forwintercms/content/controllers/items/_column_edit.htm',
             ]]);
         }
     }
@@ -824,7 +823,7 @@ class Items extends Controller implements ContentItems
             return $this->makeView404();
 
         $this->listTitle = $this->getListPageTitle();
-        $this->pageTitle = Lang::get('wbry.content::content.list.sort_btn');
+        $this->pageTitle = Lang::get('forwintercms.content::content.list.sort_btn');
         $this->reorder();
 
         return $this->makeViewContentFile('reorder');
@@ -845,7 +844,7 @@ class Items extends Controller implements ContentItems
         }
 
         $title = $this->getListTitle($model->name, $model->name);
-        $this->pageTitle = Lang::get('wbry.content::content.form.title', ['title' => $title]);
+        $this->pageTitle = Lang::get('forwintercms.content::content.form.title', ['title' => $title]);
         $this->listTitle = $this->getListPageTitle();
         $this->initForm($model);
 

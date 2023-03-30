@@ -3,9 +3,9 @@
 # ===================================
 
 #title: Title
-modelClass: Wbry\Content\Models\Item
-list: $/wbry/content/models/item/columns.yaml
-recordUrl: 'wbry/content/items/:page_slug/:id'
+modelClass: ForWinterCms\Content\Models\Item
+list: $/forwintercms/content/models/item/columns.yaml
+recordUrl: 'forwintercms/content/items/:page_slug/:id'
 noRecordsMessage: 'backend::lang.list.no_records'
 recordsPerPage: 20
 showSetup: true

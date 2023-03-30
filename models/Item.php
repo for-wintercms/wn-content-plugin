@@ -1,17 +1,16 @@
 <?php
 
-namespace Wbry\Content\Models;
+namespace ForWinterCms\Content\Models;
 
 use Model;
 use October\Rain\Database\Builder;
-use Wbry\Content\Classes\ContentItems;
-use Wbry\Content\Models\Page as PageModel;
+use ForWinterCms\Content\Classes\ContentItems;
+use ForWinterCms\Content\Models\Page as PageModel;
 
 /**
  * Item model
  *
- * @package Wbry\Content\Models
- * @author Wbry, Diamond <me@diamondsystems.org>
+ * @package ForWinterCms\Content\Models
  */
 class Item extends Model
 {
@@ -20,7 +19,7 @@ class Item extends Model
 
     public $implement = [];
 
-    public $table = 'wbry_content_items';
+    public $table = 'forwintercms_content_items';
 
     protected $jsonable = ['items'];
 
@@ -37,7 +36,7 @@ class Item extends Model
     ];
 
     public $attributeNames = [
-        'name' => 'wbry.content::content.items.name_label',
+        'name' => 'forwintercms.content::content.items.name_label',
     ];
 
     /*

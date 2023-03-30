@@ -8,7 +8,7 @@
                   data-stripe-load-indicator>
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title"><?= e(trans('wbry.content::content.popup.rename_block.title_rename')) ?><span class="contentItemId"></span></h4>
+                    <h4 class="modal-title"><?= e(trans('forwintercms.content::content.popup.rename_block.title_rename')) ?><span class="contentItemId"></span></h4>
                 </div>
                 <div class="modal-body">
 
@@ -16,16 +16,16 @@
 
                     <?php if ($this->isItemRenameTitle()): ?>
                         <div class="form-group span-full">
-                            <label><?= e(trans('wbry.content::content.items.title_label')) ?></label>
+                            <label><?= e(trans('forwintercms.content::content.items.title_label')) ?></label>
                             <input type="text" name="title" value="" class="form-control" />
                         </div>
                     <?php endif; ?>
 
                     <?php if ($this->isItemRenameSlug()): ?>
                         <div class="form-group span-full">
-                            <label><?= e(trans('wbry.content::content.items.name_label')) ?></label>
+                            <label><?= e(trans('forwintercms.content::content.items.name_label')) ?></label>
                             <input type="text" name="name" value="" class="form-control" />
-                            <p class="help-block"><?= e(trans('wbry.content::content.items.name_cmt')) ?></p>
+                            <p class="help-block"><?= e(trans('forwintercms.content::content.items.name_cmt')) ?></p>
                         </div>
                     <?php endif; ?>
 
@@ -38,7 +38,7 @@
                     <button type="submit"
                             class="btn btn-primary"
                             data-attach-loading>
-                        <?= e(trans('wbry.content::lang.form.rename')) ?>
+                        <?= e(trans('forwintercms.content::lang.form.rename')) ?>
                     </button>
                 </div>
             </form>

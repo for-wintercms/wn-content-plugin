@@ -1,6 +1,6 @@
 <?php
 
-namespace Wbry\Content\Classes\Behaviors;
+namespace ForWinterCms\Content\Classes\Behaviors;
 
 use Db;
 use Event;
@@ -8,8 +8,7 @@ use Backend\Behaviors\FormController as FormControllerMain;
 
 /**
  * FormController behavior
- * @package Wbry\Content\Classes\Behaviors
- * @author Wbry, Diamond <me@diamondsystems.org>
+ * @package ForWinterCms\Content\Classes\Behaviors
  */
 class FormController extends FormControllerMain
 {
@@ -22,7 +21,7 @@ class FormController extends FormControllerMain
             'old_slug',
         ];
 
-        Event::fire('wbry.content.pageSaveBefore', [$model, &$delAttr]);
+        Event::fire('forwintercms.content.pageSaveBefore', [$model, &$delAttr]);
 
         $model->bindEvent('model.saveInternal', function ($attributes, $options) use ($model, &$delAttr) {
             foreach ($delAttr as $attr)
@@ -35,6 +34,6 @@ class FormController extends FormControllerMain
                 $modelToSave->save(null, $this->formWidget->getSessionKey());
         });
 
-        Event::fire('wbry.content.pageSaveAfter', [$model, &$delAttr]);
+        Event::fire('forwintercms.content.pageSaveAfter', [$model, &$delAttr]);
     }
 }

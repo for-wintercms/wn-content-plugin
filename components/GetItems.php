@@ -1,16 +1,15 @@
 <?php
 
-namespace Wbry\Content\Components;
+namespace ForWinterCms\Content\Components;
 
 use Cms\Classes\ComponentBase;
-use Wbry\Content\Classes\ContentItems;
-use Wbry\Content\Models\Page as PageModel;
+use ForWinterCms\Content\Classes\ContentItems;
+use ForWinterCms\Content\Models\Page as PageModel;
 
 /**
  * GetItems component
  *
- * @package Wbry\Content\Components
- * @author Wbry, Diamond <me@diamondsystems.org>
+ * @package ForWinterCms\Content\Components
  */
 class GetItems extends ComponentBase
 {
@@ -19,8 +18,8 @@ class GetItems extends ComponentBase
     public function componentDetails()
     {
         return [
-            'name'        => 'wbry.content::lang.components.get_items.name',
-            'description' => 'wbry.content::lang.components.get_items.desc',
+            'name'        => 'forwintercms.content::lang.components.get_items.name',
+            'description' => 'forwintercms.content::lang.components.get_items.desc',
         ];
     }
 

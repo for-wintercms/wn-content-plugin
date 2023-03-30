@@ -3,14 +3,14 @@
 # ===================================
 
 name: "Content list"
-modelClass: Wbry\Content\Models\Item
-form: $/wbry/content/models/item/fields.yaml
+modelClass: ForWinterCms\Content\Models\Item
+form: $/forwintercms/content/models/item/fields.yaml
 
 create:
-  redirect: wbry/content/items/:page_slug/update/:id
-  redirectClose: wbry/content/items/:page_slug
+  redirect: forwintercms/content/items/:page_slug/update/:id
+  redirectClose: forwintercms/content/items/:page_slug
 update:
-  redirectClose: wbry/content/items/:page_slug
+  redirectClose: forwintercms/content/items/:page_slug
 delete:
-  redirectClose: wbry/content/items/:page_slug
+  redirectClose: forwintercms/content/items/:page_slug
 preview: {}

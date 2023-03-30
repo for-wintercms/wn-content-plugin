@@ -1,10 +1,10 @@
 <div class="control-tabs content-tabs main-tabs-content" data-control="tab">
     <ul class="nav nav-tabs">
         <li class="active">
-            <a href="javascript:;"><i class="icon-file-text-o"></i>&nbsp;&nbsp;<?= e(trans('wbry.content::content.tabs.content')) ?></a>
+            <a href="javascript:;"><i class="icon-file-text-o"></i>&nbsp;&nbsp;<?= e(trans('forwintercms.content::content.tabs.content')) ?></a>
         </li>
         <li>
-            <a href="javascript:;"><i class="icon-cog"></i>&nbsp;&nbsp;<?= e(trans('wbry.content::content.tabs.settings')) ?></a>
+            <a href="javascript:;"><i class="icon-cog"></i>&nbsp;&nbsp;<?= e(trans('forwintercms.content::content.tabs.settings')) ?></a>
         </li>
     </ul>
     <div class="tab-content">
@@ -37,7 +37,7 @@
                                 data-request="onDeletePage"
                                 data-request-data="slug:'<?= $this->page ?>'"
                                 data-load-indicator="<?= e(trans('backend::lang.form.deleting')) ?>"
-                                data-request-confirm="<?= e(trans('wbry.content::content.msg.confirm_page_delete', ['page' => $this->getListPageTitle()])) ?>">
+                                data-request-confirm="<?= e(trans('forwintercms.content::content.msg.confirm_page_delete', ['page' => $this->getListPageTitle()])) ?>">
                         </button>
                         <?php endif ?>
                     </div>

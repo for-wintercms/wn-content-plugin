@@ -1,11 +1,10 @@
 <?php
 
-namespace Wbry\Content\Classes\Interfaces;
+namespace ForWinterCms\Content\Classes\Interfaces;
 
 /**
  * ContentItems interface
- * @package Wbry\Content\Classes\Interfaces
- * @author Wbry, Diamond <me@diamondsystems.org>
+ * @package ForWinterCms\Content\Classes\Interfaces
  */
 interface ContentItems
 {

@@ -1,16 +1,15 @@
 <?php
 
-namespace Wbry\Content\Components;
+namespace ForWinterCms\Content\Components;
 
 use Cms\Classes\ComponentBase;
-use Wbry\Content\Classes\ContentItems;
-use Wbry\Content\Models\Item as ItemModel;
+use ForWinterCms\Content\Classes\ContentItems;
+use ForWinterCms\Content\Models\Item as ItemModel;
 
 /**
  * GetContent component
  *
- * @package Wbry\Content\Components
- * @author Wbry, Diamond <me@diamondsystems.org>
+ * @package ForWinterCms\Content\Components
  */
 class GetContent extends ComponentBase
 {
@@ -21,15 +20,15 @@ class GetContent extends ComponentBase
     protected $itemData = [];
 
     /**
-     * @var \Wbry\Content\Classes\ContentItems
+     * @var \ForWinterCms\Content\Classes\ContentItems
      */
     protected $contentItem = null;
 
     public function componentDetails()
     {
         return [
-            'name'        => 'wbry.content::lang.components.get_content.name',
-            'description' => 'wbry.content::lang.components.get_content.desc',
+            'name'        => 'forwintercms.content::lang.components.get_content.name',
+            'description' => 'forwintercms.content::lang.components.get_content.desc',
         ];
     }
 
@@ -37,14 +36,14 @@ class GetContent extends ComponentBase
     {
         return [
             'pageSlug' => [
-                'title'       => 'wbry.content::lang.components.get_content.page_slug_title',
-                'description' => 'wbry.content::lang.components.get_content.page_slug_desc',
+                'title'       => 'forwintercms.content::lang.components.get_content.page_slug_title',
+                'description' => 'forwintercms.content::lang.components.get_content.page_slug_desc',
                 'default'     => "{{ :page_slug }}",
                 'type'        => 'string',
             ],
             'is404' => [
-                'title'       => 'wbry.content::lang.components.get_content.is404_title',
-                'description' => 'wbry.content::lang.components.get_content.is404_desc',
+                'title'       => 'forwintercms.content::lang.components.get_content.is404_title',
+                'description' => 'forwintercms.content::lang.components.get_content.is404_desc',
                 'default'     => true,
                 'type'        => 'checkbox',
                 'showExternalParam' => false,

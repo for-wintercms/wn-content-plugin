@@ -1,10 +1,4 @@
-1.0.1:
+1.0.0:
     - 'Initialize plugin.'
-    - table_create_wbry_content_items.php
-1.0.2:
-    - 'Pages model added for easy functionality expansion'
-    - table_create_wbry_content_pages.php
-    - table_update_wbry_content_items_1.php
-1.0.3:
-    - 'Add title, icon, order columns in model Page'
-    - table_update_wbry_content_pages_1.php
+    - table_create_forwintercms_content_items.php
+    - table_create_forwintercms_content_pages.php

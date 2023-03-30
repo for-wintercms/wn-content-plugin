@@ -1,19 +1,18 @@
 <?php
 
-namespace Wbry\Content\Models;
+namespace ForWinterCms\Content\Models;
 
 use Model;
 use October\Rain\Database\Builder;
-use Wbry\Content\Classes\IconList;
+use ForWinterCms\Content\Classes\IconList;
 
 /**
  * Page Model
- * @package Wbry\Content\Models
- * @author Wbry, Diamond <me@diamondsystems.org>
+ * @package ForWinterCms\Content\Models
  */
 class Page extends Model
 {
-    public $table = 'wbry_content_pages';
+    public $table = 'forwintercms_content_pages';
     public $fillable = ['title','slug','icon','order'];
 
     /**
@@ -24,7 +23,7 @@ class Page extends Model
     ];
 
     public $hasMany = [
-        'items' => 'Wbry\Content\Models\Item'
+        'items' => 'ForWinterCms\Content\Models\Item'
     ];
 
     /*

@@ -1,26 +1,25 @@
 <?php
 
-namespace Wbry\Content;
+namespace ForWinterCms\Content;
 
 use Event;
 use Backend;
 use System\Classes\PluginBase;
-use Wbry\Content\Models\Item as ItemModel;
+use ForWinterCms\Content\Models\Item as ItemModel;
 
 /**
  * Plugin - Content control
  *
- * @package Wbry\Content
- * @author Wbry, Diamond <me@diamondsystems.org>
+ * @package ForWinterCms\Content
  */
 class Plugin extends PluginBase
 {
     public function pluginDetails()
     {
         return [
-            'name'   => 'wbry.content::lang.plugin.name',
-            'description' => 'wbry.content::lang.plugin.description',
-            'author' => 'Weberry, Diamond',
+            'name'   => 'forwintercms.content::lang.plugin.name',
+            'description' => 'forwintercms.content::lang.plugin.description',
+            'author' => 'ForWinterCms',
             'icon'   => 'oc-icon-list-alt',
         ];
     }
@@ -28,13 +27,13 @@ class Plugin extends PluginBase
     public function registerPermissions()
     {
         return [
-            'wbry.content.items' => [
-                'label' => 'wbry.content::lang.plugin.name',
-                'tab'   => 'wbry.content::lang.permissions.items',
+            'forwintercms.content.items' => [
+                'label' => 'forwintercms.content::lang.plugin.name',
+                'tab'   => 'forwintercms.content::lang.permissions.items',
             ],
-            'wbry.content.items_changes' => [
-                'label' => 'wbry.content::lang.plugin.name',
-                'tab'   => 'wbry.content::lang.permissions.items_changes',
+            'forwintercms.content.items_changes' => [
+                'label' => 'forwintercms.content::lang.plugin.name',
+                'tab'   => 'forwintercms.content::lang.permissions.items_changes',
             ],
         ];
     }
@@ -42,18 +41,18 @@ class Plugin extends PluginBase
     public function registerNavigation()
     {
         $menuItems = [
-            'label'   => 'wbry.content::lang.menu.items',
+            'label'   => 'forwintercms.content::lang.menu.items',
             'icon'    => 'icon-list-alt',
-            'iconSvg' => 'plugins/wbry/content/assets/images/icon-content.svg',
+            'iconSvg' => 'plugins/forwintercms/content/assets/images/icon-content.svg',
         ];
-        Event::fire('wbry.content.menu.items', [&$menuItems]);
+        Event::fire('forwintercms.content.menu.items', [&$menuItems]);
         if (! is_array($menuItems))
             return [];
 
         return [
             'items' => array_merge($menuItems, [
-                'url'         => Backend::url('wbry/content/items'),
-                'permissions' => ['wbry.content.items'],
+                'url'         => Backend::url('forwintercms/content/items'),
+                'permissions' => ['forwintercms.content.items'],
             ])
         ];
     }
@@ -61,8 +60,8 @@ class Plugin extends PluginBase
     public function registerComponents()
     {
         return [
-            'Wbry\Content\Components\GetContent' => 'getContent',
-            'Wbry\Content\Components\GetItems'   => 'getItems',
+            'ForWinterCms\Content\Components\GetContent' => 'getContent',
+            'ForWinterCms\Content\Components\GetItems'   => 'getItems',
         ];
     }
 

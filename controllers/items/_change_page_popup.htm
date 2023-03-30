@@ -7,24 +7,24 @@
                   data-stripe-load-indicator>
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title toggle-change toggle-create"><?= e(trans('wbry.content::content.popup.page.title_create')) ?></h4>
-                    <h4 class="modal-title toggle-change toggle-clone"><?= e(trans('wbry.content::content.popup.page.title_clone')) ?></h4>
+                    <h4 class="modal-title toggle-change toggle-create"><?= e(trans('forwintercms.content::content.popup.page.title_create')) ?></h4>
+                    <h4 class="modal-title toggle-change toggle-clone"><?= e(trans('forwintercms.content::content.popup.page.title_clone')) ?></h4>
                 </div>
                 <div class="modal-body form-elements">
 
                     <div class="form-group span-left is-required">
-                        <label><?= e(trans('wbry.content::content.pages.field_title')) ?></label>
+                        <label><?= e(trans('forwintercms.content::content.pages.field_title')) ?></label>
                         <input type="text" name="title" class="form-control" id="presetNewPageName" />
                     </div>
 
                     <div class="form-group span-right is-required">
-                        <label><?= e(trans('wbry.content::content.pages.field_slug')) ?></label>
+                        <label><?= e(trans('forwintercms.content::content.pages.field_slug')) ?></label>
                         <input type="text" name="slug" class="form-control" data-input-preset="#presetNewPageName" />
                         <input type="hidden" name="old_slug" />
                     </div>
 
                     <div class="form-group dropdown-field span-left">
-                        <label><?= e(trans('wbry.content::content.pages.field_icon')) ?></label>
+                        <label><?= e(trans('forwintercms.content::content.pages.field_icon')) ?></label>
                         <select name="icon" class="form-control custom-select">
                             <?php foreach ($this->getIconList() as $itemV) : ?>
                             <option value="icon-<?= $itemV ?>"><?= $itemV ?></option>
@@ -33,7 +33,7 @@
                     </div>
 
                     <div class="form-group span-right">
-                        <label><?= e(trans('wbry.content::content.pages.field_order')) ?></label>
+                        <label><?= e(trans('forwintercms.content::content.pages.field_order')) ?></label>
                         <input type="number" name="order" class="form-control" min="-999" max="1000" />
                     </div>
 
@@ -48,7 +48,7 @@
                             class="btn btn-primary"
                             data-attach-loading>
                         <span class="toggle-change toggle-create"><?= e(trans('backend::lang.form.create')) ?></span>
-                        <span class="toggle-change toggle-clone"><?= e(trans('wbry.content::lang.form.clone')) ?></span>
+                        <span class="toggle-change toggle-clone"><?= e(trans('forwintercms.content::lang.form.clone')) ?></span>
                     </button>
                 </div>
             </form>

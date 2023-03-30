@@ -1,22 +1,21 @@
 <?php
 
-namespace Wbry\Content\Updates;
+namespace ForWinterCms\Content\Updates;
 
 use Schema;
 use October\Rain\Database\Schema\Blueprint;
 use October\Rain\Database\Updates\Migration;
 
 /**
- * TableCreateWbryContentItems migration
+ * TableCreateForwintercmsContentItems migration
  *
- * @package Wbry\Content\Updates
- * @author Wbry, Diamond <me@diamondsystems.org>
+ * @package ForWinterCms\Content\Updates
  */
-class TableCreateWbryContentItems extends Migration
+class TableCreateForwintercmsContentItems extends Migration
 {
     public function up()
     {
-        Schema::create('wbry_content_items', function(Blueprint $table)
+        Schema::create('forwintercms_content_items', function(Blueprint $table)
         {
             $table->engine = 'InnoDB';
             $table->increments('id')->unsigned();
@@ -33,6 +32,6 @@ class TableCreateWbryContentItems extends Migration
     
     public function down()
     {
-        Schema::dropIfExists('wbry_content_items');
+        Schema::dropIfExists('forwintercms_content_items');
     }
 }

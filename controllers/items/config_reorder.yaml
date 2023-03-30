@@ -2,8 +2,8 @@
 #  Reorder Behavior Config
 # ===================================
 
-title: 'wbry.content::content.list.create_btn'
+title: 'forwintercms.content::content.list.create_btn'
 nameFrom: title
-modelClass: Wbry\Content\Models\Item
+modelClass: ForWinterCms\Content\Models\Item
 toolbar:
   buttons: reorder_toolbar

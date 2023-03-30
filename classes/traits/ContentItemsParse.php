@@ -1,19 +1,19 @@
 <?php
 
-namespace Wbry\Content\Classes\Traits;
+namespace ForWinterCms\Content\Classes\Traits;
 
 use Cms\Classes\Page;
 use Db;
 use Lang;
 use File;
-use Wbry\Content\Models\Item;
+use ForWinterCms\Content\Models\Item;
 use Yaml;
 use Event;
 use Backend;
 use Validator;
 use Cms\Classes\Theme as CmsTheme;
-use Wbry\Content\Models\Item as ItemModel;
-use Wbry\Content\Models\Page as PageModel;
+use ForWinterCms\Content\Models\Item as ItemModel;
+use ForWinterCms\Content\Models\Page as PageModel;
 use October\Rain\Exception\SystemException;
 use October\Rain\Exception\ValidationException;
 use October\Rain\Exception\ApplicationException;
@@ -21,8 +21,7 @@ use October\Rain\Exception\ApplicationException;
 /**
  * ContentItemsParse trait
  *
- * @package Wbry\Content\Classes\Traits
- * @author Wbry, Diamond <me@diamondsystems.org>
+ * @package ForWinterCms\Content\Classes\Traits
  */
 trait ContentItemsParse
 {
@@ -121,7 +120,7 @@ trait ContentItemsParse
             $config = Yaml::parseFile($file->getRealPath());
 
             if (! is_array($config) || empty($config['label']) || ! isset($config['form']))
-                throw new ApplicationException(Lang::get('wbry.content::content.errors.section_config', ['fileName' => $file->getFilename()]));
+                throw new ApplicationException(Lang::get('forwintercms.content::content.errors.section_config', ['fileName' => $file->getFilename()]));
 
             $this->contentItemSectionsList[$fileBasename] = [
                 'title'   => $config['label'],
@@ -149,7 +148,7 @@ trait ContentItemsParse
             #================
             $fileName = $file->getFilename();
             $config   = Yaml::parseFile($file->getRealPath());
-            $errItem  = Lang::get('wbry.content::content.errors.pages_list', ['fileName' => $fileName]);
+            $errItem  = Lang::get('forwintercms.content::content.errors.pages_list', ['fileName' => $fileName]);
 
             if (! isset($config['items']) || ! is_array($config['items']))
                 throw new ApplicationException($errItem);
@@ -164,7 +163,7 @@ trait ContentItemsParse
                 elseif (isset($item['section']))
                 {
                     if (empty($item['section']) || ! isset($this->contentItemSectionsList[$item['section']]))
-                        throw new ApplicationException(Lang::get('wbry.content::content.errors.no_section_file', ['sectionFile' => $item['section'].'.yaml']));
+                        throw new ApplicationException(Lang::get('forwintercms.content::content.errors.no_section_file', ['sectionFile' => $item['section'].'.yaml']));
                 }
                 elseif (! isset($item['form']))
                     throw new ApplicationException($errItem);
@@ -289,13 +288,13 @@ trait ContentItemsParse
             $pageAttr['old_slug'] = $old_slug;
 
         $validator = Validator::make($pageAttr, $rules, [
-            'no_exists_page' => Lang::get('wbry.content::content.errors.no_exists_page', ['slug' => $slug]),
+            'no_exists_page' => Lang::get('forwintercms.content::content.errors.no_exists_page', ['slug' => $slug]),
         ]);
         $validator->setAttributeNames([
-            'title' => Lang::get('wbry.content::content.pages.field_title'),
-            'slug'  => Lang::get('wbry.content::content.pages.field_slug'),
-            'icon'  => Lang::get('wbry.content::content.pages.field_icon'),
-            'order' => Lang::get('wbry.content::content.pages.field_order'),
+            'title' => Lang::get('forwintercms.content::content.pages.field_title'),
+            'slug'  => Lang::get('forwintercms.content::content.pages.field_slug'),
+            'icon'  => Lang::get('forwintercms.content::content.pages.field_icon'),
+            'order' => Lang::get('forwintercms.content::content.pages.field_order'),
         ]);
 
         if ($validator->fails())
@@ -374,9 +373,9 @@ trait ContentItemsParse
                 $configPath = $this->newConfigFilePath($pageAttr['slug']);
             $pageId = PageModel::slug($pageAttr['slug'])->value('id');
 
-            Event::fire('wbry.content.buildContentItemsPageSave.before', [&$saveConfig, $pageId, $action]);
+            Event::fire('forwintercms.content.buildContentItemsPageSave.before', [&$saveConfig, $pageId, $action]);
             $this->saveContentItemConfigFile($saveConfig, $configPath);
-            Event::fire('wbry.content.buildContentItemsPageSave.after', [&$saveConfig, $pageId, $action]);
+            Event::fire('forwintercms.content.buildContentItemsPageSave.after', [&$saveConfig, $pageId, $action]);
         });
 
         try {
@@ -420,7 +419,7 @@ trait ContentItemsParse
      */
     protected function getContentItemPageConfigPath(string $pageSlug)
     {
-        $langErrPage = Lang::get('wbry.content::content.errors.no_page', ['pageSlug' => $pageSlug]);
+        $langErrPage = Lang::get('forwintercms.content::content.errors.no_page', ['pageSlug' => $pageSlug]);
         if (! $pageSlug || ! isset($this->contentItemFiles[$pageSlug]))
             throw new ApplicationException($langErrPage);
 
@@ -445,7 +444,7 @@ trait ContentItemsParse
         $config = Yaml::parseFile($configPath);
         $fileName = $this->contentItemFiles[$pageSlug] ?? basename($configPath);
         if (! is_array($config) || ! isset($config['items']))
-            throw new ApplicationException(Lang::get('wbry.content::content.errors.page_config', ['fileName' => $fileName]));
+            throw new ApplicationException(Lang::get('forwintercms.content::content.errors.page_config', ['fileName' => $fileName]));
 
         return $config;
     }
@@ -468,7 +467,7 @@ trait ContentItemsParse
     public function addContentItem(string $pageSlug, string $itemSlug, string $addType, array $parameters = [])
     {
         if (! in_array($addType, ['new', 'ready', 'section']))
-            throw new ApplicationException(Lang::get('wbry.content::content.errors.add_item_type'));
+            throw new ApplicationException(Lang::get('forwintercms.content::content.errors.add_item_type'));
 
         # check page slug
         # ===================
@@ -478,14 +477,14 @@ trait ContentItemsParse
         # ===================
         $saveItemSlug = empty($parameters['item_key']) ? $itemSlug : $parameters['item_key'];
         if (! $this->validateAlphaDash('itemSlug', $saveItemSlug))
-            throw new ApplicationException(Lang::get('wbry.content::content.errors.item_slug', ['itemSlug' => $saveItemSlug]));
+            throw new ApplicationException(Lang::get('forwintercms.content::content.errors.item_slug', ['itemSlug' => $saveItemSlug]));
 
         if (isset($this->contentItemList[$pageSlug][$saveItemSlug]))
         {
             if (ItemModel::item($pageSlug, $saveItemSlug)->count())
-                throw new ApplicationException(Lang::get('wbry.content::content.errors.no_exists_item', ['itemSlug' => $saveItemSlug]));
+                throw new ApplicationException(Lang::get('forwintercms.content::content.errors.no_exists_item', ['itemSlug' => $saveItemSlug]));
             elseif ($addType != 'ready')
-                throw new ApplicationException(Lang::get('wbry.content::content.errors.available_item', ['pageSlug' => $pageSlug, 'itemSlug' => $saveItemSlug]));
+                throw new ApplicationException(Lang::get('forwintercms.content::content.errors.available_item', ['pageSlug' => $pageSlug, 'itemSlug' => $saveItemSlug]));
         }
 
         # item config
@@ -503,7 +502,7 @@ trait ContentItemsParse
 
             case 'section':
                 $sectionSlug = $parameters['section_name'] ?? '';
-                $langErrSection = Lang::get('wbry.content::content.errors.no_item_tmp', ['itemSlug' => $sectionSlug]);
+                $langErrSection = Lang::get('forwintercms.content::content.errors.no_item_tmp', ['itemSlug' => $sectionSlug]);
                 if (empty($sectionSlug) || ! $this->validateAlphaDash('sectionSlug', $sectionSlug))
                     throw new ApplicationException($langErrSection);
                 elseif (! isset($this->contentItemSectionsList[$sectionSlug]))
@@ -576,7 +575,7 @@ trait ContentItemsParse
         $configPath = $this->getContentItemPageConfigPath($pageSlug);
 
         if (!$itemSlug || ! isset($this->contentItemList[$pageSlug][$itemSlug]))
-            throw new ApplicationException(Lang::get('wbry.content::content.errors.no_item', ['itemSlug' => $itemSlug]));
+            throw new ApplicationException(Lang::get('forwintercms.content::content.errors.no_item', ['itemSlug' => $itemSlug]));
 
         $rules   = [];
         $isTitle = (! empty($newTitle) && $newTitle !== $this->contentItemList[$pageSlug][$itemSlug]['title']);
@@ -596,11 +595,11 @@ trait ContentItemsParse
             'title' => $newTitle,
             'name'  => $newSlug,
         ], $rules, [
-            'no_exists_item' => Lang::get('wbry.content::content.errors.no_exists_item', ['itemSlug' => $newSlug]),
+            'no_exists_item' => Lang::get('forwintercms.content::content.errors.no_exists_item', ['itemSlug' => $newSlug]),
         ]);
         $validator->setAttributeNames([
-            'title' => Lang::get('wbry.content::content.items.title_label'),
-            'name'  => Lang::get('wbry.content::content.items.name_label'),
+            'title' => Lang::get('forwintercms.content::content.items.title_label'),
+            'name'  => Lang::get('forwintercms.content::content.items.name_label'),
         ]);
         if ($validator->fails())
             throw new ValidationException($validator);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Wbry\Content\Classes;
+namespace ForWinterCms\Content\Classes;
 
 use File;
 
@@ -8,8 +8,7 @@ use File;
  * Contains a list of icons.
  * @see http://octobercms.com/docs/ui/icon
  *
- * @package Wbry\Content\Classes
- * @author Wbry, Diamond <me@diamondsystems.org>
+ * @package ForWinterCms\Content\Classes
  */
 class IconList
 {

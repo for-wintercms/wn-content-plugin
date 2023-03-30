@@ -1,5 +1,3 @@
-# !!!  Attention: Alpha version  !!!
-
 # Content Management Plugin
 
 ## Working integrations
@@ -111,7 +109,7 @@ items:
 ## Events
 
 The plugin has various events for extend the logic.
-All events begin with a prefix ```wbry.content.*```
+All events begin with a prefix ```forwintercms.content.*```
 
 
 ## Components
