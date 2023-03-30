@@ -74,7 +74,7 @@ trait ContentItemsParse
             $directory = CmsTheme::getActiveTheme()->getPath().'/'.self::$contentItemsDir;
 
             if (! File::isDirectory($directory))
-                return false;
+                File::makeDirectory($directory);
 
             $this->contentItemsPath = $directory;
         }
