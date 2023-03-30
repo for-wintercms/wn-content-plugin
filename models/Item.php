@@ -3,7 +3,7 @@
 namespace ForWinterCms\Content\Models;
 
 use Model;
-use October\Rain\Database\Builder;
+use Winter\Storm\Database\Builder;
 use ForWinterCms\Content\Classes\ContentItems;
 use ForWinterCms\Content\Models\Page as PageModel;
 
@@ -14,8 +14,8 @@ use ForWinterCms\Content\Models\Page as PageModel;
  */
 class Item extends Model
 {
-    use \October\Rain\Database\Traits\Validation;
-    use \October\Rain\Database\Traits\Sortable;
+    use \Winter\Storm\Database\Traits\Validation;
+    use \Winter\Storm\Database\Traits\Sortable;
 
     public $implement = [];
 

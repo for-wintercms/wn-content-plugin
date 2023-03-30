@@ -3,7 +3,7 @@
 namespace ForWinterCms\Content\Models;
 
 use Model;
-use October\Rain\Database\Builder;
+use Winter\Storm\Database\Builder;
 use ForWinterCms\Content\Classes\IconList;
 
 /**

@@ -6,7 +6,7 @@ use File;
 
 /**
  * Contains a list of icons.
- * @see http://octobercms.com/docs/ui/icon
+ * @see https://wintercms.com/docs/ui/icon
  *
  * @package ForWinterCms\Content\Classes
  */

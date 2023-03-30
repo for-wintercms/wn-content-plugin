@@ -2,7 +2,7 @@
 
 ## Working integrations
 
- - *(optional)* For a complete translation system, install the [**Rainlab.Translate**](https://octobercms.com/plugin/rainlab-translate) plugin.
+ - *(optional)* For a complete translation system, install the [**Winter.Translate**](https://github.com/wintercms/wn-translate-plugin) plugin.
 
 ## Config files
 
@@ -13,7 +13,7 @@ Config files path: ```/themes/your-active-theme/content-items/*```
 
 Directory: ```config-files-path/sections```
 
-Regular partial files - [DOC partials](https://octobercms.com/docs/cms/partials)
+Regular partial files - [DOC partials](https://wintercms.com/docs/cms/partials)
 
 
 #### Sections
@@ -28,7 +28,7 @@ Fields with settings:
  --------- | ------------ | -------------
  label     | required     | Section title
  partial   | optional     | Partial file
- form      | required     | A configuration array, see [form fields](https://octobercms.com/docs/backend/forms#form-fields).
+ form      | required     | A configuration array, see [form fields](https://wintercms.com/docs/backend/forms#form-fields).
 
 ##### Example:
 
@@ -74,7 +74,7 @@ Declare a key-value pair. Value settings:
  Field    | Importance   | Description
  -------- | ------------ | -------------
  label    | required     | Page title (for backend)
- form     | required     | A configuration array, see [form fields](https://octobercms.com/docs/backend/forms#form-fields).
+ form     | required     | A configuration array, see [form fields](https://wintercms.com/docs/backend/forms#form-fields).
  section  | optional     | Section file. If declared, the **form** settings field will be ignored.
 
 ##### Example:

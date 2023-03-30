@@ -20,8 +20,8 @@ use ForWinterCms\Content\Models\Item as ItemModel;
 use ForWinterCms\Content\Models\Page as PageModel;
 use ForWinterCms\Content\Classes\IconList;
 use ForWinterCms\Content\Classes\Interfaces\ContentItems;
-use October\Rain\Exception\ValidationException;
-use October\Rain\Exception\ApplicationException;
+use Winter\Storm\Exception\ValidationException;
+use Winter\Storm\Exception\ApplicationException;
 
 /**
  * Items controller

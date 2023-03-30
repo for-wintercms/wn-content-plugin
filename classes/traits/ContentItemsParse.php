@@ -14,9 +14,9 @@ use Validator;
 use Cms\Classes\Theme as CmsTheme;
 use ForWinterCms\Content\Models\Item as ItemModel;
 use ForWinterCms\Content\Models\Page as PageModel;
-use October\Rain\Exception\SystemException;
-use October\Rain\Exception\ValidationException;
-use October\Rain\Exception\ApplicationException;
+use Winter\Storm\Exception\SystemException;
+use Winter\Storm\Exception\ValidationException;
+use Winter\Storm\Exception\ApplicationException;
 
 /**
  * ContentItemsParse trait

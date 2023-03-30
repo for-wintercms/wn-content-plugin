@@ -13,7 +13,7 @@ use ForWinterCms\Content\Classes\Interfaces\ContentItems as InterfaceContentItem
  */
 class ContentItems implements InterfaceContentItems
 {
-    use \October\Rain\Support\Traits\Singleton;
+    use \Winter\Storm\Support\Traits\Singleton;
     use Traits\ContentItemsParse;
 
     protected function init()
