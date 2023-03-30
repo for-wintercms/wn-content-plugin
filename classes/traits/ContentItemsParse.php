@@ -114,7 +114,7 @@ trait ContentItemsParse
                 continue;
 
             $fileBasename = $file->getBasename('.'.$fileExt);
-            if (! $this->validateAlphaDash('file', $fileBasename))
+            if (! $this->validateAlphaDash('file', $fileBasename, ['ascii']))
                 continue;
 
             $config = Yaml::parseFile($file->getRealPath());
@@ -141,7 +141,7 @@ trait ContentItemsParse
                 continue;
 
             $menuSlug = $file->getBasename('.'.$fileExt);
-            if (! $this->validateAlphaDash('file', $menuSlug) || ! PageModel::slug($menuSlug)->count())
+            if (! $this->validateAlphaDash('file', $menuSlug, ['ascii']) || ! PageModel::slug($menuSlug)->count())
                 continue;
 
             # content items
@@ -476,7 +476,7 @@ trait ContentItemsParse
         # check item slug
         # ===================
         $saveItemSlug = empty($parameters['item_key']) ? $itemSlug : $parameters['item_key'];
-        if (! $this->validateAlphaDash('itemSlug', $saveItemSlug))
+        if (! $this->validateAlphaDash('itemSlug', $saveItemSlug, ['ascii']))
             throw new ApplicationException(Lang::get('forwintercms.content::content.errors.item_slug', ['itemSlug' => $saveItemSlug]));
 
         if (isset($this->contentItemList[$pageSlug][$saveItemSlug]))
@@ -503,7 +503,7 @@ trait ContentItemsParse
             case 'section':
                 $sectionSlug = $parameters['section_name'] ?? '';
                 $langErrSection = Lang::get('forwintercms.content::content.errors.no_item_tmp', ['itemSlug' => $sectionSlug]);
-                if (empty($sectionSlug) || ! $this->validateAlphaDash('sectionSlug', $sectionSlug))
+                if (empty($sectionSlug) || ! $this->validateAlphaDash('sectionSlug', $sectionSlug, ['ascii']))
                     throw new ApplicationException($langErrSection);
                 elseif (! isset($this->contentItemSectionsList[$sectionSlug]))
                     throw new ApplicationException($langErrSection);

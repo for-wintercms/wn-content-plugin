@@ -13,8 +13,6 @@ use ForWinterCms\Content\Models\Page as PageModel;
  */
 class GetItems extends ComponentBase
 {
-    use \Illuminate\Validation\Concerns\ValidatesAttributes;
-
     public function componentDetails()
     {
         return [

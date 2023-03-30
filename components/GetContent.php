@@ -61,7 +61,7 @@ class GetContent extends ComponentBase
         $this->is404 = (bool)$this->property('is404', true);
         $pageSlug = $this->property('pageSlug', $this->param('page_slug'));
 
-        if ($this->validateAlphaDash('pageSlug', $pageSlug) && $this->contentItem->checkPageSlug($pageSlug))
+        if ($this->validateAlphaDash('pageSlug', $pageSlug, ['ascii']) && $this->contentItem->checkPageSlug($pageSlug))
             $this->pageSlug = $pageSlug;
 
         if (is_null($this->pageSlug) && $this->is404)
