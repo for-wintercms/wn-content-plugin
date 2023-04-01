@@ -137,10 +137,11 @@ Example
 ==
 
 get fields
-{% set testData1 = getItems.item('page-slug', 'header') %}
+{% set pageHeaderData = getItems.item('page-slug', 'header') %}
 
 or for multiple items fields
-{% set testData2 = getItems.items('page-slug', ['header', 'menu']) %}
+{% set pageAllData = getItems.items('page-slug') %}
+{% set pageBlockData = getItems.items('page-slug', ['header', 'menu']) %}
 
 or ready content
 {{ getItems.item('page-slug', 'header', true) }}

@@ -38,14 +38,14 @@ class GetItems extends ComponentBase
     /**
      * Get Items list
      *
-     * @param string $pageSlug   - Page slug
-     * @param array  $itemSlugs  - Item slugs (keys)
-     * @param bool   $isContent  - if true return contents list else items data array
+     * @param string      $pageSlug   - Page slug
+     * @param array|null  $itemSlugs  - Item slugs (keys)
+     * @param bool        $isContent  - if true return contents list else items data array
      *
      * @return array
      * @throws
      */
-    public function items(string $pageSlug, array $itemSlugs, bool $isContent = false)
+    public function items(string $pageSlug, array $itemSlugs = null, bool $isContent = false)
     {
         $contentItems = ContentItems::instance();
         if ((! $contentItems->checkPageSlug($pageSlug)))
@@ -56,6 +56,13 @@ class GetItems extends ComponentBase
             return [];
 
         $result = [];
+        $fnItems = function() use ($page, $itemSlugs) {
+            if (empty($itemSlugs))
+                return $page->items()->get();
+            else
+                return $page->items()->whereIn('name', $itemSlugs)->get();
+        };
+
         if ($isContent)
         {
             $partials = $contentItems->getPartials($pageSlug, $itemSlugs);
@@ -63,7 +70,7 @@ class GetItems extends ComponentBase
                 return [];
 
             $twig = $this->controller->getTwig();
-            foreach ($page->items()->whereIn('name', $itemSlugs)->get() as $item)
+            foreach ($fnItems() as $item)
             {
                 if (! isset($partials[$item->name]))
                     continue;
@@ -78,7 +85,7 @@ class GetItems extends ComponentBase
         }
         else
         {
-            foreach ($page->items()->whereIn('name', $itemSlugs)->get() as $item)
+            foreach ($fnItems() as $item)
                 $result[$item->name] = $item->items;
         }
 
