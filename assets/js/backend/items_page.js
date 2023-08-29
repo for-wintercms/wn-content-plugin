@@ -127,7 +127,7 @@ var wd_items = wd_items || {
                 langLocales[i] = $(el).data('field-name').toLowerCase();
             });
 
-            var funcFieldsFill = function(el)
+            var funcFieldsFill = function(el, tagName)
             {
                 // field name attr
                 var fieldName = $(el).attr('name').trim();//
@@ -145,13 +145,22 @@ var wd_items = wd_items || {
                 if (! fieldSetData)
                     $emptyFields[0] = $(el);
 
+                var funcSetField = function($el)
+                {
+                    $el.val(fieldSetData);
+                    if (tagName === 'textarea') {
+                        if ($el.attr('id').match(/^RichEditor/))
+                            $el.parent().find("div.fr-element").html(fieldSetData);
+                    }
+                };
+
                 langLocales.forEach(function(langCode) {
                     $transField = $("[name='Item["+langCode+"]["+fieldName+"]']");
                     if ($transField.length !== 1)
                         return;
                     if (fieldSetData) {
                         if (! $transField.val().trim())
-                            $transField.val(fieldSetData).prop('readonly', true);
+                            funcSetField($transField);
                     }
                     else {
                         fieldSetData = $transField.val().trim();
@@ -162,7 +171,7 @@ var wd_items = wd_items || {
 
                 if (fieldSetData) {
                     $emptyFields.forEach(function($el) {
-                        $el.val(fieldSetData).prop('readonly', true);
+                        funcSetField($el);
                     });
                 }
             };
@@ -170,10 +179,11 @@ var wd_items = wd_items || {
             // search all send fields
             $('#layout-body form.layout').find("[name^='Item[items][']").each(function(i, el)
             {
-                switch ($(el).prop('tagName').toLowerCase())
+                var tagName = $(el).prop('tagName').toLowerCase();
+                switch (tagName)
                 {
-                    case 'textarea':
-                        funcFieldsFill(el);
+                    case 'textarea': // <p>Регистрируясь, я принимаю <a href="/privacy-policy">Политику конфиденциальности</a>.</p>
+                        funcFieldsFill(el, tagName);
                         return;
                     case 'input':
                     {
@@ -188,12 +198,13 @@ var wd_items = wd_items || {
                             case 'checkbox':
                                 return;
                             default:
-                                funcFieldsFill(el);
+                                funcFieldsFill(el, tagName);
                                 return;
                         }
                     }
                 }
             });
+            // return false;
         });
     },
 
