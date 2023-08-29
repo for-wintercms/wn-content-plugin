@@ -672,7 +672,7 @@ class Items extends Controller implements ContentItems
                 {
                     $form->addTabFields(['items' => array_merge($itemForm, ['tab' => strtoupper($this->defaultLocale)])]);
                     foreach ($this->transLocales as $langCode)
-                        $form->addTabFields([$langCode => array_merge($itemForm, ['tab' => strtoupper($langCode)])]);
+                        $form->addTabFields([$langCode => array_merge($itemForm, ['tab' => strtoupper($langCode), 'cssClass' => 'langLocale'])]);
                 }
                 else
                     $form->addFields(['items' => $itemForm]);

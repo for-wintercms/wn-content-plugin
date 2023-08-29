@@ -29,6 +29,7 @@
         'title'         => 'Update - :title',
         'items_missing' => 'No form',
         'items_empty'   => 'Form is empty',
+        'fill_and_save' => 'Fill in blanks and Save',
     ],
     'tabs' => [
         'content'  => 'Content',

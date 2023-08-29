@@ -1,5 +1,10 @@
 var wd_items = wd_items || {
 
+    // trimN: function(str)
+    // {
+    //     return str.replace(/^[\s\xa0]+|[\s\xa0]+$/g, "");
+    // },
+
     select2Icons: function(selector)
     {
         var funSelectIcon = function(state)
@@ -109,6 +114,86 @@ var wd_items = wd_items || {
             $popup.find('input[name="name"]').val(itemName);
             $popup.find('input[name="old_name"]').val(itemName);
             $popup.modal('show');
+        });
+
+        // Fill in blanks and Save
+        $('#fill_and_save').click(function()
+        {
+            var langLocales = [];
+            var $langLocales = $('.langLocale');
+            if (! $langLocales.length)
+                return;
+            $langLocales.each(function(i, el) {
+                langLocales[i] = $(el).data('field-name').toLowerCase();
+            });
+
+            var funcFieldsFill = function(el)
+            {
+                // field name attr
+                var fieldName = $(el).attr('name').trim();//
+                var re = /^Item\[items\]\[(.*?)\]$/;
+                if (! fieldName.match(re))
+                    return;
+                fieldName = fieldName.replace(re, "$1").trim();
+                if (! fieldName)
+                    return;
+
+                // fill fields
+                var $transField;
+                var $emptyFields = [];
+                var fieldSetData = $(el).val().trim();
+                if (! fieldSetData)
+                    $emptyFields[0] = $(el);
+
+                langLocales.forEach(function(langCode) {
+                    $transField = $("[name='Item["+langCode+"]["+fieldName+"]']");
+                    if ($transField.length !== 1)
+                        return;
+                    if (fieldSetData) {
+                        if (! $transField.val().trim())
+                            $transField.val(fieldSetData).prop('readonly', true);
+                    }
+                    else {
+                        fieldSetData = $transField.val().trim();
+                        if (! fieldSetData)
+                            $emptyFields[$emptyFields.length] = $transField;
+                    }
+                });
+
+                if (fieldSetData) {
+                    $emptyFields.forEach(function($el) {
+                        $el.val(fieldSetData).prop('readonly', true);
+                    });
+                }
+            };
+
+            // search all send fields
+            $('#layout-body form.layout').find("[name^='Item[items][']").each(function(i, el)
+            {
+                switch ($(el).prop('tagName').toLowerCase())
+                {
+                    case 'textarea':
+                        funcFieldsFill(el);
+                        return;
+                    case 'input':
+                    {
+                        var fieldType = $(el).attr('type').toLowerCase();
+                        switch (fieldType) {
+                            case 'file':
+                            case 'image':
+                            case 'button':
+                            case 'submit':
+                            case 'reset':
+                            case 'radio':
+                            case 'checkbox':
+                                return;
+                            default:
+                                funcFieldsFill(el);
+                                return;
+                        }
+                    }
+                }
+            });
         });
     },
 
