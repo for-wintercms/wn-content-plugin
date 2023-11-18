@@ -42,6 +42,8 @@
         'page' => [
             'title_create' => 'Create page',
             'title_clone'  => 'Clone page',
+            'field_ready_tmp' => 'Ready templates',
+            'field_option_create_new_tmp' => 'Create a new template',
         ],
         'block' => [
             'title_create'   => 'Create block for page - :page',

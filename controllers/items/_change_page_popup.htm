@@ -12,6 +12,21 @@
                 </div>
                 <div class="modal-body form-elements">
 
+                    <?php $itemsList = $this->getReadyItemsList() ?>
+                    <?php if (count($itemsList)) : ?>
+                    <div class="form-group dropdown-field span-full">
+                        <label><?= e(trans('forwintercms.content::content.popup.page.field_ready_tmp')) ?></label>
+                        <select name="readyTmp" class="form-control custom-select">
+                            <option value="0"><?= e(trans('forwintercms.content::content.popup.page.field_option_create_new_tmp')) ?></option>
+                            <optgroup label="<?= e(trans('forwintercms.content::content.popup.page.field_ready_tmp')) ?>">
+                                <?php foreach ($itemsList['ready'] as $itemK => $itemV) : ?>
+                                <option value="ready_<?= $itemK ?>"><?= $itemV ?></option>
+                                <?php endforeach ?>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <?php endif; ?>
+
                     <div class="form-group span-left is-required">
                         <label><?= e(trans('forwintercms.content::content.pages.field_title')) ?></label>
                         <input type="text" name="title" class="form-control" id="presetNewPageName" />

@@ -42,6 +42,8 @@
         'page' => [
             'title_create' => 'Создать страницу',
             'title_clone'  => 'Клонировать страницу',
+            'field_ready_tmp' => 'Готовые шаблоны',
+            'field_option_create_new_tmp' => 'Создать новый шаблон...',
         ],
         'block' => [
             'title_create'   => 'Создать блок для страницы - :page',
