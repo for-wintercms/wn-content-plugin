@@ -229,8 +229,8 @@ class Items extends Controller implements ContentItems
     protected function addAssets()
     {
         # Custom
-        $this->addCss('/plugins/forwintercms/content/assets/css/backend/main.css', '1559221212');
-        $this->addJs('/plugins/forwintercms/content/assets/js/backend/items_page.js', '1559221212');
+        $this->addCss('/plugins/forwintercms/content/assets/css/backend/main.css', '1696488639');
+        $this->addJs('/plugins/forwintercms/content/assets/js/backend/items_page.js', '1696488639');
 
         # framework extras
         $this->addJs('/modules/system/assets/js/framework.extras.js');
@@ -642,6 +642,18 @@ class Items extends Controller implements ContentItems
         return $this->extendableCall('onReorder', []);
     }
 
+    public function onGetTranslateItems($id = null)
+    {
+        $ret = [];
+        if ($this->transLocales && is_numeric($id) && $id > 0 && ($model = ItemModel::find($id))) {
+            $ret[$this->defaultLocale] = $model->getAttributeTranslated('items', $this->defaultLocale);
+            foreach ($this->transLocales as $locale)
+                $ret[$locale] = $model->getAttributeTranslated('items', $locale);
+        }
+
+        return ['result' => $ret];
+    }
+
     /*
      * Filters
      */
@@ -668,13 +680,48 @@ class Items extends Controller implements ContentItems
                     'usePanelStyles' => false,
                     'form' => $activeForm,
                 ];
+                /*
                 if ($this->transLocales)
                 {
-                    $form->addTabFields(['items' => array_merge($itemForm, ['tab' => strtoupper($this->defaultLocale)])]);
-                    foreach ($this->transLocales as $langCode)
-                        $form->addTabFields([$langCode => array_merge($itemForm, ['tab' => strtoupper($langCode), 'cssClass' => 'langLocale'])]);
+                    $form->addTabFields(['items' => [
+                        'type' => 'nestedform',
+                        'usePanelStyles' => false,
+                        'tab' => 'Main',
+                        'form' => $activeForm,
+                    ]]);
+                    $form->addTabFields(['translates' => [
+                        'type' => 'nestedform',
+                        'usePanelStyles' => false,
+                        'tab' => 'Translate',
+                        'form' => ['secondaryTabs' => [
+                            'fields' => [
+                                'items' => [
+                                    'type' => 'nestedform',
+                                    'usePanelStyles' => false,
+                                    'tab' => 'EN',
+                                    'form' => $activeForm,
+                                ],
+                                'ru' => [
+                                    'type' => 'nestedform',
+                                    'usePanelStyles' => false,
+                                    'tab' => 'RU',
+                                    'form' => $activeForm,
+                                ],
+                                'uz' => [
+                                    'type' => 'nestedform',
+                                    'usePanelStyles' => false,
+                                    'tab' => 'UZ',
+                                    'form' => $activeForm,
+                                ],
+                            ],
+                        ]],
+                    ]]);
+//                    $form->addSecondaryTabFields(['items' => array_merge($itemForm, ['tab' => strtoupper($this->defaultLocale)])]);
+//                    foreach ($this->locales as $langCode)
+//                        $form->addSecondaryTabFields([$langCode => array_merge($itemForm, ['tab' => strtoupper($langCode), 'cssClass' => 'langLocale'])]);
                 }
                 else
+                */
                     $form->addFields(['items' => $itemForm]);
             }
             else
@@ -834,6 +881,9 @@ class Items extends Controller implements ContentItems
         if ($this->actionId < 1 || ! ($model = ItemModel::find($this->actionId)))
             return $this->makeView404();
 
+        $this->addJs('/plugins/forwintercms/content/assets/js/backend/translate_items.js', '1696488639');
+
+        /*
         if ($this->transLocales)
         {
             foreach ($this->transLocales as $locale)
@@ -842,6 +892,7 @@ class Items extends Controller implements ContentItems
                 $model->setAttribute($locale, $itemsData);
             }
         }
+        */
 
         $title = $this->getListTitle($model->name, $model->name);
         $this->pageTitle = Lang::get('forwintercms.content::content.form.title', ['title' => $title]);
