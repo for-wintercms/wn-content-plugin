@@ -689,15 +689,13 @@ trait ContentItemsParse
      *
      * @throws
      */
-    private function saveContentItemConfigFile(array $config, string $configPath, string $newConfigPath = NULL)
+    private function saveContentItemConfigFile(array $config, string $configPath)
     {
         @File::chmod($this->contentItemsPagesPath);
 
         $configStr = Yaml::render($config);
         if (! File::put($configPath, $configStr))
             throw new SystemException(sprintf('Error saving file %s', $configPath));
-        if ($newConfigPath && ! File::put($configPath, $newConfigPath))
-            throw new SystemException(sprintf('Error rename file %s', $configPath));
 
         @File::chmod($configPath);
     }
