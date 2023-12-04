@@ -2,11 +2,9 @@
 
 namespace ForWinterCms\Content\Classes\Traits;
 
-use Cms\Classes\Page;
 use Db;
 use Lang;
 use File;
-use ForWinterCms\Content\Models\Item;
 use Yaml;
 use Event;
 use Backend;
