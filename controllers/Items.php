@@ -421,8 +421,10 @@ class Items extends Controller implements ContentItems
      */
     public function onCreatePage()
     {
-        if (! $this->isPageCreate())
+        if (! $this->isPageCreate()) {
             Flash::error(Lang::get('forwintercms.content::content.errors.non_page_create'));
+            return [];
+        }
 
         $readyTmp = post('readyTmp');
         if (! empty($readyTmp))
@@ -456,8 +458,10 @@ class Items extends Controller implements ContentItems
      */
     public function onClonePage()
     {
-        if (! $this->isPageClone())
+        if (! $this->isPageClone()) {
             Flash::error(Lang::get('forwintercms.content::content.errors.non_page_clone'));
+            return [];
+        }
 
         $this->buildContentItemPage(post(), self::CONTENT_ITEM_ACTION_CLONE, post('old_slug'));
 
@@ -475,8 +479,10 @@ class Items extends Controller implements ContentItems
      */
     public function onEditPage()
     {
-        if (! $this->isPageEdit())
+        if (! $this->isPageEdit()) {
             Flash::error(Lang::get('forwintercms.content::content.errors.non_page_edit'));
+            return [];
+        }
 
         $pageData    = post('Page');
         $pageSlug    = $pageData['slug'] ?? '';
@@ -500,8 +506,10 @@ class Items extends Controller implements ContentItems
      */
     public function onDeletePage()
     {
-        if (! $this->isPageDelete())
+        if (! $this->isPageDelete()) {
             Flash::error(Lang::get('forwintercms.content::content.errors.non_page_delete'));
+            return [];
+        }
 
         $pageSlug = post('slug');
         $this->deleteContentItemPage($pageSlug);
