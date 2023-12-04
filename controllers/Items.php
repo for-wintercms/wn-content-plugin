@@ -45,6 +45,7 @@ class Items extends Controller implements ContentItems
     public $requiredPermissions = ['forwintercms.content.items'];
 
     public $page          = null;
+    public $pages         = null;
     public $locales       = null;
     public $defaultLocale = null;
     public $transLocales  = null;
@@ -65,6 +66,7 @@ class Items extends Controller implements ContentItems
         parent::__construct();
 
         $this->locales();
+        $this->pages();
         $this->translatableDataManager();
         $this->parseContentItemsData();
         $this->addActionMenu();
@@ -100,6 +102,11 @@ class Items extends Controller implements ContentItems
             if ($this->defaultLocale && is_array($this->locales) && count($this->locales))
                 $this->transLocales = array_diff(array_keys($this->locales), [$this->defaultLocale]);
         }
+    }
+
+    protected function pages()
+    {
+        $this->pages = PageModel::select('title','slug','icon','order')->get();
     }
 
     protected function translatableDataManager()
@@ -158,7 +165,7 @@ class Items extends Controller implements ContentItems
             $submenu = [];
             $isClonePage = $this->isPageClone();
 
-            foreach (PageModel::select('title','slug','icon','order')->get() as $page)
+            foreach ($this->pages as $page)
             {
                 $submenu[$page->slug] = [
                     'label' => $page->title,
@@ -342,6 +349,21 @@ class Items extends Controller implements ContentItems
         return $menuName;
     }
 
+    public function getReadyPagesList()
+    {
+        $tmpList = [];
+        foreach ($this->contentItemFiles as $pageSlug => $page)
+            $tmpList[$pageSlug] = $page['title'];
+
+        foreach ($this->pages as $page)
+        {
+            if (isset($tmpList[$page->slug]))
+                unset($tmpList[$page->slug]);
+        }
+
+        return $tmpList;
+    }
+
     public function getReadyItemsList()
     {
         $tmpList = [];
@@ -402,7 +424,23 @@ class Items extends Controller implements ContentItems
         if (! $this->isPageCreate())
             Flash::error(Lang::get('forwintercms.content::content.errors.non_page_create'));
 
-        $this->buildContentItemPage(post());
+        $readyTmp = post('readyTmp');
+        if (! empty($readyTmp))
+        {
+            if (! isset($this->contentItemFiles[$readyTmp])) {
+                Flash::error(Lang::get('forwintercms.content::content.errors.no_page', ['pageSlug' => $readyTmp]));
+                return [];
+            }
+            $this->buildContentItemPage([
+                'title' => $this->contentItemFiles[$readyTmp]['title'],
+                'slug' => $readyTmp,
+                'old_slug' => '',
+                'icon' => $this->contentItemFiles[$readyTmp]['icon'],
+                'order' => $this->contentItemFiles[$readyTmp]['order'],
+            ]);
+        }
+        else
+            $this->buildContentItemPage(post());
 
         Flash::success(Lang::get('forwintercms.content::content.success.create_page', ['page' => post('title')]));
 

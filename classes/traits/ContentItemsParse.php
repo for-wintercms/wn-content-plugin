@@ -39,7 +39,7 @@ trait ContentItemsParse
     protected $contentItemsContentPath = null;
 
     /**
-     * @var array - [page_slug => filename]
+     * @var array - [page_slug => [file => filename, title => 'Page name', icon => icon_name, order => order_number]]
      */
     protected $contentItemFiles = [];
 
@@ -139,7 +139,7 @@ trait ContentItemsParse
                 continue;
 
             $menuSlug = $file->getBasename('.'.$fileExt);
-            if (! $this->validateAlphaDash('file', $menuSlug, ['ascii']) || ! PageModel::slug($menuSlug)->count())
+            if (! $this->validateAlphaDash('file', $menuSlug, ['ascii']))
                 continue;
 
             # content items
@@ -151,8 +151,15 @@ trait ContentItemsParse
             if (! isset($config['items']) || ! is_array($config['items']))
                 throw new ApplicationException($errItem);
 
-            $this->contentItemFiles[$menuSlug] = $fileName;
-            $this->contentItemList[$menuSlug]  = [];
+            $this->contentItemFiles[$menuSlug]['file']  = $fileName;
+            $this->contentItemFiles[$menuSlug]['title'] = (!empty($config['title']) && is_string($config['title'])) ? $config['title'] : $menuSlug;
+            $this->contentItemFiles[$menuSlug]['icon']  = (!empty($config['icon']) && is_string($config['icon'])) ? $config['icon'] : 'icon-plus';
+            $this->contentItemFiles[$menuSlug]['order'] = (!empty($config['order']) && (is_string($config['order']) || is_int($config['order']))) ? $config['order'] : 100;
+
+            if (! PageModel::slug($menuSlug)->count())
+                continue;
+
+            $this->contentItemList[$menuSlug] = [];
 
             foreach ($config['items'] as $rAction => $item)
             {
@@ -213,7 +220,7 @@ trait ContentItemsParse
         if (empty($pageSlug) || empty($itemSlug) || ! isset($this->contentItemFiles[$pageSlug]))
             return null;
 
-        $filePath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug];
+        $filePath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug]['file'];
         if (! file_exists($filePath))
             return null;
 
@@ -273,12 +280,16 @@ trait ContentItemsParse
         $pageTableName = PageModel::make()->getTable();
         $rules = [
             'old_slug' => 'required|alpha_dash|min:2|exists:'. $pageTableName .',slug',
-            'title' => 'required',
+            'title' => 'required|between:2,255',
             'slug'  => 'required|alpha_dash|between:2,255|no_exists_page',
             'icon'  => 'alpha_dash|min:2',
             'order' => 'numeric|min:-999|max:1000',
         ];
-        $slug = $pageAttr['slug'] ?? '';
+        $pageAttr = array_merge([
+            'slug'  => '',
+            'icon'  => '',
+            'order' => '',
+        ], $pageAttr);
 
         if ($action === self::CONTENT_ITEM_ACTION_CREATE)
             unset($rules['old_slug']);
@@ -286,7 +297,7 @@ trait ContentItemsParse
             $pageAttr['old_slug'] = $old_slug;
 
         $validator = Validator::make($pageAttr, $rules, [
-            'no_exists_page' => Lang::get('forwintercms.content::content.errors.no_exists_page', ['slug' => $slug]),
+            'no_exists_page' => Lang::get('forwintercms.content::content.errors.no_exists_page', ['slug' => $pageAttr['slug']]),
         ]);
         $validator->setAttributeNames([
             'title' => Lang::get('forwintercms.content::content.pages.field_title'),
@@ -319,7 +330,7 @@ trait ContentItemsParse
             {
                 if (isset($this->contentItemFiles[$old_slug]))
                 {
-                    $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$old_slug];
+                    $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$old_slug]['file'];
                     if (file_exists($configPath))
                     {
                         if ($action === self::CONTENT_ITEM_ACTION_EDIT && $old_slug !== $pageAttr['slug'])
@@ -401,7 +412,7 @@ trait ContentItemsParse
 
             if (isset($this->contentItemFiles[$pageSlug]))
             {
-                $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug];
+                $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug]['file'];
                 if (file_exists($configPath))
                     File::delete($configPath);
             }
@@ -421,7 +432,7 @@ trait ContentItemsParse
         if (! $pageSlug || ! isset($this->contentItemFiles[$pageSlug]))
             throw new ApplicationException($langErrPage);
 
-        $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug];
+        $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug]['file'];
         if (! file_exists($configPath))
             throw new ApplicationException($langErrPage);
 
@@ -440,9 +451,11 @@ trait ContentItemsParse
     protected function getContentItemPageConfig(string $pageSlug, string $configPath)
     {
         $config = Yaml::parseFile($configPath);
-        $fileName = $this->contentItemFiles[$pageSlug] ?? basename($configPath);
         if (! is_array($config) || ! isset($config['items']))
+        {
+            $fileName = isset($this->contentItemFiles[$pageSlug]) ? $this->contentItemFiles[$pageSlug]['file'] : basename($configPath);
             throw new ApplicationException(Lang::get('forwintercms.content::content.errors.page_config', ['fileName' => $fileName]));
+        }
 
         return $config;
     }
@@ -643,7 +656,7 @@ trait ContentItemsParse
         if (! $pageSlug || ! isset($this->contentItemFiles[$pageSlug]) || ! count($itemSlugList))
             return;
 
-        $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug];
+        $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug]['file'];
         if (! file_exists($configPath))
             return;
 

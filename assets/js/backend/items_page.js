@@ -19,7 +19,7 @@ var wd_items = wd_items || {
         });
     },
 
-    select2CreateTmp: function(selector)
+    select2Tmp: function(selector)
     {
         var funSelect = function(state)
         {
@@ -67,11 +67,22 @@ var wd_items = wd_items || {
     {
         var me = this;
 
+        // create content block
+        var popupChangePageSelector = '#popupChangePage select[name="readyTmp"]';
+        var $createPageEmptyForm = $('#popupChangePage .emptyForm');
+        this.select2Tmp(popupChangePageSelector);
+        $(popupChangePageSelector).on("select2:select", function(e) {
+            if (e.params.data.id)
+                $createPageEmptyForm.hide(200);
+            else
+                $createPageEmptyForm.show(200);
+        });
+
         // create items type
         $('#createItemPopup').on('click', '#popupCreateItemTabs ul li a', function(){
             $('#popupCreateItemTabs input[name="formType"]').val($(this).data('form-type'));
         });
-        this.select2CreateTmp('#popupCreateItem select[name="readyTmp"]');
+        this.select2Tmp('#popupCreateItem select[name="readyTmp"]');
 
         // submenu control panel
         $('#layout-sidenav ul li').mouseover(function() {
@@ -220,6 +231,14 @@ var wd_items = wd_items || {
         valData.slug     = isClone ? liObj.data('submenu-slug')  : '';
         valData.order    = isClone ? liObj.data('submenu-order') : '100';
         valData.old_slug = isClone ? valData.slug : '';
+
+        $modal.find('select[name="readyTmp"] option:first').prop('selected', true).change();
+        $modal.find('.emptyForm').show();
+
+        if (isClone)
+            $modal.find('.readyTmp').hide();
+        else
+            $modal.find('.readyTmp').show();
 
         for (var k in valData)
             $modal.find('input[name="' + k + '"]').val(valData[k]);
