@@ -409,13 +409,6 @@ trait ContentItemsParse
             $pageId = PageModel::slug($pageSlug)->value('id');
             PageModel::slug($pageSlug)->delete();
             ItemModel::where('page_id', $pageId)->delete();
-
-            if (isset($this->contentItemFiles[$pageSlug]))
-            {
-                $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug]['file'];
-                if (file_exists($configPath))
-                    File::delete($configPath);
-            }
         });
     }
 
