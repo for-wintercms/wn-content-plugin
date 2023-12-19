@@ -430,14 +430,17 @@ class Items extends Controller implements ContentItems
         }
 
         $readyTmp = post('readyTmp');
+        $title = post('title');
+
         if (! empty($readyTmp))
         {
             if (! isset($this->contentItemFiles[$readyTmp])) {
                 Flash::error(Lang::get('forwintercms.content::content.errors.no_page', ['pageSlug' => $readyTmp]));
                 return [];
             }
+            $title = $this->contentItemFiles[$readyTmp]['title'];
             $this->buildContentItemPage([
-                'title' => $this->contentItemFiles[$readyTmp]['title'],
+                'title' => $title,
                 'slug' => $readyTmp,
                 'old_slug' => '',
                 'icon' => $this->contentItemFiles[$readyTmp]['icon'],
@@ -447,7 +450,7 @@ class Items extends Controller implements ContentItems
         else
             $this->buildContentItemPage(post());
 
-        Flash::success(Lang::get('forwintercms.content::content.success.create_page', ['page' => post('title')]));
+        Flash::success(Lang::get('forwintercms.content::content.success.create_page', ['page' => $title]));
 
         $pageSlug = post('slug');
         if ($this->getPageModel($pageSlug))
