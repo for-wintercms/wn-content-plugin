@@ -353,7 +353,10 @@ class Items extends Controller implements ContentItems
     {
         $tmpList = [];
         foreach ($this->contentItemFiles as $pageSlug => $page)
-            $tmpList[$pageSlug] = $page['title'];
+        {
+            if ($page['items_cnt'] > 0)
+                $tmpList[$pageSlug] = $page['title'];
+        }
 
         foreach ($this->pages as $page)
         {

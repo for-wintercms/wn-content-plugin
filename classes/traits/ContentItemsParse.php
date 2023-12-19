@@ -39,7 +39,7 @@ trait ContentItemsParse
     protected $contentItemsContentPath = null;
 
     /**
-     * @var array - [page_slug => [file => filename, title => 'Page name', icon => icon_name, order => order_number]]
+     * @var array - [page_slug => [file => filename, title => 'Page name', icon => icon_name, order => order_number, items_cnt => count]]
      */
     protected $contentItemFiles = [];
 
@@ -155,6 +155,7 @@ trait ContentItemsParse
             $this->contentItemFiles[$menuSlug]['title'] = (!empty($config['title']) && is_string($config['title'])) ? $config['title'] : $menuSlug;
             $this->contentItemFiles[$menuSlug]['icon']  = (!empty($config['icon']) && is_string($config['icon'])) ? $config['icon'] : 'icon-plus';
             $this->contentItemFiles[$menuSlug]['order'] = (!empty($config['order']) && (is_string($config['order']) || is_int($config['order']))) ? $config['order'] : 100;
+            $this->contentItemFiles[$menuSlug]['items_cnt'] = count($config['items']);
 
             if (! PageModel::slug($menuSlug)->count())
                 continue;
