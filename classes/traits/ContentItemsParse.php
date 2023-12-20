@@ -221,7 +221,7 @@ trait ContentItemsParse
         if (empty($pageSlug) || empty($itemSlug) || ! isset($this->contentItemFiles[$pageSlug]))
             return null;
 
-        $filePath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug]['file'];
+        $filePath = $this->pageConfigFilePath($pageSlug);
         if (! file_exists($filePath))
             return null;
 
@@ -331,13 +331,13 @@ trait ContentItemsParse
             {
                 if (isset($this->contentItemFiles[$old_slug]))
                 {
-                    $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$old_slug]['file'];
+                    $configPath = $this->pageConfigFilePath($old_slug);
                     if (file_exists($configPath))
                     {
                         if ($action === self::CONTENT_ITEM_ACTION_EDIT && $old_slug !== $pageAttr['slug'])
                         {
                             $oldConfigPath = $configPath;
-                            $configPath    = $this->newConfigFilePath($pageAttr['slug']);
+                            $configPath    = $this->newPageConfigFilePath($pageAttr['slug']);
 
                             File::move($oldConfigPath, $configPath);
                         }
@@ -426,7 +426,7 @@ trait ContentItemsParse
         if (! $pageSlug || ! isset($this->contentItemFiles[$pageSlug]))
             throw new ApplicationException($langErrPage);
 
-        $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug]['file'];
+        $configPath = $this->pageConfigFilePath($pageSlug);
         if (! file_exists($configPath))
             throw new ApplicationException($langErrPage);
 
@@ -650,7 +650,7 @@ trait ContentItemsParse
         if (! $pageSlug || ! isset($this->contentItemFiles[$pageSlug]) || ! count($itemSlugList))
             return;
 
-        $configPath = $this->contentItemsPagesPath .'/'. $this->contentItemFiles[$pageSlug]['file'];
+        $configPath = $this->pageConfigFilePath($pageSlug);
         if (! file_exists($configPath))
             return;
 
@@ -694,7 +694,12 @@ trait ContentItemsParse
         @File::chmod($configPath);
     }
 
-    private function newConfigFilePath(string $pageSlug)
+    private function pageConfigFilePath(string $pageSlug)
+    {
+        return $this->contentItemsPagesPath .'/'. ($this->contentItemFiles[$pageSlug]['file'] ?? $pageSlug .'.yaml');
+    }
+
+    private function newPageConfigFilePath(string $pageSlug)
     {
         return $this->contentItemsPagesPath .'/'. $pageSlug .'.yaml';
     }
