@@ -39,7 +39,7 @@ trait ContentItemsParse
     protected $contentItemsContentPath = null;
 
     /**
-     * @var array - [page_slug => [file => filename, title => 'Page name', icon => icon_name, order => order_number, items_cnt => count]]
+     * @var array - [page_slug => [title => 'Page name', icon => icon_name, order => order_number, items_cnt => count]]
      */
     protected $contentItemFiles = [];
 
@@ -144,14 +144,12 @@ trait ContentItemsParse
 
             # content items
             #================
-            $fileName = $file->getFilename();
-            $config   = Yaml::parseFile($file->getRealPath());
-            $errItem  = Lang::get('forwintercms.content::content.errors.pages_list', ['fileName' => $fileName]);
+            $config  = Yaml::parseFile($file->getRealPath());
+            $errItem = Lang::get('forwintercms.content::content.errors.pages_list', ['fileName' => $file->getFilename()]);
 
             if (! isset($config['items']) || ! is_array($config['items']))
                 throw new ApplicationException($errItem);
 
-            $this->contentItemFiles[$menuSlug]['file']  = $fileName;
             $this->contentItemFiles[$menuSlug]['title'] = (!empty($config['title']) && is_string($config['title'])) ? $config['title'] : $menuSlug;
             $this->contentItemFiles[$menuSlug]['icon']  = (!empty($config['icon']) && is_string($config['icon'])) ? $config['icon'] : 'icon-plus';
             $this->contentItemFiles[$menuSlug]['order'] = (!empty($config['order']) && (is_string($config['order']) || is_int($config['order']))) ? $config['order'] : 100;
@@ -345,7 +343,7 @@ trait ContentItemsParse
                     if ($old_slug !== $pageAttr['slug'] && file_exists($configPath))
                     {
                         $oldConfigPath = $configPath;
-                        $configPath    = $this->newPageConfigFilePath($pageAttr['slug']);
+                        $configPath    = $this->pageConfigFilePath($pageAttr['slug']);
 
                         File::move($oldConfigPath, $configPath);
                     }
@@ -353,7 +351,7 @@ trait ContentItemsParse
                     break;
 
                 case self::CONTENT_ITEM_ACTION_CLONE:
-                    $configPath = $this->newPageConfigFilePath($pageAttr['slug']);
+                    $configPath = $this->pageConfigFilePath($pageAttr['slug']);
                     $page = PageModel::slug($old_slug)->first();
 
                     if (! $page)
@@ -441,10 +439,7 @@ trait ContentItemsParse
     {
         $config = Yaml::parseFile($configPath);
         if (! is_array($config) || ! isset($config['items']))
-        {
-            $fileName = isset($this->contentItemFiles[$pageSlug]) ? $this->contentItemFiles[$pageSlug]['file'] : basename($configPath);
-            throw new ApplicationException(Lang::get('forwintercms.content::content.errors.page_config', ['fileName' => $fileName]));
-        }
+            throw new ApplicationException(Lang::get('forwintercms.content::content.errors.page_config', ['fileName' => basename($configPath)]));
 
         return $config;
     }
@@ -690,11 +685,6 @@ trait ContentItemsParse
     }
 
     private function pageConfigFilePath(string $pageSlug)
-    {
-        return $this->contentItemsPagesPath .'/'. ($this->contentItemFiles[$pageSlug]['file'] ?? $pageSlug .'.yaml');
-    }
-
-    private function newPageConfigFilePath(string $pageSlug)
     {
         return $this->contentItemsPagesPath .'/'. $pageSlug .'.yaml';
     }
