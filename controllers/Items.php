@@ -499,7 +499,7 @@ class Items extends Controller implements ContentItems
         $page = $this->getPageModel($pageSlug);
         $this->pageSave($page);
 
-        Flash::success(Lang::get('forwintercms.content::content.success.edit_page', ['page' => post('title')]));
+        Flash::success(Lang::get('forwintercms.content::content.success.edit_page', ['page' => $pageData['title']]));
 
         if ($page)
             return redirect($this->getPageUrl($pageSlug));
