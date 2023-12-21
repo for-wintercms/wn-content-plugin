@@ -261,8 +261,8 @@ trait ContentItemsParse
      *              icon  => (optional) menu icon, default ''
      *              order => (optional) menu order, default '100'
      *          ]
-     * @param string  $action    - create, clone or edit. Default 'create'
-     * @param string  $old_slug  - (required for edit page) old menu slug and\or URN slug,
+     * @param string       $action    - create, clone or edit. Default 'create'
+     * @param string|null  $old_slug  - (required for edit page) old menu slug and\or URN slug,
      * @throws
      */
     public function buildContentItemPage(array $pageAttr, string $action = self::CONTENT_ITEM_ACTION_CREATE, string $old_slug = null)
@@ -316,43 +316,44 @@ trait ContentItemsParse
 
         Db::transaction(function() use (&$pageAttr, $action, $old_slug)
         {
-            $configPath = null;
-            $saveConfig = ['items' => []];
-            $saveData   = [
+            $saveData = $saveConfig = [
                 'title' => $pageAttr['title'],
-                'slug'  => $pageAttr['slug'],
                 'icon'  => $pageAttr['icon'],
-                'order' => $pageAttr['order'],
+                'order' => $pageAttr['order']
             ];
+            $saveData['slug'] = $pageAttr['slug'];
+            $configPath = $this->pageConfigFilePath(
+                ($action === self::CONTENT_ITEM_ACTION_CREATE) ? $pageAttr['slug'] : $old_slug
+            );
 
-            if ($action === self::CONTENT_ITEM_ACTION_CREATE)
-                PageModel::create($saveData);
-            else
+            if (file_exists($configPath))
             {
-                if (isset($this->contentItemFiles[$old_slug]))
-                {
-                    $configPath = $this->pageConfigFilePath($old_slug);
-                    if (file_exists($configPath))
+                $parseConfigs = Yaml::parseFile($configPath);
+                if (is_array($parseConfigs))
+                    $saveConfig = array_merge($parseConfigs, $saveConfig);
+            }
+            if (! isset($saveConfig['items']))
+                $saveConfig['items'] = [];
+
+            switch ($action)
+            {
+                case self::CONTENT_ITEM_ACTION_CREATE:
+                    PageModel::create($saveData);
+                    break;
+
+                case self::CONTENT_ITEM_ACTION_EDIT:
+                    if ($old_slug !== $pageAttr['slug'] && file_exists($configPath))
                     {
-                        if ($action === self::CONTENT_ITEM_ACTION_EDIT && $old_slug !== $pageAttr['slug'])
-                        {
-                            $oldConfigPath = $configPath;
-                            $configPath    = $this->newPageConfigFilePath($pageAttr['slug']);
+                        $oldConfigPath = $configPath;
+                        $configPath    = $this->newPageConfigFilePath($pageAttr['slug']);
 
-                            File::move($oldConfigPath, $configPath);
-                        }
-
-                        $parseConfigs = Yaml::parseFile($configPath);
-                        if (is_array($parseConfigs))
-                            $saveConfig = array_merge($saveConfig, $parseConfigs);
+                        File::move($oldConfigPath, $configPath);
                     }
-                    else
-                        $configPath = null;
-                }
+                    PageModel::slug($old_slug)->update($saveData);
+                    break;
 
-                if ($action === self::CONTENT_ITEM_ACTION_CLONE)
-                {
-                    $configPath = null;
+                case self::CONTENT_ITEM_ACTION_CLONE:
+                    $configPath = $this->newPageConfigFilePath($pageAttr['slug']);
                     $page = PageModel::slug($old_slug)->first();
 
                     if (! $page)
@@ -374,18 +375,12 @@ trait ContentItemsParse
                             $newItem->save();
                         }
                     }
-                }
-                else
-                    PageModel::slug($old_slug)->update($saveData);
+                    break;
             }
 
-            if (! $configPath)
-                $configPath = $this->newConfigFilePath($pageAttr['slug']);
-            $pageId = PageModel::slug($pageAttr['slug'])->value('id');
-
-            Event::fire('forwintercms.content.buildContentItemsPageSave.before', [&$saveConfig, $pageId, $action]);
+            Event::fire('forwintercms.content.buildContentItemsPageSave.before', [&$saveConfig, $pageAttr['slug'], $action]);
             $this->saveContentItemConfigFile($saveConfig, $configPath);
-            Event::fire('forwintercms.content.buildContentItemsPageSave.after', [&$saveConfig, $pageId, $action]);
+            Event::fire('forwintercms.content.buildContentItemsPageSave.after', [&$saveConfig, $pageAttr['slug'], $action]);
         });
 
         try {
