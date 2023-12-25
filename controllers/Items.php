@@ -644,23 +644,9 @@ class Items extends Controller implements ContentItems
             return $this->listRefresh();
         }
 
-        $return = null;
-        Db::transaction(function () use (&$return)
-        {
-            $delItems = [];
-            ItemModel::extend(function($model) use (&$delItems) {
-                $model->bindEvent('model.afterDelete', function () use ($model, &$delItems) {
-                    $delItems[] = $model->name;
-                });
-            });
-            $return = $this->extendableCall('index_onDelete', []);
-            try {
-                $this->deleteContentItems($this->page, $delItems);
-            } catch (ApplicationException $e) {
-                Flash::forget();
-                throw $e;
-            }
-        });
+        $return = $this->extendableCall('index_onDelete', []);
+        $return['#createItemPopup'] = $this->makePartial('create_item_popup');
+
         return $return;
     }
 
@@ -671,19 +657,7 @@ class Items extends Controller implements ContentItems
             if (! $this->isItemDelete())
                 Flash::error(Lang::get('forwintercms.content::content.errors.non_item_delete'));
             else
-            {
-                $return = null;
-                Db::transaction(function () use (&$return, $id)
-                {
-                    ItemModel::extend(function($model) {
-                        $model->bindEvent('model.afterDelete', function () use ($model) {
-                            $this->deleteContentItems($this->page, [$model->name]);
-                        });
-                    });
-                    $return = $this->extendableCall('update_onDelete', [$id]);
-                });
-                return $return;
-            }
+                return $this->extendableCall('update_onDelete', [$id]);
         }
 
         return null;
