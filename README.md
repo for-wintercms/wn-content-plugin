@@ -66,6 +66,9 @@ Yaml files with page margin settings.
  Field    | Importance   | Description
  -------- | ------------ | -------------
  items    | required     | Page fields and sections. See more below.
+ title    | optional     | Page title
+ icon     | optional     | Page icon
+ order    | optional     | The order in the menu
 
 ##### *[items]* page fields and sections:
 
@@ -83,6 +86,9 @@ Declare a key-value pair. Value settings:
 # content-items/pages/books.yaml
 # ========================================
 
+title: 'Books'
+icon: icon-book
+order: '200'
 items:
     body_block:
         label: Books list
