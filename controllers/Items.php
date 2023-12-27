@@ -248,78 +248,78 @@ class Items extends Controller implements ContentItems
      * Functional limitations
      */
 
-    public function isItemCreate()
+    public function isItemCreate(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemCreate');
+        return $this->accessCheck('forwintercms.content.isItemCreate');
     }
 
-    public function isItemCreateNewTmp()
+    public function isItemCreateNewTmp(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemCreateNewTmp');
+        return $this->accessCheck('forwintercms.content.isItemCreateNewTmp');
     }
 
-    public function isItemCreateReadyTmp()
+    public function isItemCreateReadyTmp(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemCreateReadyTmp');
+        return $this->accessCheck('forwintercms.content.isItemCreateReadyTmp');
     }
 
-    public function isItemRename()
+    public function isItemRename(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemRename');
+        return $this->accessCheck('forwintercms.content.isItemRename');
     }
 
-    public function isItemRenameTitle()
+    public function isItemRenameTitle(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemRenameTitle');
+        return $this->accessCheck('forwintercms.content.isItemRenameTitle');
     }
 
-    public function isItemRenameSlug()
+    public function isItemRenameSlug(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemRenameSlug');
+        return $this->accessCheck('forwintercms.content.isItemRenameSlug');
     }
 
-    public function isItemDelete()
+    public function isItemDelete(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemDelete');
+        return $this->accessCheck('forwintercms.content.isItemDelete');
     }
 
-    public function isItemSort()
+    public function isItemSort(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemSort');
+        return $this->accessCheck('forwintercms.content.isItemSort');
     }
 
-    public function isPageCreate()
+    public function isPageCreate(): bool
     {
-        return $this->getEventResult('forwintercms.content.isPageCreate');
+        return $this->accessCheck('forwintercms.content.isPageCreate');
     }
 
-    public function isPageClone()
+    public function isPageClone(): bool
     {
-        return $this->getEventResult('forwintercms.content.isPageClone');
+        return $this->accessCheck('forwintercms.content.isPageClone');
     }
 
-    public function isPageEdit()
+    public function isPageEdit(): bool
     {
-        return $this->getEventResult('forwintercms.content.isPageEdit');
+        return $this->accessCheck('forwintercms.content.isPageEdit');
     }
 
-    public function isPageDelete()
+    public function isPageDelete(): bool
     {
-        return $this->getEventResult('forwintercms.content.isPageDelete');
+        return $this->accessCheck('forwintercms.content.isPageDelete');
     }
 
-    public function hasAccessItemsChanges()
+    public function hasAccessItemsChanges(): bool
     {
         static $itemsChanges;
-        return $itemsChanges ?: ($itemsChanges = $this->user->hasAccess('forwintercms.content.items_changes'));
+        return $itemsChanges ?: ($itemsChanges = (bool)$this->user->hasAccess('forwintercms.content.items_changes'));
     }
 
-    private function getEventResult($event)
+    private function accessCheck($event): bool
     {
         $default = $this->hasAccessItemsChanges();
         $result  = Event::fire($event, [$this->page, $default], true);
 
-        return $result !== null ? $result : $default;
+        return is_bool($result) ? $result : $default;
     }
 
     /*
