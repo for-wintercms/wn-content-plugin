@@ -12,44 +12,48 @@
                 </div>
                 <div class="modal-body form-elements">
 
-                    <?php $itemsList = $this->getReadyItemsList() ?>
-                    <?php if (count($itemsList)) : ?>
-                    <div class="form-group dropdown-field span-full">
-                        <label><?= e(trans('forwintercms.content::content.popup.page.field_ready_tmp')) ?></label>
-                        <select name="readyTmp" class="form-control custom-select">
-                            <option value="0"><?= e(trans('forwintercms.content::content.popup.page.field_option_create_new_tmp')) ?></option>
-                            <optgroup label="<?= e(trans('forwintercms.content::content.popup.page.field_ready_tmp')) ?>">
-                                <?php foreach ($itemsList['ready'] as $itemK => $itemV) : ?>
-                                <option value="ready_<?= $itemK ?>"><?= $itemV ?></option>
-                                <?php endforeach ?>
-                            </optgroup>
-                        </select>
+                    <?php $readyPages = $this->getReadyPagesList() ?>
+                    <?php if (count($readyPages)) : ?>
+                    <div class="readyTmp">
+                        <div class="form-group dropdown-field span-full">
+                            <label><?= e(trans('forwintercms.content::content.popup.page.field_ready_tmp')) ?></label>
+                            <select name="readyTmp" class="form-control custom-select">
+                                <option value=""><?= e(trans('forwintercms.content::content.popup.page.field_option_create_new_tmp')) ?></option>
+                                <optgroup label="<?= e(trans('forwintercms.content::content.popup.page.field_ready_tmp')) ?>">
+                                    <?php foreach ($readyPages as $pageSlug => $pageTitle) : ?>
+                                    <option value="<?= $pageSlug ?>"><?= $pageTitle ?></option>
+                                    <?php endforeach ?>
+                                </optgroup>
+                            </select>
+                        </div>
                     </div>
                     <?php endif; ?>
 
-                    <div class="form-group span-left is-required">
-                        <label><?= e(trans('forwintercms.content::content.pages.field_title')) ?></label>
-                        <input type="text" name="title" class="form-control" id="presetNewPageName" />
-                    </div>
+                    <div class="emptyForm">
+                        <div class="form-group span-left is-required">
+                            <label><?= e(trans('forwintercms.content::content.pages.field_title')) ?></label>
+                            <input type="text" name="title" class="form-control" id="presetNewPageName" />
+                        </div>
 
-                    <div class="form-group span-right is-required">
-                        <label><?= e(trans('forwintercms.content::content.pages.field_slug')) ?></label>
-                        <input type="text" name="slug" class="form-control" data-input-preset="#presetNewPageName" />
-                        <input type="hidden" name="old_slug" />
-                    </div>
+                        <div class="form-group span-right is-required">
+                            <label><?= e(trans('forwintercms.content::content.pages.field_slug')) ?></label>
+                            <input type="text" name="slug" class="form-control" data-input-preset="#presetNewPageName" />
+                            <input type="hidden" name="old_slug" />
+                        </div>
 
-                    <div class="form-group dropdown-field span-left">
-                        <label><?= e(trans('forwintercms.content::content.pages.field_icon')) ?></label>
-                        <select name="icon" class="form-control custom-select">
-                            <?php foreach ($this->getIconList() as $itemV) : ?>
-                            <option value="icon-<?= $itemV ?>"><?= $itemV ?></option>
-                            <?php endforeach ?>
-                        </select>
-                    </div>
+                        <div class="form-group dropdown-field span-left">
+                            <label><?= e(trans('forwintercms.content::content.pages.field_icon')) ?></label>
+                            <select name="icon" class="form-control custom-select">
+                                <?php foreach ($this->getIconList() as $itemV) : ?>
+                                <option value="icon-<?= $itemV ?>"><?= $itemV ?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
 
-                    <div class="form-group span-right">
-                        <label><?= e(trans('forwintercms.content::content.pages.field_order')) ?></label>
-                        <input type="number" name="order" class="form-control" min="-999" max="1000" />
+                        <div class="form-group span-right">
+                            <label><?= e(trans('forwintercms.content::content.pages.field_order')) ?></label>
+                            <input type="number" name="order" class="form-control" min="-999" max="1000" />
+                        </div>
                     </div>
 
                 </div>

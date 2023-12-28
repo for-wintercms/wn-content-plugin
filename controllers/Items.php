@@ -45,6 +45,7 @@ class Items extends Controller implements ContentItems
     public $requiredPermissions = ['forwintercms.content.items'];
 
     public $page          = null;
+    public $pages         = null;
     public $locales       = null;
     public $defaultLocale = null;
     public $transLocales  = null;
@@ -65,6 +66,7 @@ class Items extends Controller implements ContentItems
         parent::__construct();
 
         $this->locales();
+        $this->pages();
         $this->translatableDataManager();
         $this->parseContentItemsData();
         $this->addActionMenu();
@@ -100,6 +102,11 @@ class Items extends Controller implements ContentItems
             if ($this->defaultLocale && is_array($this->locales) && count($this->locales))
                 $this->transLocales = array_diff(array_keys($this->locales), [$this->defaultLocale]);
         }
+    }
+
+    protected function pages()
+    {
+        $this->pages = PageModel::select('title','slug','icon','order')->get();
     }
 
     protected function translatableDataManager()
@@ -158,7 +165,7 @@ class Items extends Controller implements ContentItems
             $submenu = [];
             $isClonePage = $this->isPageClone();
 
-            foreach (PageModel::select('title','slug','icon','order')->get() as $page)
+            foreach ($this->pages as $page)
             {
                 $submenu[$page->slug] = [
                     'label' => $page->title,
@@ -241,78 +248,78 @@ class Items extends Controller implements ContentItems
      * Functional limitations
      */
 
-    public function isItemCreate()
+    public function isItemCreate(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemCreate');
+        return $this->accessCheck('forwintercms.content.isItemCreate');
     }
 
-    public function isItemCreateNewTmp()
+    public function isItemCreateNewTmp(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemCreateNewTmp');
+        return $this->accessCheck('forwintercms.content.isItemCreateNewTmp');
     }
 
-    public function isItemCreateReadyTmp()
+    public function isItemCreateReadyTmp(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemCreateReadyTmp');
+        return $this->accessCheck('forwintercms.content.isItemCreateReadyTmp');
     }
 
-    public function isItemRename()
+    public function isItemRename(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemRename');
+        return $this->accessCheck('forwintercms.content.isItemRename');
     }
 
-    public function isItemRenameTitle()
+    public function isItemRenameTitle(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemRenameTitle');
+        return $this->accessCheck('forwintercms.content.isItemRenameTitle');
     }
 
-    public function isItemRenameSlug()
+    public function isItemRenameSlug(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemRenameSlug');
+        return $this->accessCheck('forwintercms.content.isItemRenameSlug');
     }
 
-    public function isItemDelete()
+    public function isItemDelete(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemDelete');
+        return $this->accessCheck('forwintercms.content.isItemDelete');
     }
 
-    public function isItemSort()
+    public function isItemSort(): bool
     {
-        return $this->getEventResult('forwintercms.content.isItemSort');
+        return $this->accessCheck('forwintercms.content.isItemSort');
     }
 
-    public function isPageCreate()
+    public function isPageCreate(): bool
     {
-        return $this->getEventResult('forwintercms.content.isPageCreate');
+        return $this->accessCheck('forwintercms.content.isPageCreate');
     }
 
-    public function isPageClone()
+    public function isPageClone(): bool
     {
-        return $this->getEventResult('forwintercms.content.isPageClone');
+        return $this->accessCheck('forwintercms.content.isPageClone');
     }
 
-    public function isPageEdit()
+    public function isPageEdit(): bool
     {
-        return $this->getEventResult('forwintercms.content.isPageEdit');
+        return $this->accessCheck('forwintercms.content.isPageEdit');
     }
 
-    public function isPageDelete()
+    public function isPageDelete(): bool
     {
-        return $this->getEventResult('forwintercms.content.isPageDelete');
+        return $this->accessCheck('forwintercms.content.isPageDelete');
     }
 
-    public function hasAccessItemsChanges()
+    public function hasAccessItemsChanges(): bool
     {
         static $itemsChanges;
-        return $itemsChanges ?: ($itemsChanges = $this->user->hasAccess('forwintercms.content.items_changes'));
+        return $itemsChanges ?: ($itemsChanges = (bool)$this->user->hasAccess('forwintercms.content.items_changes'));
     }
 
-    private function getEventResult($event)
+    private function accessCheck($event): bool
     {
         $default = $this->hasAccessItemsChanges();
         $result  = Event::fire($event, [$this->page, $default], true);
 
-        return $result !== null ? $result : $default;
+        return is_bool($result) ? $result : $default;
     }
 
     /*
@@ -340,6 +347,24 @@ class Items extends Controller implements ContentItems
 
         $menuName = $this->currentPage->title ?? Lang::get('forwintercms.content::content.list.title');
         return $menuName;
+    }
+
+    public function getReadyPagesList()
+    {
+        $tmpList = [];
+        foreach ($this->contentItemFiles as $pageSlug => $page)
+        {
+            if ($page['items_cnt'] > 0)
+                $tmpList[$pageSlug] = $page['title'];
+        }
+
+        foreach ($this->pages as $page)
+        {
+            if (isset($tmpList[$page->slug]))
+                unset($tmpList[$page->slug]);
+        }
+
+        return $tmpList;
     }
 
     public function getReadyItemsList()
@@ -399,12 +424,33 @@ class Items extends Controller implements ContentItems
      */
     public function onCreatePage()
     {
-        if (! $this->isPageCreate())
+        if (! $this->isPageCreate()) {
             Flash::error(Lang::get('forwintercms.content::content.errors.non_page_create'));
+            return [];
+        }
 
-        $this->buildContentItemPage(post());
+        $readyTmp = post('readyTmp');
+        $title = post('title');
 
-        Flash::success(Lang::get('forwintercms.content::content.success.create_page', ['page' => post('title')]));
+        if (! empty($readyTmp))
+        {
+            if (! isset($this->contentItemFiles[$readyTmp])) {
+                Flash::error(Lang::get('forwintercms.content::content.errors.no_page', ['pageSlug' => $readyTmp]));
+                return [];
+            }
+            $title = $this->contentItemFiles[$readyTmp]['title'];
+            $this->buildContentItemPage([
+                'title' => $title,
+                'slug' => $readyTmp,
+                'old_slug' => '',
+                'icon' => $this->contentItemFiles[$readyTmp]['icon'],
+                'order' => $this->contentItemFiles[$readyTmp]['order'],
+            ]);
+        }
+        else
+            $this->buildContentItemPage(post());
+
+        Flash::success(Lang::get('forwintercms.content::content.success.create_page', ['page' => $title]));
 
         $pageSlug = post('slug');
         if ($this->getPageModel($pageSlug))
@@ -418,8 +464,10 @@ class Items extends Controller implements ContentItems
      */
     public function onClonePage()
     {
-        if (! $this->isPageClone())
+        if (! $this->isPageClone()) {
             Flash::error(Lang::get('forwintercms.content::content.errors.non_page_clone'));
+            return [];
+        }
 
         $this->buildContentItemPage(post(), self::CONTENT_ITEM_ACTION_CLONE, post('old_slug'));
 
@@ -437,8 +485,10 @@ class Items extends Controller implements ContentItems
      */
     public function onEditPage()
     {
-        if (! $this->isPageEdit())
+        if (! $this->isPageEdit()) {
             Flash::error(Lang::get('forwintercms.content::content.errors.non_page_edit'));
+            return [];
+        }
 
         $pageData    = post('Page');
         $pageSlug    = $pageData['slug'] ?? '';
@@ -449,7 +499,7 @@ class Items extends Controller implements ContentItems
         $page = $this->getPageModel($pageSlug);
         $this->pageSave($page);
 
-        Flash::success(Lang::get('forwintercms.content::content.success.edit_page', ['page' => post('title')]));
+        Flash::success(Lang::get('forwintercms.content::content.success.edit_page', ['page' => $pageData['title']]));
 
         if ($page)
             return redirect($this->getPageUrl($pageSlug));
@@ -462,8 +512,10 @@ class Items extends Controller implements ContentItems
      */
     public function onDeletePage()
     {
-        if (! $this->isPageDelete())
+        if (! $this->isPageDelete()) {
             Flash::error(Lang::get('forwintercms.content::content.errors.non_page_delete'));
+            return [];
+        }
 
         $pageSlug = post('slug');
         $this->deleteContentItemPage($pageSlug);
@@ -592,23 +644,9 @@ class Items extends Controller implements ContentItems
             return $this->listRefresh();
         }
 
-        $return = null;
-        Db::transaction(function () use (&$return)
-        {
-            $delItems = [];
-            ItemModel::extend(function($model) use (&$delItems) {
-                $model->bindEvent('model.afterDelete', function () use ($model, &$delItems) {
-                    $delItems[] = $model->name;
-                });
-            });
-            $return = $this->extendableCall('index_onDelete', []);
-            try {
-                $this->deleteContentItems($this->page, $delItems);
-            } catch (ApplicationException $e) {
-                Flash::forget();
-                throw $e;
-            }
-        });
+        $return = $this->extendableCall('index_onDelete', []);
+        $return['#createItemPopup'] = $this->makePartial('create_item_popup');
+
         return $return;
     }
 
@@ -619,19 +657,7 @@ class Items extends Controller implements ContentItems
             if (! $this->isItemDelete())
                 Flash::error(Lang::get('forwintercms.content::content.errors.non_item_delete'));
             else
-            {
-                $return = null;
-                Db::transaction(function () use (&$return, $id)
-                {
-                    ItemModel::extend(function($model) {
-                        $model->bindEvent('model.afterDelete', function () use ($model) {
-                            $this->deleteContentItems($this->page, [$model->name]);
-                        });
-                    });
-                    $return = $this->extendableCall('update_onDelete', [$id]);
-                });
-                return $return;
-            }
+                return $this->extendableCall('update_onDelete', [$id]);
         }
 
         return null;

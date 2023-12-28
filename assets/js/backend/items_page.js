@@ -19,7 +19,7 @@ var wd_items = wd_items || {
         });
     },
 
-    select2CreateTmp: function(selector)
+    select2Tmp: function(selector)
     {
         var funSelect = function(state)
         {
@@ -63,38 +63,26 @@ var wd_items = wd_items || {
         this.select2Icons('#popupChangePage select[name="icon"]');
     },
 
-    show_changePageModalData: function(modalType, liObj)
-    {
-        var $modal  = $('#popupChangePage'),
-            isClone = modalType === 'clone',
-            iconVal = isClone ? liObj.data('submenu-icon') : 'icon-plus',
-            request = 'on'+ modalType.substring(0, 1).toUpperCase() + modalType.substring(1) +'Page',
-            valData = {};
-
-        valData.title    = isClone ? liObj.data('submenu-title') : '';
-        valData.slug     = isClone ? liObj.data('submenu-slug')  : '';
-        valData.order    = isClone ? liObj.data('submenu-order') : '100';
-        valData.old_slug = isClone ? valData.slug : '';
-
-        for (var k in valData)
-            $modal.find('input[name="' + k + '"]').val(valData[k]);
-
-        $modal.find('select[name="icon"] option[value="'+ iconVal +'"]:eq(0)').prop('selected', true).change();
-        $modal.find('form[data-request]').data('request',request);
-        $modal.find('.toggle-change').hide();
-        $modal.find('.toggle-'+modalType).show();
-        $modal.modal('show');
-    },
-
     events: function()
     {
         var me = this;
+
+        // create content block
+        var popupChangePageSelector = '#popupChangePage select[name="readyTmp"]';
+        var $createPageEmptyForm = $('#popupChangePage .emptyForm');
+        this.select2Tmp(popupChangePageSelector);
+        $(popupChangePageSelector).on("select2:select", function(e) {
+            if (e.params.data.id)
+                $createPageEmptyForm.hide(200);
+            else
+                $createPageEmptyForm.show(200);
+        });
 
         // create items type
         $('#createItemPopup').on('click', '#popupCreateItemTabs ul li a', function(){
             $('#popupCreateItemTabs input[name="formType"]').val($(this).data('form-type'));
         });
-        this.select2CreateTmp('#popupCreateItem select[name="readyTmp"]');
+        this.select2Tmp('#popupCreateItem select[name="readyTmp"]');
 
         // submenu control panel
         $('#layout-sidenav ul li').mouseover(function() {
@@ -138,6 +126,128 @@ var wd_items = wd_items || {
             $popup.find('input[name="old_name"]').val(itemName);
             $popup.modal('show');
         });
+
+        // Fill in blanks and Save
+        $('#fill_and_save').click(function()
+        {
+            var langLocales = [];
+            var $langLocales = $('.langLocale');
+            if (! $langLocales.length)
+                return;
+            $langLocales.each(function(i, el) {
+                langLocales[i] = $(el).data('field-name').toLowerCase();
+            });
+
+            var funcFieldsFill = function(el, tagName)
+            {
+                // field name attr
+                var fieldName = $(el).attr('name').trim();//
+                var re = /^Item\[items\]\[(.*?)\]$/;
+                if (! fieldName.match(re))
+                    return;
+                fieldName = fieldName.replace(re, "$1").trim();
+                if (! fieldName)
+                    return;
+
+                // fill fields
+                var $transField;
+                var $emptyFields = [];
+                var fieldSetData = $(el).val().trim();
+                if (! fieldSetData)
+                    $emptyFields[0] = $(el);
+
+                var funcSetField = function($el)
+                {
+                    $el.val(fieldSetData);
+                    if (tagName === 'textarea') {
+                        if ($el.attr('id').match(/^RichEditor/))
+                            $el.parent().find("div.fr-element").html(fieldSetData);
+                    }
+                };
+
+                langLocales.forEach(function(langCode) {
+                    $transField = $("[name='Item["+langCode+"]["+fieldName+"]']");
+                    if ($transField.length !== 1)
+                        return;
+                    if (fieldSetData) {
+                        if (! $transField.val().trim())
+                            funcSetField($transField);
+                    }
+                    else {
+                        fieldSetData = $transField.val().trim();
+                        if (! fieldSetData)
+                            $emptyFields[$emptyFields.length] = $transField;
+                    }
+                });
+
+                if (fieldSetData) {
+                    $emptyFields.forEach(function($el) {
+                        funcSetField($el);
+                    });
+                }
+            };
+
+            // search all send fields
+            $('#layout-body form.layout').find("[name^='Item[items][']").each(function(i, el)
+            {
+                var tagName = $(el).prop('tagName').toLowerCase();
+                switch (tagName)
+                {
+                    case 'textarea':
+                        funcFieldsFill(el, tagName);
+                        return;
+                    case 'input':
+                    {
+                        var fieldType = $(el).attr('type').toLowerCase();
+                        switch (fieldType) {
+                            case 'file':
+                            case 'image':
+                            case 'button':
+                            case 'submit':
+                            case 'reset':
+                            case 'radio':
+                            case 'checkbox':
+                                return;
+                            default:
+                                funcFieldsFill(el, tagName);
+                                return;
+                        }
+                    }
+                }
+            });
+            // return false;
+        });
+    },
+
+    show_changePageModalData: function(modalType, liObj)
+    {
+        var $modal  = $('#popupChangePage'),
+            isClone = modalType === 'clone',
+            iconVal = isClone ? liObj.data('submenu-icon') : 'icon-plus',
+            request = 'on'+ modalType.substring(0, 1).toUpperCase() + modalType.substring(1) +'Page',
+            valData = {};
+
+        valData.title    = isClone ? liObj.data('submenu-title') : '';
+        valData.slug     = isClone ? liObj.data('submenu-slug')  : '';
+        valData.order    = isClone ? liObj.data('submenu-order') : '100';
+        valData.old_slug = isClone ? valData.slug : '';
+
+        $modal.find('select[name="readyTmp"] option:first').prop('selected', true).change();
+        $modal.find('.emptyForm').show();
+
+        if (isClone)
+            $modal.find('.readyTmp').hide();
+        else
+            $modal.find('.readyTmp').show();
+
+        for (var k in valData)
+            $modal.find('input[name="' + k + '"]').val(valData[k]);
+
+        $modal.find('select[name="icon"] option[value="'+ iconVal +'"]:eq(0)').prop('selected', true).change();
+        $modal.find('form[data-request]').data('request',request);
+        $modal.find('.toggle-change').hide();
+        $modal.find('.toggle-'+modalType).show();
+        $modal.modal('show');
     },
 
     init: function()
