@@ -74,3 +74,11 @@
 .layout-row .field-section p {
     font-style: italic;
 }
+.file-lang-mark {
+    font-size: 0.8em;
+    background: #f9f9b2;
+    border-radius: 4px;
+    border: 1px solid #ffd68a;
+    padding: 0 4px;
+    margin-left: 4px;
+}

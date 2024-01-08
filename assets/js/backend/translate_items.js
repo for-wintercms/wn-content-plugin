@@ -1,5 +1,15 @@
 var translate_items = translate_items || {
 
+    addFileLangMark: function()
+    {
+        $("#layout-body .form-group [translate='1']").each(function(i, el)
+        {
+            $formGroup = $(el).closest('.form-group');
+            if ($formGroup.children().prop('tagName').toLowerCase() === 'label')
+                $formGroup.find('label:first-child').append('<span class="file-lang-mark">'+$formGroup.data('field-name')+'</span>');
+        });
+    },
+
     translateItems: function()
     {
         $("#layout-body .form-group [translate='1']").each(function(i, el)
@@ -113,6 +123,8 @@ var translate_items = translate_items || {
     {
         var me = this;
 
+        // TODO: css class "file-lang-mark"
+
         console.log('new translate item JS');
 
         // ajax before send
@@ -123,7 +135,7 @@ var translate_items = translate_items || {
         });
 
         $('#translateTabs li').click(function(){
-            //
+            console.log($(this).text());
         });
 
         // Fill in blanks and Save
@@ -187,6 +199,35 @@ var translate_items = translate_items || {
                 }
             };
 
+            // // search all send fields
+            // $('#layout-body form.layout').find("[name^='Item[items][']").each(function(i, el)
+            // {
+            //     var tagName = $(el).prop('tagName').toLowerCase();
+            //     switch (tagName)
+            //     {
+            //         case 'textarea':
+            //             funcFieldsFill(el, tagName);
+            //             return;
+            //         case 'input':
+            //         {
+            //             var fieldType = $(el).attr('type').toLowerCase();
+            //             switch (fieldType) {
+            //                 case 'file':
+            //                 case 'image':
+            //                 case 'button':
+            //                 case 'submit':
+            //                 case 'reset':
+            //                 case 'radio':
+            //                 case 'checkbox':
+            //                     return;
+            //                 default:
+            //                     funcFieldsFill(el, tagName);
+            //                     return;
+            //             }
+            //         }
+            //     }
+            // });
+
             // return false;
         });
         */
@@ -197,7 +238,8 @@ var translate_items = translate_items || {
         if ($('#layout-body #translateTabs').length <= 0)
             return;
 
-        this.translateItems();
+        this.addFileLangMark();
+        // this.translateItems();
         this.events();
     }
 };
