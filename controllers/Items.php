@@ -699,56 +699,30 @@ class Items extends Controller implements ContentItems
         if ($form->arrayName === 'Item')
         {
             $activeForm = isset($form->data->name) ? $this->getActiveContentItemForm($this->page, $form->data->name) : null;
-            if (! empty($activeForm))
+            if (! empty($activeForm['fields']))
             {
-                $itemForm = [
+                if ($this->transLocales)
+                {
+                    foreach ($activeForm['fields'] as $formFieldName => $formFieldVal)
+                    {
+                        if (isset($formFieldVal['attributes']['translate']) && $formFieldVal['attributes']['translate'])
+                        {
+                            $span = $formFieldVal['span'] ?? 'auto';
+                            $formFieldVal['span'] = 'full';
+                            $activeForm['fields'][$formFieldName] = [
+                                'type' => 'nestedform',
+                                'usePanelStyles' => false,
+                                'span' => $span,
+                                'form' => ['fields' => array_fill_keys($this->locales, $formFieldVal)],
+                            ];
+                        }
+                    }
+                }
+                $form->addFields(['items' => [
                     'type' => 'nestedform',
                     'usePanelStyles' => false,
                     'form' => $activeForm,
-                ];
-                /*
-                if ($this->transLocales)
-                {
-                    $form->addTabFields(['items' => [
-                        'type' => 'nestedform',
-                        'usePanelStyles' => false,
-                        'tab' => 'Main',
-                        'form' => $activeForm,
-                    ]]);
-                    $form->addTabFields(['translates' => [
-                        'type' => 'nestedform',
-                        'usePanelStyles' => false,
-                        'tab' => 'Translate',
-                        'form' => ['secondaryTabs' => [
-                            'fields' => [
-                                'items' => [
-                                    'type' => 'nestedform',
-                                    'usePanelStyles' => false,
-                                    'tab' => 'EN',
-                                    'form' => $activeForm,
-                                ],
-                                'ru' => [
-                                    'type' => 'nestedform',
-                                    'usePanelStyles' => false,
-                                    'tab' => 'RU',
-                                    'form' => $activeForm,
-                                ],
-                                'uz' => [
-                                    'type' => 'nestedform',
-                                    'usePanelStyles' => false,
-                                    'tab' => 'UZ',
-                                    'form' => $activeForm,
-                                ],
-                            ],
-                        ]],
-                    ]]);
-//                    $form->addSecondaryTabFields(['items' => array_merge($itemForm, ['tab' => strtoupper($this->defaultLocale)])]);
-//                    foreach ($this->locales as $langCode)
-//                        $form->addSecondaryTabFields([$langCode => array_merge($itemForm, ['tab' => strtoupper($langCode), 'cssClass' => 'langLocale'])]);
-                }
-                else
-                */
-                    $form->addFields(['items' => $itemForm]);
+                ]]);
             }
             else
             {
