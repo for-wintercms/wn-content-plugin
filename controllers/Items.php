@@ -236,12 +236,12 @@ class Items extends Controller implements ContentItems
     protected function addAssets()
     {
         # Custom
-        $this->addCss('/plugins/forwintercms/content/assets/css/backend/main.css', '1696488639');
-        $this->addJs('/plugins/forwintercms/content/assets/js/backend/items_page.js', '1696488639');
+        $this->addCss('/plugins/forwintercms/content/assets/css/backend/main.css', '1704789802');
+        $this->addJs('/plugins/forwintercms/content/assets/js/backend/items_page.js', '1704789802');
 
         # framework extras
-        $this->addJs('/modules/system/assets/js/framework.extras.js');
-        $this->addCss('/modules/system/assets/css/framework.extras.css');
+        $this->addJs('/modules/system/assets/js/framework.extras.js', '1704789802');
+        $this->addCss('/modules/system/assets/css/framework.extras.css', '1704789802');
     }
 
     /*
@@ -668,18 +668,6 @@ class Items extends Controller implements ContentItems
         return $this->extendableCall('onReorder', []);
     }
 
-    public function onGetTranslateItems($id = null)
-    {
-        $ret = [];
-        if ($this->transLocales && is_numeric($id) && $id > 0 && ($model = ItemModel::find($id))) {
-            $ret[$this->defaultLocale] = $model->getAttributeTranslated('items', $this->defaultLocale);
-            foreach ($this->transLocales as $locale)
-                $ret[$locale] = $model->getAttributeTranslated('items', $locale);
-        }
-
-        return ['result' => $ret];
-    }
-
     /*
      * Filters
      */
@@ -881,18 +869,7 @@ class Items extends Controller implements ContentItems
         if ($this->actionId < 1 || ! ($model = ItemModel::find($this->actionId)))
             return $this->makeView404();
 
-        $this->addJs('/plugins/forwintercms/content/assets/js/backend/translate_items.js', '1696488639');
-
-        /*
-        if ($this->transLocales)
-        {
-            foreach ($this->transLocales as $locale)
-            {
-                $itemsData = $model->getAttributeTranslated('items', $locale) ?: $model->items;
-                $model->setAttribute($locale, $itemsData);
-            }
-        }
-        */
+        $this->addJs('/plugins/forwintercms/content/assets/js/backend/translate_items.js', '1704789802');
 
         $title = $this->getListTitle($model->name, $model->name);
         $this->pageTitle = Lang::get('forwintercms.content::content.form.title', ['title' => $title]);
