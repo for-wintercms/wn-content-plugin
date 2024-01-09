@@ -19,7 +19,7 @@ class Item extends Model
 
     public $implement = [];
 
-    public $table = 'forwintercms_content_items';
+    public $table = 'forwn_content_items';
 
     protected $jsonable = ['items'];
 

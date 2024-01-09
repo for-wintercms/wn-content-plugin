@@ -12,7 +12,7 @@ use ForWinterCms\Content\Classes\IconList;
  */
 class Page extends Model
 {
-    public $table = 'forwintercms_content_pages';
+    public $table = 'forwn_content_pages';
     public $fillable = ['title','slug','icon','order'];
 
     /**

@@ -7,13 +7,18 @@ use Winter\Storm\Database\Schema\Blueprint;
 use Winter\Storm\Database\Updates\Migration;
 use ForWinterCms\Content\Classes\Interfaces\ContentItems;
 
-class TableCreateForwintercmsContentPages extends Migration implements ContentItems
+/**
+ * TableCreateForwnContentPages migration
+ *
+ * @package ForWinterCms\Content\Updates
+ */
+class TableCreateForwnContentPages extends Migration implements ContentItems
 {
     use \ForWinterCms\Content\Classes\Traits\ContentItemsParse;
 
     public function up()
     {
-        Schema::create('forwintercms_content_pages', function(Blueprint $table) {
+        Schema::create('forwn_content_pages', function(Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
             $table->string('title', 255);
@@ -31,6 +36,6 @@ class TableCreateForwintercmsContentPages extends Migration implements ContentIt
 
     public function down()
     {
-        Schema::dropIfExists('forwintercms_content_pages');
+        Schema::dropIfExists('forwn_content_pages');
     }
 }

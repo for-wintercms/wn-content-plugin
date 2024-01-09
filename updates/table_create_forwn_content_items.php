@@ -7,15 +7,15 @@ use Winter\Storm\Database\Schema\Blueprint;
 use Winter\Storm\Database\Updates\Migration;
 
 /**
- * TableCreateForwintercmsContentItems migration
+ * TableCreateForwnContentItems migration
  *
  * @package ForWinterCms\Content\Updates
  */
-class TableCreateForwintercmsContentItems extends Migration
+class TableCreateForwnContentItems extends Migration
 {
     public function up()
     {
-        Schema::create('forwintercms_content_items', function(Blueprint $table)
+        Schema::create('forwn_content_items', function(Blueprint $table)
         {
             $table->engine = 'InnoDB';
             $table->increments('id')->unsigned();
@@ -32,6 +32,6 @@ class TableCreateForwintercmsContentItems extends Migration
     
     public function down()
     {
-        Schema::dropIfExists('forwintercms_content_items');
+        Schema::dropIfExists('forwn_content_items');
     }
 }

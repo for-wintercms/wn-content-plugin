@@ -1,4 +1,11 @@
 1.0.0:
     - 'Initialize plugin.'
-    - table_create_forwintercms_content_items.php
-    - table_create_forwintercms_content_pages.php
+    - table_create_forwn_content_items.php
+    - table_create_forwn_content_pages.php
+1.0.1:
+    - 'Many improvements in management'
+    - 'The template is taken into account when creating pages'
+    - 'When deleting pages, the template settings do not change'
+    - 'When deleting blocks, the template settings do not change'
+    - 'New field translation system'
+    - table_create_forwn_content_translate_items.php
