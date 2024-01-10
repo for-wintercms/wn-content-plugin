@@ -10,7 +10,7 @@
     <?= Form::open(['class' => 'layout']) ?>
 
         <div class="layout-row">
-            <? if ($this->transLocales): ?>
+            <? if ($this->isTranslateFields()): ?>
             <div id="translateTabs" class="control-tabs secondary-tabs" data-control="tab">
                 <ul class="nav nav-tabs">
                     <? foreach ($this->locales as $langCode => $langName): ?>

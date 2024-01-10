@@ -2,6 +2,7 @@
 
 namespace ForWinterCms\Content;
 
+use App;
 use Event;
 use Backend;
 use System\Classes\PluginBase;
@@ -67,15 +68,17 @@ class Plugin extends PluginBase
 
     public function boot()
     {
-        # extend models
-        # ================
-        ItemModel::extend(function($model)
+        # add Winter.Translate plugin
+        # =============================
+        $WtLocaleModel = 'Winter\Translate\Models\Locale';
+        if (class_exists($WtLocaleModel))
         {
-            # add RainLab Translatable Model
-            # =================================
-            $transModel = 'RainLab\Translate\Behaviors\TranslatableModel';
-            if (class_exists($transModel))
-                $model->implement[] = $transModel;
-        });
+            Event::listen('forwintercms.content.defaultLocale', function($defaultLocale) use($WtLocaleModel) {
+                return $WtLocaleModel::getDefault()->code ?? App::getLocale();
+            });
+            Event::listen('forwintercms.content.locales', function($locales) use($WtLocaleModel) {
+                return $WtLocaleModel::listEnabled();
+            });
+        }
     }
 }

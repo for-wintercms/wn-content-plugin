@@ -44,16 +44,15 @@ class Items extends Controller implements ContentItems
 
     public $requiredPermissions = ['forwintercms.content.items'];
 
-    public $page          = null;
-    public $pages         = null;
-    public $locales       = null;
+    public $page = null;
+    public $pages = null;
+    public $locales = null;
     public $defaultLocale = null;
-    public $transLocales  = null;
-    public $listTitle     = null;
-    public $actionAjax    = null;
-    public $actionId      = null;
-    public $ajaxHandler   = null;
-    public $currentPage   = null;
+    public $listTitle = null;
+    public $actionAjax = null;
+    public $actionId = null;
+    public $ajaxHandler = null;
+    public $currentPage = null;
 
     public $isContentItemError = false;
 
@@ -77,31 +76,26 @@ class Items extends Controller implements ContentItems
 
     protected function locales()
     {
-        # set lang
-        # ==========
-        if (Session::has('locale'))
+        $this->defaultLocale = App::getLocale();
+        $defaultLocale = Event::fire('forwintercms.content.defaultLocale', $this->defaultLocale, true);
+        if (! empty($defaultLocale))
+            $this->defaultLocale = $defaultLocale;
+        elseif (empty($this->defaultLocale))
         {
-            $locale = Session::get('locale');
-            if ($locale !== App::getLocale())
-                App::setLocale($locale);
+            $this->locales = [];
+            return;
         }
-        else
-            $locale = App::getLocale();
 
-        # get locale list
-        # =================
-        $TL_Model = 'RainLab\Translate\Models\Locale';
-        if (class_exists($TL_Model))
-        {
-            $this->defaultLocale = $TL_Model::getDefault()->code ?? null;
-            $this->locales = $TL_Model::listEnabled();
+        $this->locales = Event::fire('forwintercms.content.locales', [$this->defaultLocale => mb_strtoupper($this->defaultLocale)], true);
+        if (! is_array($this->locales))
+            $this->locales = [];
+        elseif (! isset($this->locales[$this->defaultLocale]))
+            $this->locales[$this->defaultLocale] = mb_strtoupper($this->defaultLocale);
+    }
 
-            if (! isset($this->locales[$this->defaultLocale]))
-                $this->defaultLocale = isset($this->locales[$locale]) ? $locale : null;
-
-            if ($this->defaultLocale && is_array($this->locales) && count($this->locales))
-                $this->transLocales = array_diff(array_keys($this->locales), [$this->defaultLocale]);
-        }
+    public function isTranslateFields()
+    {
+        return count($this->locales) > 1;
     }
 
     protected function pages()
@@ -111,7 +105,7 @@ class Items extends Controller implements ContentItems
 
     protected function translatableDataManager()
     {
-        if (! $this->transLocales)
+        if (! $this->isTranslateFields())
             return;
 
         ItemModel::extend(function($model)
@@ -689,7 +683,7 @@ class Items extends Controller implements ContentItems
             $activeForm = isset($form->data->name) ? $this->getActiveContentItemForm($this->page, $form->data->name) : null;
             if (! empty($activeForm['fields']))
             {
-                if ($this->transLocales)
+                if ($this->isTranslateFields())
                 {
                     foreach ($activeForm['fields'] as $formFieldName => $formFieldVal)
                     {
