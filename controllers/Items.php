@@ -2,7 +2,7 @@
 
 namespace ForWinterCms\Content\Controllers;
 
-use Db;
+use DB;
 use App;
 use Lang;
 use View;
@@ -110,18 +110,46 @@ class Items extends Controller implements ContentItems
 
         ItemModel::extend(function($model)
         {
-            $model->bindEvent('model.beforeSetAttribute', function($attr, $data) use ($model)
-            {
-                if (isset($this->locales[$attr]))
-                {
-                    $model->addJsonable($attr);
-                    $model->setAttributeTranslated('items', $data, $attr);
-                }
-            });
             $model->bindEvent('model.beforeSave', function() use ($model)
             {
-                foreach ($this->locales as $code => $lang)
-                    unset($model->attributes[$code]);
+                if (! count($this->contentItemList[$this->page][$model->name]['translate_fields']))
+                    return;
+
+                $locales = array_keys($this->locales);
+                $fields = $model->items;
+                $itemsCnt = count($fields);
+                $translateFields = array_fill_keys($locales, []);
+
+                foreach ($this->contentItemList[$this->page][$model->name]['translate_fields'] as $formFieldName)
+                {
+                    if (! empty($fields[$formFieldName]) && is_array($fields[$formFieldName]))
+                    {
+                        foreach ($locales as $locale)
+                            $translateFields[$locale][$formFieldName] = $fields[$formFieldName][$locale] ?? '';
+                        unset($fields[$formFieldName]);
+                    }
+                }
+
+                if (count($fields) != $itemsCnt)
+                {
+                    $itemModelId = $model->id;
+                    $upsertData = [];
+
+                    foreach ($translateFields as $translateLocal => $translateData) {
+                        $upsertData[] = [
+                            'item_id' => $itemModelId,
+                            'locale' => $translateLocal,
+                            'items' => json_encode($translateData),
+                        ];
+                    }
+
+                    DB::transaction(function() use ($upsertData) {
+                        DB::table(ItemModel::TRANSLATE_ITEM_TABLE_NAME)->upsert($upsertData, ['item_id', 'locale'], ['items']);
+                        DB::table(ItemModel::TRANSLATE_ITEM_TABLE_NAME)->whereNotIn('locale', array_keys($this->locales))->delete();
+                    });
+
+                    $model->items = $fields;
+                }
             });
         });
     }
@@ -695,7 +723,7 @@ class Items extends Controller implements ContentItems
                                 'type' => 'nestedform',
                                 'usePanelStyles' => false,
                                 'span' => $span,
-                                'form' => ['fields' => array_fill_keys($this->locales, $formFieldVal)],
+                                'form' => ['fields' => array_fill_keys(array_keys($this->locales), $formFieldVal)],
                             ];
                         }
                     }
@@ -863,11 +891,43 @@ class Items extends Controller implements ContentItems
         if ($this->actionId < 1 || ! ($model = ItemModel::find($this->actionId)))
             return $this->makeView404();
 
-        $this->addJs('/plugins/forwintercms/content/assets/js/backend/translate_items.js', '1704789802');
+        // translate fields
+        if ($this->isTranslateFields())
+        {
+            $this->addJs('/plugins/forwintercms/content/assets/js/backend/translate_items.js', '1704789802');
+
+            $translateItemsData = array_fill_keys(
+                $this->contentItemList[$this->page][$model->name]['translate_fields'], array_fill_keys(
+                    array_keys($this->locales), ''
+                )
+            );
+            $translateFields = DB::table(ItemModel::TRANSLATE_ITEM_TABLE_NAME)
+                ->where('item_id', $model->id)
+                ->whereIn('locale', array_keys($this->locales))
+                ->get();
+
+            foreach ($translateFields as $translateField)
+            {
+                $translateItems = @json_decode($translateField->items,true);
+                if (empty($translateItems) || ! is_array($translateItems))
+                    continue;
+                $translateLocale = $translateField->locale;
+                foreach ($translateItems as $translateItemKey => $translateItemVal)
+                {
+                    if (isset($translateItemsData[$translateItemKey]))
+                        $translateItemsData[$translateItemKey][$translateLocale] = $translateItemVal;
+                }
+            }
+
+            $model->items = array_merge($model->items, $translateItemsData);
+
+            unset($translateItemsData, $translateItems, $translateFields, $translateField, $translateItemKey, $translateItemVal, $translateLocale);
+        }
 
         $title = $this->getListTitle($model->name, $model->name);
         $this->pageTitle = Lang::get('forwintercms.content::content.form.title', ['title' => $title]);
         $this->listTitle = $this->getListPageTitle();
+
         $this->initForm($model);
 
         return $this->makeViewContentFile('update');

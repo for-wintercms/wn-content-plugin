@@ -27,6 +27,8 @@ class TableCreateForwnContentTranslateItems extends Migration
             $table->integer('item_id');
             $table->string('locale', 255);
             $table->text('items')->nullable();
+
+            $table->unique(['item_id', 'locale']);
         });
     }
     

@@ -44,7 +44,7 @@ trait ContentItemsParse
     protected $contentItemFiles = [];
 
     /**
-     * @var array - [page_slug => [item_slug => [title => item_name, section => section_name]]]
+     * @var array - [page_slug => [item_slug => [title => item_name, section => section_name, translate_fields => [translate_fields_list]]]]
      */
     protected $contentItemList = [];
 
@@ -162,6 +162,7 @@ trait ContentItemsParse
 
             foreach ($config['items'] as $rAction => $item)
             {
+                // check config file
                 if (empty($rAction) || empty($item['label']))
                     throw new ApplicationException($errItem);
                 elseif (isset($item['section']))
@@ -172,9 +173,22 @@ trait ContentItemsParse
                 elseif (! isset($item['form']))
                     throw new ApplicationException($errItem);
 
+                // translate fields
+                $translateFields = [];
+                if (! empty($item['form']['fields']))
+                {
+                    foreach ($item['form']['fields'] as $formFieldName => $formFieldVal)
+                    {
+                        if (isset($formFieldVal['attributes']['translate']) && $formFieldVal['attributes']['translate'])
+                            $translateFields[] = $formFieldName;
+                    }
+                }
+
+                // save everything in memory
                 $this->contentItemList[$menuSlug][$rAction] = [
                     'title'   => $item['label'],
                     'section' => $item['section'] ?? '',
+                    'translate_fields' => $translateFields,
                 ];
             }
         }

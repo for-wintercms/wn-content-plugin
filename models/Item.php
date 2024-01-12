@@ -14,6 +14,8 @@ use ForWinterCms\Content\Models\Page as PageModel;
  */
 class Item extends Model
 {
+    const TRANSLATE_ITEM_TABLE_NAME = 'forwn_content_translate_items';
+
     use \Winter\Storm\Database\Traits\Validation;
     use \Winter\Storm\Database\Traits\Sortable;
 

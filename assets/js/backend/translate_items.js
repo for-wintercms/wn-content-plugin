@@ -9,7 +9,7 @@ var translate_items = translate_items || {
             $formGroup = $(el).closest('.form-group');
             $formGroup.addClass('translate-field');
             if ($formGroup.children().prop('tagName').toLowerCase() === 'label')
-                $formGroup.find('label:first-child').append('<span class="file-lang-mark">'+$formGroup.data('field-name')+'</span>');
+                $formGroup.find('label:first-child').append('<span class="file-lang-mark">'+$formGroup.data('field-name').toUpperCase()+'</span>');
         });
     },
 
@@ -28,9 +28,9 @@ var translate_items = translate_items || {
         var me = this;
 
         // Switch translated fields
-        me.switchTranslatedFields($('#translateTabs li.active:first').data('lang').toUpperCase(), 0);
+        me.switchTranslatedFields($('#translateTabs li.active:first').data('lang').toLowerCase(), 0);
         $('#translateTabs li').click(function(){
-            me.switchTranslatedFields($(this).data('lang').toUpperCase(), me.switchingTimeTranslatedFields);
+            me.switchTranslatedFields($(this).data('lang').toLowerCase(), me.switchingTimeTranslatedFields);
         });
     },
 
