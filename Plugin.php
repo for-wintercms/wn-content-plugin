@@ -6,7 +6,6 @@ use App;
 use Event;
 use Backend;
 use System\Classes\PluginBase;
-use ForWinterCms\Content\Models\Item as ItemModel;
 
 /**
  * Plugin - Content control

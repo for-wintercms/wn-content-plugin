@@ -25,8 +25,6 @@ class Item extends Model
 
     protected $jsonable = ['items'];
 
-    public $translatable = ['items'];
-
     public $fillable = ['page_id', 'name', 'items'];
 
     /**
