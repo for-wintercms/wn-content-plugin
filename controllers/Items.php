@@ -114,15 +114,19 @@ class Items extends Controller implements ContentItems
         {
             $model->bindEvent('model.beforeSave', function() use ($model)
             {
-                if (! count($this->contentItemList[$this->page][$model->name]['translate_fields']))
+                if (! count($this->getContentItemTranslateFields($this->page, $model->name)))
                     return;
 
+                // check fields
+                $model->items = array_intersect_key($model->items, array_flip($this->getContentItemIncludeFields($this->page, $model->name)));
+
+                // translate fields
                 $locales = array_keys($this->locales);
                 $fields = $model->items;
-                $itemsCnt = count($fields);
+                $fieldsOldCnt = count($fields);
                 $translateFields = array_fill_keys($locales, []);
 
-                foreach ($this->contentItemList[$this->page][$model->name]['translate_fields'] as $formFieldName)
+                foreach ($this->getContentItemTranslateFields($this->page, $model->name) as $formFieldName)
                 {
                     if (! empty($fields[$formFieldName]) && is_array($fields[$formFieldName]))
                     {
@@ -132,7 +136,7 @@ class Items extends Controller implements ContentItems
                     }
                 }
 
-                if (count($fields) != $itemsCnt)
+                if (count($fields) != $fieldsOldCnt)
                 {
                     $itemModelId = $model->id;
                     $upsertData = [];
@@ -893,13 +897,16 @@ class Items extends Controller implements ContentItems
         if ($this->actionId < 1 || ! ($model = ItemModel::find($this->actionId)))
             return $this->makeView404();
 
+        // check fields
+        $model->items = array_intersect_key($model->items, array_flip($this->getContentItemIncludeFields($this->page, $model->name)));
+
         // translate fields
         if ($this->isTranslateFields())
         {
             $this->addJs('/plugins/forwintercms/content/assets/js/backend/translate_items.js', '1704789802');
 
             $translateItemsData = array_fill_keys(
-                $this->contentItemList[$this->page][$model->name]['translate_fields'], array_fill_keys(
+                $this->getContentItemTranslateFields($this->page, $model->name), array_fill_keys(
                     array_keys($this->locales), ''
                 )
             );

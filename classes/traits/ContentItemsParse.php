@@ -175,13 +175,18 @@ trait ContentItemsParse
                 elseif (! isset($item['form']))
                     throw new ApplicationException($errItem);
 
-                // translate fields
+                // fields list
+                $includeFields = [];
                 $translateFields = [];
                 if (! empty($item['form']['fields']))
                 {
                     foreach ($item['form']['fields'] as $formFieldName => $formFieldVal)
                     {
-                        if (isset($formFieldVal['attributes']['translate']) && $formFieldVal['attributes']['translate'])
+                        if (($formFieldVal['type']??'') == 'section' || ($formFieldVal['attributes']['exclude']??false))
+                            continue;
+
+                        $includeFields[] = $formFieldName;
+                        if ($formFieldVal['attributes']['translate']??false)
                             $translateFields[] = $formFieldName;
                     }
                 }
@@ -190,6 +195,7 @@ trait ContentItemsParse
                 $this->contentItemList[$menuSlug][$rAction] = [
                     'title'   => $item['label'],
                     'section' => $item['section'] ?? '',
+                    'include_fields' => $includeFields,
                     'translate_fields' => $translateFields,
                 ];
             }
@@ -221,6 +227,16 @@ trait ContentItemsParse
         $this->contentItemSectionsList = [];
 
         $this->parseContentItems();
+    }
+
+    public function getContentItemIncludeFields(string $pageSlug, string $itemSlug): array
+    {
+        return $this->contentItemList[$pageSlug][$itemSlug]['include_fields']??[];
+    }
+
+    public function getContentItemTranslateFields(string $pageSlug, string $itemSlug): array
+    {
+        return $this->contentItemList[$pageSlug][$itemSlug]['translate_fields']??[];
     }
 
     /**
