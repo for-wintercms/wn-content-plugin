@@ -897,9 +897,6 @@ class Items extends Controller implements ContentItems
         if ($this->actionId < 1 || ! ($model = ItemModel::find($this->actionId)))
             return $this->makeView404();
 
-        // check fields
-        $model->items = array_intersect_key($model->items, array_flip($this->getContentItemIncludeFields($this->page, $model->name)));
-
         // translate fields
         if ($this->isTranslateFields())
         {

@@ -46,6 +46,21 @@ class Item extends Model
      * Scopes
      */
 
+    public function newQuery()
+    {
+        $query = parent::newQuery();
+
+        // Avoid to only query the x and y columns
+        if (empty($query->getQuery()->columns))
+            $query->addSelect(DB::raw($this->getTable().'.*'));
+
+        // add page name column
+        $query->leftJoin('forwn_content_pages as pg', 'pg.id', '=', $this->getTable().'.page_id');
+        $query->addSelect(DB::raw('pg.slug as page'));
+
+        return $query;
+    }
+
     public function scopePage(Builder $query, string $page): void
     {
         $query->where('page_id', PageModel::where('slug', $page)->value('id'));
@@ -71,14 +86,11 @@ class Item extends Model
             }
         }
 
-        if (empty($query->getQuery()->columns))
-            $query->select(DB::raw($this->getTable().'.*'));
-
         $query->leftJoin(DB::raw($this::TRANSLATE_ITEM_TABLE_NAME.' as ti'), function ($join) use ($lang) {
             $join->on('ti.item_id', '=', $this->getTable().'.id')
                 ->where('ti.locale', '=', $lang);
         });
-        $query->addSelect(DB::raw('ti.items as translate_items'));
+        $query->addSelect('ti.items as translate_items');
         $query->addSelect(DB::raw("'$lang' as lang"));
     }
 
@@ -99,6 +111,10 @@ class Item extends Model
             unset($this->original['translate_items']);
             $this->original['items'] = '';
         }
+
+        // correcting attributes in items
+        $contentItems = ContentItems::instance();
+        $this->items = array_intersect_key($this->items, array_flip($contentItems->getContentItemIncludeFields($this->page, $this->name)));
     }
 
     /*
