@@ -104,17 +104,20 @@ class Item extends Model
     public function afterFetch()
     {
         // correction of translatable fields
-        if (! empty($this->translate_items) && ! empty($this->items))
+        if (! empty($this->translate_items))
         {
-            $this->items += @json_decode($this->translate_items, true) ?: [];
+            $this->items = ($this->items ?: []) + (@json_decode($this->translate_items, true) ?: []);
             $this->offsetUnset('translate_items');
             unset($this->original['translate_items']);
             $this->original['items'] = '';
         }
 
         // correcting attributes in items
-        $contentItems = ContentItems::instance();
-        $this->items = array_intersect_key($this->items, array_flip($contentItems->getContentItemIncludeFields($this->page, $this->name)));
+        if (! empty($this->items))
+        {
+            $contentItems = ContentItems::instance();
+            $this->items = array_intersect_key($this->items, array_flip($contentItems->getContentItemIncludeFields($this->page, $this->name)));
+        }
     }
 
     /*

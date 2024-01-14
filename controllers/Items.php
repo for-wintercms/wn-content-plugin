@@ -118,11 +118,12 @@ class Items extends Controller implements ContentItems
                     return;
 
                 // check fields
-                $model->items = array_intersect_key($model->items, array_flip($this->getContentItemIncludeFields($this->page, $model->name)));
+                if (! empty($model->items))
+                    $model->items = array_intersect_key($model->items, array_flip($this->getContentItemIncludeFields($this->page, $model->name)));
 
                 // translate fields
                 $locales = array_keys($this->locales);
-                $fields = $model->items;
+                $fields = $model->items ?: [];
                 $fieldsOldCnt = count($fields);
                 $translateFields = array_fill_keys($locales, []);
 
@@ -925,7 +926,7 @@ class Items extends Controller implements ContentItems
                 }
             }
 
-            $model->items = array_merge($model->items, $translateItemsData);
+            $model->items = array_merge($model->items ?: [], $translateItemsData);
 
             unset($translateItemsData, $translateItems, $translateFields, $translateField, $translateItemKey, $translateItemVal, $translateLocale);
         }
