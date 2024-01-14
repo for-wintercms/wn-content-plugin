@@ -3,6 +3,7 @@
 namespace ForWinterCms\Content\Models;
 
 use DB;
+use App;
 use Event;
 use Model;
 use Winter\Storm\Database\Builder;
