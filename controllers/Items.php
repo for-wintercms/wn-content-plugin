@@ -79,7 +79,7 @@ class Items extends Controller implements ContentItems
     protected function locales()
     {
         $this->defaultLocale = App::getLocale();
-        $defaultLocale = Event::fire('forwintercms.content.defaultLocale', $this->defaultLocale, true);
+        $defaultLocale = Event::fire('forwintercms.content.defaultLocale', [$this->defaultLocale], true);
         if (! empty($defaultLocale))
             $this->defaultLocale = $defaultLocale;
         elseif (empty($this->defaultLocale))
@@ -88,7 +88,7 @@ class Items extends Controller implements ContentItems
             return;
         }
 
-        $this->locales = Event::fire('forwintercms.content.locales', [$this->defaultLocale => mb_strtoupper($this->defaultLocale)], true);
+        $this->locales = Event::fire('forwintercms.content.locales', [[$this->defaultLocale => mb_strtoupper($this->defaultLocale)]], true);
         if (! is_array($this->locales))
             $this->locales = [];
         elseif (! isset($this->locales[$this->defaultLocale]))
