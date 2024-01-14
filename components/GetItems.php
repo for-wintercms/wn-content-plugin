@@ -24,28 +24,30 @@ class GetItems extends ComponentBase
     /**
      * Get Item
      *
-     * @param string $pageSlug   - Page slug
-     * @param string $itemSlug   - Item slug (key)
-     * @param bool   $isContent  - if true return content else item data array
+     * @param string $pageSlug   Page slug
+     * @param string $itemSlug   Item slug (key)
+     * @param bool   $isContent  If true return content else item data array
+     * @param string|null $lang  Translation language
      *
      * @return string|array
      */
-    public function item(string $pageSlug, string $itemSlug, bool $isContent = false)
+    public function item(string $pageSlug, string $itemSlug, bool $isContent = false, string $lang = null)
     {
-        return $this->items($pageSlug, [$itemSlug], $isContent)[$itemSlug] ?? null;
+        return $this->items($pageSlug, [$itemSlug], $isContent, $lang)[$itemSlug] ?? null;
     }
 
     /**
      * Get Items list
      *
-     * @param string      $pageSlug   - Page slug
-     * @param array|null  $itemSlugs  - Item slugs (keys)
-     * @param bool        $isContent  - if true return contents list else items data array
+     * @param string      $pageSlug   Page slug
+     * @param array|null  $itemSlugs  Item slugs (keys)
+     * @param bool        $isContent  If true return contents list else items data array
+     * @param string|null $lang       Translation language
      *
      * @return array
      * @throws
      */
-    public function items(string $pageSlug, array $itemSlugs = null, bool $isContent = false)
+    public function items(string $pageSlug, array $itemSlugs = null, bool $isContent = false, string $lang = null): array
     {
         $contentItems = ContentItems::instance();
         if ((! $contentItems->checkPageSlug($pageSlug)))
@@ -56,11 +58,11 @@ class GetItems extends ComponentBase
             return [];
 
         $result = [];
-        $fnItems = function() use ($page, $itemSlugs) {
+        $fnItems = function() use ($page, $itemSlugs, $lang) {
             if (empty($itemSlugs))
-                return $page->items()->get();
+                return $page->items()->itemsLang($lang)->get();
             else
-                return $page->items()->whereIn('name', $itemSlugs)->get();
+                return $page->items()->whereIn('name', $itemSlugs)->itemsLang($lang)->get();
         };
 
         if ($isContent)

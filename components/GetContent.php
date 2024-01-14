@@ -75,7 +75,14 @@ class GetContent extends ComponentBase
         return $this->itemData[$itemSlug];
     }
 
-    public function getSections()
+    /**
+     * Get sections
+     *
+     * @param string|null $lang  Translate language
+     *
+     * @return array
+     */
+    public function getSections(?string $lang = null): array
     {
         if (is_null($this->pageSlug))
             return [];
@@ -84,7 +91,7 @@ class GetContent extends ComponentBase
         if (! is_array($partials) || ! count($partials))
             return [];
 
-        $items = ItemModel::page($this->pageSlug)->get();
+        $items = ItemModel::page($this->pageSlug)->itemsLang($lang)->get();
         if (! $items)
             return [];
 
@@ -105,11 +112,23 @@ class GetContent extends ComponentBase
         return $result;
     }
 
-    public function getContent()
+    /**
+     * Get content
+     *
+     * @param string|null $lang  Translate language
+     *
+     * @return string
+     *
+     * @throws \Throwable
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function getContent(?string $lang = null): string
     {
         $twig = $this->controller->getTwig();
         $content = '';
-        foreach ($this->getSections() as $section)
+        foreach ($this->getSections($lang) as $section)
         {
             $content .= $twig
                 ->loadTemplate($section['partial'])

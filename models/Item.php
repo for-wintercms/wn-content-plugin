@@ -2,6 +2,7 @@
 
 namespace ForWinterCms\Content\Models;
 
+use DB;
 use Model;
 use Winter\Storm\Database\Builder;
 use ForWinterCms\Content\Classes\ContentItems;
@@ -43,14 +44,59 @@ class Item extends Model
      * Scopes
      */
 
-    public function scopePage(Builder $query, string $page)
+    public function scopePage(Builder $query, string $page): void
     {
         $query->where('page_id', PageModel::where('slug', $page)->value('id'));
     }
 
-    public function scopeItem(Builder $query, string $page, string $name)
+    public function scopeItem(Builder $query, string $page, string $name): void
     {
         $query->page($page)->where('name', $name);
+    }
+
+    public function scopeItemsLang(Builder $query, ?string $lang = null): void
+    {
+        if (! $lang)
+        {
+            $getLang = Event::fire('forwintercms.content.locale', [], true);
+            if (! empty($getLang) && is_string($getLang))
+                $lang = $getLang;
+            else
+            {
+                $lang = App::getLocale();
+                if (empty($lang))
+                    return;
+            }
+        }
+
+        if (empty($query->getQuery()->columns))
+            $query->select(DB::raw($this->getTable().'.*'));
+
+        $query->leftJoin(DB::raw($this::TRANSLATE_ITEM_TABLE_NAME.' as ti'), function ($join) use ($lang) {
+            $join->on('ti.item_id', '=', $this->getTable().'.id')
+                ->where('ti.locale', '=', $lang);
+        });
+        $query->addSelect(DB::raw('ti.items as translate_items'));
+        $query->addSelect(DB::raw("'$lang' as lang"));
+    }
+
+    /*
+     * Events
+     */
+
+    /**
+     * Event "afterFetch"
+     */
+    public function afterFetch()
+    {
+        // correction of translatable fields
+        if (! empty($this->translate_items) && ! empty($this->items))
+        {
+            $this->items += @json_decode($this->translate_items, true) ?: [];
+            $this->offsetUnset('translate_items');
+            unset($this->original['translate_items']);
+            $this->original['items'] = '';
+        }
     }
 
     /*
