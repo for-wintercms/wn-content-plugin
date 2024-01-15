@@ -7,15 +7,19 @@ var translate_items = translate_items || {
         var funcAddFileLangMark = function(i, el)
         {
             $formGroup = $(el).closest('.form-group');
-            $markHtml = '<span class="file-lang-mark">'+$formGroup.data('field-name').toUpperCase()+'</span>';
 
-            $formGroup.addClass('translate-field');
+            if ($formGroup.hasClass('translate-field'))
+                return;
+            else
+                $formGroup.addClass('translate-field');
+
+            $markHtml = '<span class="file-lang-mark">'+$formGroup.data('field-name').toUpperCase()+'</span>';
 
             if ($formGroup.children().prop('tagName').toLowerCase() === 'label')
                 $formGroup.find('label:first-child').append($markHtml);
             else
             {
-                var findLabel = $formGroup.find('label[for="'+$formGroup.attr('id').replace(/-group$/,'')+'"]:eq(0)');
+                var findLabel = $formGroup.find('label[for="'+$formGroup.attr('id').replace(/-group$/,'')+'"]:first-child');
                 if (findLabel.length)
                     findLabel.append($markHtml);
                 else
