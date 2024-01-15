@@ -4,13 +4,27 @@ var translate_items = translate_items || {
 
     addFileLangMark: function()
     {
-        $("#layout-body .form-group [translate='1']").each(function(i, el)
+        var funcAddFileLangMark = function(i, el)
         {
             $formGroup = $(el).closest('.form-group');
+            $markHtml = '<span class="file-lang-mark">'+$formGroup.data('field-name').toUpperCase()+'</span>';
+
             $formGroup.addClass('translate-field');
+
             if ($formGroup.children().prop('tagName').toLowerCase() === 'label')
-                $formGroup.find('label:first-child').append('<span class="file-lang-mark">'+$formGroup.data('field-name').toUpperCase()+'</span>');
-        });
+                $formGroup.find('label:first-child').append($markHtml);
+            else
+            {
+                var labelName = ($formGroup.parent().closest('.form-group').data('field-name')??'').toUpperCase();
+                $formGroup.prepend('<label>'+labelName+' '+$markHtml+'</label>');
+            }
+        };
+
+        // repeater widget
+        $("#layout-body .form-group > .field-repeater").each(funcAddFileLangMark);
+
+        // all other fields and widgets
+        $("#layout-body .form-group [translate='1']").each(funcAddFileLangMark);
     },
 
     switchTranslatedFields: function(lang, switchTimeMs)
