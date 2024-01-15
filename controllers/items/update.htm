@@ -1,7 +1,7 @@
 <?php Block::put('breadcrumb') ?>
     <ul>
         <li><a href="<?= $this->getPageUrl() ?>"><?= e($this->listTitle) ?></a></li>
-        <li><?= e($this->pageTitle) ?> <small class="create-content-item-title"><?= $this->formGetModel()->name ?></small></li>
+        <li><?= e($this->pageTitle) ?> <small class="create-content-item-title"><?= $this->updateFormName ?></small></li>
     </ul>
 <?php Block::endPut() ?>
 
@@ -10,7 +10,7 @@
     <?= Form::open(['class' => 'layout']) ?>
 
         <div class="layout-row">
-            <? if ($this->isTranslateFields()): ?>
+            <? if ($this->isTranslateFields($this->updateFormName)): ?>
             <div id="translateTabs" class="control-tabs secondary-tabs" data-control="tab">
                 <ul class="nav nav-tabs">
                     <? foreach ($this->locales as $langCode => $langName): ?>

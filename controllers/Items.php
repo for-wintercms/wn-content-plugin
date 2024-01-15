@@ -55,6 +55,7 @@ class Items extends Controller implements ContentItems
     public $actionId = null;
     public $ajaxHandler = null;
     public $currentPage = null;
+    public $updateFormName = null;
 
     public $isContentItemError = false;
 
@@ -95,9 +96,9 @@ class Items extends Controller implements ContentItems
             $this->locales[$this->defaultLocale] = mb_strtoupper($this->defaultLocale);
     }
 
-    public function isTranslateFields()
+    public function isTranslateFields(string $itemName)
     {
-        return count($this->locales) > 1;
+        return count($this->locales) > 1 && count($this->getContentItemTranslateFields($this->page, $itemName));
     }
 
     protected function pages()
@@ -107,7 +108,7 @@ class Items extends Controller implements ContentItems
 
     protected function translatableDataManager()
     {
-        if (! $this->isTranslateFields())
+        if (count($this->locales) > 1)
             return;
 
         ItemModel::extend(function($model)
@@ -718,7 +719,7 @@ class Items extends Controller implements ContentItems
             $activeForm = isset($form->data->name) ? $this->getActiveContentItemForm($this->page, $form->data->name) : null;
             if (! empty($activeForm['fields']))
             {
-                if ($this->isTranslateFields())
+                if ($this->isTranslateFields($form->data->name))
                 {
                     foreach ($activeForm['fields'] as $formFieldName => $formFieldVal)
                     {
@@ -899,7 +900,7 @@ class Items extends Controller implements ContentItems
             return $this->makeView404();
 
         // translate fields
-        if ($this->isTranslateFields())
+        if ($this->isTranslateFields($model->name))
         {
             $this->addJs('/plugins/forwintercms/content/assets/js/backend/translate_items.js', '1704789802');
 
@@ -934,6 +935,7 @@ class Items extends Controller implements ContentItems
         $title = $this->getListTitle($model->name, $model->name);
         $this->pageTitle = Lang::get('forwintercms.content::content.form.title', ['title' => $title]);
         $this->listTitle = $this->getListPageTitle();
+        $this->updateFormName = $model->name;
 
         $this->initForm($model);
 
