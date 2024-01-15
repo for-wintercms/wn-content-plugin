@@ -927,6 +927,14 @@ class Items extends Controller implements ContentItems
                 }
             }
 
+            // transferring from untranslatable to translatable fields
+            foreach ($model->items as $itemName => $itemVal)
+            {
+                if (! empty($itemVal) && isset($translateItemsData[$itemName][$this->defaultLocale]) && empty($translateItemsData[$itemName][$this->defaultLocale]))
+                    $translateItemsData[$itemName][$this->defaultLocale] = $itemVal;
+            }
+
+            // additions to items
             $model->items = array_merge($model->items ?: [], $translateItemsData);
 
             unset($translateItemsData, $translateItems, $translateFields, $translateField, $translateItemKey, $translateItemVal, $translateLocale);
