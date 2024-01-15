@@ -15,8 +15,14 @@ var translate_items = translate_items || {
                 $formGroup.find('label:first-child').append($markHtml);
             else
             {
-                var labelName = ($formGroup.parent().closest('.form-group').data('field-name')??'').toUpperCase();
-                $formGroup.prepend('<label>'+labelName+' '+$markHtml+'</label>');
+                var findLabel = $formGroup.find('label[for="'+$formGroup.attr('id').replace(/-group$/,'')+'"]:eq(0)');
+                if (findLabel.length)
+                    findLabel.append($markHtml);
+                else
+                {
+                    var labelName = ($formGroup.parent().closest('.form-group').data('field-name')??'').toUpperCase();
+                    $formGroup.prepend('<label>'+labelName+' '+$markHtml+'</label>');
+                }
             }
         };
 
