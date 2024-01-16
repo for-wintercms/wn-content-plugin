@@ -108,7 +108,7 @@ class Items extends Controller implements ContentItems
 
     protected function translatableDataManager()
     {
-        if (count($this->locales) > 1)
+        if (! count($this->locales))
             return;
 
         ItemModel::extend(function($model)
