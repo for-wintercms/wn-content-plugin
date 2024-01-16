@@ -907,6 +907,8 @@ class Items extends Controller implements ContentItems
         {
             $this->addJs('/plugins/forwintercms/content/assets/js/backend/translate_items.js', '1704789802');
 
+            // filling in the translated fields
+            $translateDefaultLocaleItemsData = [];
             $translateItemsData = array_fill_keys(
                 $this->getContentItemTranslateFields($this->page, $model->name), array_fill_keys(
                     array_keys($this->locales), ''
@@ -922,11 +924,15 @@ class Items extends Controller implements ContentItems
                 $translateItems = @json_decode($translateField->items,true);
                 if (empty($translateItems) || ! is_array($translateItems))
                     continue;
+
                 $translateLocale = $translateField->locale;
+
                 foreach ($translateItems as $translateItemKey => $translateItemVal)
                 {
                     if (isset($translateItemsData[$translateItemKey]))
                         $translateItemsData[$translateItemKey][$translateLocale] = $translateItemVal;
+                    elseif ($translateLocale == $this->defaultLocale)
+                        $translateDefaultLocaleItemsData[$translateItemKey] = $translateItemVal;
                 }
             }
 
@@ -936,11 +942,13 @@ class Items extends Controller implements ContentItems
                 if (! empty($itemVal) && isset($translateItemsData[$itemName][$this->defaultLocale]) && empty($translateItemsData[$itemName][$this->defaultLocale]))
                     $translateItemsData[$itemName][$this->defaultLocale] = $itemVal;
             }
+            if (count($translateDefaultLocaleItemsData))
+                $translateItemsData += array_intersect_key($translateDefaultLocaleItemsData, array_flip($this->getContentItemIncludeFields($this->page, $model->name)));
 
             // additions to items
             $model->items = array_merge($model->items ?: [], $translateItemsData);
 
-            unset($translateItemsData, $translateItems, $translateFields, $translateField, $translateItemKey, $translateItemVal, $translateLocale);
+            unset($translateItemsData, $translateItems, $translateFields, $translateField, $translateItemKey, $translateItemVal, $translateLocale, $translateDefaultLocaleItemsData);
         }
         else
         {
