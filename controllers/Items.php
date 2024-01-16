@@ -939,6 +939,20 @@ class Items extends Controller implements ContentItems
 
             unset($translateItemsData, $translateItems, $translateFields, $translateField, $translateItemKey, $translateItemVal, $translateLocale);
         }
+        else
+        {
+            // Check if the old fields are being translated. If there is, then translate them into untranslatable fields.
+            $translateField = DB::table(ItemModel::TRANSLATE_ITEM_TABLE_NAME)
+                ->where('item_id', $model->id)
+                ->where('locale', $this->defaultLocale)
+                ->first();
+
+            $translateItems = @json_decode($translateField->items,true);
+            if (! empty($translateItems) && is_array($translateItems))
+                $model->items = array_merge($model->items ?: [], $translateItems);
+
+            unset($translateField, $translateItems);
+        }
 
         $title = $this->getListTitle($model->name, $model->name);
         $this->pageTitle = Lang::get('forwintercms.content::content.form.title', ['title' => $title]);
