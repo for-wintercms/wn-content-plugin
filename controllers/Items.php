@@ -108,55 +108,58 @@ class Items extends Controller implements ContentItems
 
     protected function translatableDataManager()
     {
-        if (! count($this->locales))
-            return;
-
         ItemModel::extend(function($model)
         {
             $model->bindEvent('model.beforeSave', function() use ($model)
             {
-                if (! count($this->getContentItemTranslateFields($this->page, $model->name)))
-                    return;
-
-                // check fields
-                if (! empty($model->items))
-                    $model->items = array_intersect_key($model->items, array_flip($this->getContentItemIncludeFields($this->page, $model->name)));
-
-                // translate fields
-                $locales = array_keys($this->locales);
-                $fields = $model->items ?: [];
-                $fieldsOldCnt = count($fields);
-                $translateFields = array_fill_keys($locales, []);
-
-                foreach ($this->getContentItemTranslateFields($this->page, $model->name) as $formFieldName)
+                if ($this->isTranslateFields($model->name))
                 {
-                    if (! empty($fields[$formFieldName]) && is_array($fields[$formFieldName]))
+                    // check fields
+                    if (! empty($model->items))
+                        $model->items = array_intersect_key($model->items, array_flip($this->getContentItemIncludeFields($this->page, $model->name)));
+
+                    // translate fields
+                    $locales = array_keys($this->locales);
+                    $fields = $model->items ?: [];
+                    $fieldsOldCnt = count($fields);
+                    $translateFields = array_fill_keys($locales, []);
+
+                    foreach ($this->getContentItemTranslateFields($this->page, $model->name) as $formFieldName)
                     {
-                        foreach ($locales as $locale)
-                            $translateFields[$locale][$formFieldName] = $fields[$formFieldName][$locale] ?? '';
-                        unset($fields[$formFieldName]);
+                        if (! empty($fields[$formFieldName]) && is_array($fields[$formFieldName]))
+                        {
+                            foreach ($locales as $locale)
+                                $translateFields[$locale][$formFieldName] = $fields[$formFieldName][$locale] ?? '';
+                            unset($fields[$formFieldName]);
+                        }
+                    }
+
+                    if (count($fields) != $fieldsOldCnt)
+                    {
+                        $itemModelId = $model->id;
+                        $upsertData = [];
+
+                        foreach ($translateFields as $translateLocal => $translateData) {
+                            $upsertData[] = [
+                                'item_id' => $itemModelId,
+                                'locale' => $translateLocal,
+                                'items' => json_encode($translateData),
+                            ];
+                        }
+
+                        DB::transaction(function() use ($upsertData) {
+                            DB::table(ItemModel::TRANSLATE_ITEM_TABLE_NAME)->upsert($upsertData, ['item_id', 'locale'], ['items']);
+                            DB::table(ItemModel::TRANSLATE_ITEM_TABLE_NAME)->whereNotIn('locale', array_keys($this->locales))->delete();
+                        });
+
+                        $model->items = $fields;
                     }
                 }
-
-                if (count($fields) != $fieldsOldCnt)
+                else
                 {
-                    $itemModelId = $model->id;
-                    $upsertData = [];
-
-                    foreach ($translateFields as $translateLocal => $translateData) {
-                        $upsertData[] = [
-                            'item_id' => $itemModelId,
-                            'locale' => $translateLocal,
-                            'items' => json_encode($translateData),
-                        ];
-                    }
-
-                    DB::transaction(function() use ($upsertData) {
-                        DB::table(ItemModel::TRANSLATE_ITEM_TABLE_NAME)->upsert($upsertData, ['item_id', 'locale'], ['items']);
-                        DB::table(ItemModel::TRANSLATE_ITEM_TABLE_NAME)->whereNotIn('locale', array_keys($this->locales))->delete();
+                    DB::transaction(function() use($model) {
+                        DB::table(ItemModel::TRANSLATE_ITEM_TABLE_NAME)->where('item_id', $model->id)->delete();
                     });
-
-                    $model->items = $fields;
                 }
             });
         });
