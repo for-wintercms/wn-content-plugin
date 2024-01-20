@@ -55,8 +55,11 @@ class Item extends Model
             $query->addSelect(DB::raw($this->getTable().'.*'));
 
         // add page name column
-        $query->leftJoin('forwn_content_pages as pg', 'pg.id', '=', $this->getTable().'.page_id');
-        $query->addSelect(DB::raw('pg.slug as page'));
+        $query->addSelect([
+            'page' => PageModel::query()->select('slug')->whereColumn('id', $this->getTable().'.page_id' )->take(1)
+        ]);
+//        $query->leftJoin('forwn_content_pages as pg', 'pg.id', '=', $this->getTable().'.page_id');
+//        $query->addSelect(DB::raw('pg.slug as page'));
 
         return $query;
     }
