@@ -10,16 +10,16 @@
     <?= Form::open(['class' => 'layout']) ?>
 
         <div class="layout-row">
-            <? if ($this->isTranslateFields($this->updateFormName)): ?>
+            <?php if ($this->isTranslateFields($this->updateFormName)): ?>
             <div id="translateTabs" class="control-tabs secondary-tabs" data-control="tab">
                 <ul class="nav nav-tabs">
-                    <? foreach ($this->locales as $langCode => $langName): ?>
+                    <?php foreach ($this->locales as $langCode => $langName): ?>
                     <li <?= $this->defaultLocale==$langCode?'class="active" ':'' ?>data-lang="<?= $langCode ?>"><a href="javascript:;"><?= $langName ?></a></li>
-                    <? endforeach ?>
+                    <?php endforeach ?>
                 </ul>
                 <input type="hidden" name="translateLang" value="<?= $this->defaultLocale ?>">
             </div>
-            <? endif ?>
+            <?php endif ?>
             <?= $this->formRender() ?>
         </div>
 
