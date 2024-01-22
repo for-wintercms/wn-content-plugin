@@ -65,6 +65,13 @@ class Plugin extends PluginBase
         ];
     }
 
+    public function registerFormWidgets()
+    {
+        return [
+            'ForWinterCms\Content\FormWidgets\Menu' => 'contentMenu'
+        ];
+    }
+
     public function boot()
     {
         # add Winter.Translate plugin
