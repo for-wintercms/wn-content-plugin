@@ -5,6 +5,9 @@
     border: var(--cm-border);
     border-radius: 4px;
     background: #f3f5f6;
+    box-shadow: 0px 0px 4px 0px rgba(52,73,94,0.4);
+    -webkit-box-shadow: 0px 0px 4px 0px rgba(52,73,94,0.4);
+    -moz-box-shadow: 0px 0px 4px 0px rgba(52,73,94,0.4);
 
     .menu-header {
         background: #e3e9ec;
@@ -24,9 +27,34 @@
         }
     }
     .menu-body {
+        display: none;
         background: #fff;
         border-bottom: var(--cm-border);
-        display: none;
+        padding: 0.8rem;
+
+        .menu-item-form {
+            margin: 0;
+
+            .menu-form-button-type-dropdown {
+                display: inline-block;
+                width: 29%;
+
+                > a {
+                    margin: -2px 0 2px;
+                    padding: 1rem;
+                    width: 100%;
+                }
+            }
+            .menu-form-button-type-input {
+                display: inline-block;
+                width: 70%;
+            }
+            .menu-form-target-blank {
+                padding: 0.8rem 1rem 0;
+                margin: 0;
+                text-align: center;
+            }
+        }
     }
     .add-btns {
         padding: 5px;
