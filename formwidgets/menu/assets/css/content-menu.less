@@ -4,14 +4,31 @@
 .content-menu {
     border: var(--cm-border);
     border-radius: 4px;
+    background: #f3f5f6;
 
     .menu-header {
         background: #e3e9ec;
         border-bottom: var(--cm-border);
-        padding: 0.6rem;
+        padding: 0.8rem;
+
+        h3 {
+            display: inline-block;
+            font-size: 1.6rem;
+            padding: 0;
+            margin: 0;
+        }
+        i {
+            float: right;
+            line-height: 2rem;
+            margin-right: 6px;
+        }
     }
     .menu-body {
         background: #fff;
         border-bottom: var(--cm-border);
+        display: none;
+    }
+    .add-btns {
+        padding: 5px;
     }
 }

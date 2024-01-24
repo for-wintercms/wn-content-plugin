@@ -19,23 +19,24 @@ $fieldName = $field->getName();
 
             <!-- Menu list -->
             <div class="menu-item">
-                <div class="menu-header"><h3>#1 menu-header</h3><i class="icon-angle-down"></i></div>
+                <div class="menu-header"><h3>#1 menu-header</h3><i class="icon-angle-right"></i></div>
                 <div class="menu-body">
                     FORM
                 </div>
             </div>
             <div class="menu-item">
-                <div class="menu-header"><h3>#2 menu-header</h3><i class="icon-angle-down"></i></div>
+                <div class="menu-header"><h3>#2 menu-header</h3><i class="icon-angle-right"></i></div>
                 <div class="menu-body">
                     FORM
                 </div>
             </div>
 
             <!-- Add buttons-->
-            <br>
-            <div class="btn-group" role="group" aria-label="Adding a menu">
-                <button type="button" class="btn btn-outline-success wn-icon-add"><?= e(trans('forwintercms.content::widget.menu.add_item')) ?></button>
-                <button type="button" class="btn btn-outline-warning wn-icon-ellipsis-h"><?= e(trans('forwintercms.content::widget.menu.add_separator')) ?></button>
+            <div class="text-center add-btns">
+                <div class="btn-group" role="group" aria-label="Adding a menu">
+                    <button type="button" class="btn btn-outline-success wn-icon-add"><?= e(trans('forwintercms.content::widget.menu.add_item')) ?></button>
+                    <button type="button" class="btn btn-outline-warning wn-icon-ellipsis-h"><?= e(trans('forwintercms.content::widget.menu.add_separator')) ?></button>
+                </div>
             </div>
         </div>
 
