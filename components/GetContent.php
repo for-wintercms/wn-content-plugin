@@ -3,8 +3,9 @@
 namespace ForWinterCms\Content\Components;
 
 use Cms\Classes\ComponentBase;
-use ForWinterCms\Content\Classes\ContentItems;
 use ForWinterCms\Content\Models\Item as ItemModel;
+use ForWinterCms\Content\Classes\ContentItems;
+use ForWinterCms\Content\Classes\Traits\ContentItemsData;
 
 /**
  * GetContent component
@@ -14,6 +15,7 @@ use ForWinterCms\Content\Models\Item as ItemModel;
 class GetContent extends ComponentBase
 {
     use \Illuminate\Validation\Concerns\ValidatesAttributes;
+    use ContentItemsData;
 
     protected $pageSlug = null;
     protected $is404 = true;
@@ -98,15 +100,16 @@ class GetContent extends ComponentBase
         $result = [];
         foreach ($items as $item)
         {
-            $this->itemData[$item->name] = $item->items;
+            $itemName = $item->name;
+            $this->itemData[$itemName] = $this->getContentItemsData($item);
 
-            if (! isset($partials[$item->name]))
+            if (! isset($partials[$itemName]))
                 continue;
 
             $result[] = [
-                'item_slug'    => $item->name,
-                'partial'      => $partials[$item->name],
-                'content_data' => $item->items,
+                'item_slug'    => $itemName,
+                'partial'      => $partials[$itemName],
+                'content_data' => $this->itemData[$itemName],
             ];
         }
         return $result;
