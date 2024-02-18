@@ -43,6 +43,7 @@ class Items extends Controller implements ContentItems
     public $listConfig = 'config_list.yaml';
     public $formConfig = 'config_form.yaml';
     public $reorderConfig = 'config_reorder.yaml';
+    public $relationConfig = '';
 
     public $requiredPermissions = ['forwintercms.content.items'];
 
