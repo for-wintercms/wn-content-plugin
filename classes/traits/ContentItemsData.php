@@ -2,6 +2,7 @@
 
 namespace ForWinterCms\Content\Classes\Traits;
 
+use Event;
 use ForWinterCms\Content\Classes\ContentItems;
 use ForWinterCms\Content\Models\Item;
 
@@ -9,6 +10,10 @@ trait ContentItemsData
 {
     public function getContentItemsData(Item $itemModel)
     {
+        $itemsData = Event::fire('forwintercms.content.contentitemsdata', [$itemModel], true);
+        if ($itemsData && is_array($itemsData))
+            return $itemsData;
+
         $contentItems = ContentItems::instance();
         $relationFields = array_diff(
             $contentItems->getContentItemIncludeFields($itemModel->page, $itemModel->name),
