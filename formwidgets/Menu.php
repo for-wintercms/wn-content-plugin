@@ -17,6 +17,25 @@ class Menu extends FormWidgetBase
 
     public function render()
     {
+        $this->prepareVars();
+
         return $this->makePartial('menu');
+    }
+
+    /**
+     * Prepares the form widget view data
+     */
+    public function prepareVars()
+    {
+        $this->vars['field'] = $this->formField;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function loadAssets()
+    {
+        $this->addCss('css/content-menu.less');
+        $this->addJs('js/content-menu.js');
     }
 }
