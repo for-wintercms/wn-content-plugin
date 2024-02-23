@@ -46,8 +46,8 @@ $fieldName = $field->getName();
                         </div>
                         <div class="col-md-2">
                             <div class="checkbox custom-checkbox menu-form-target-blank">
-                                <input name="checkbox" value="1" type="checkbox" id="checkbox_1">
-                                <label for="checkbox_1">target="_blank"</label>
+                                <input name="checkbox" value="1" type="checkbox" id="<?= $field->getId('_blank') ?>">
+                                <label for="<?= $field->getId('_blank') ?>">target="_blank"</label>
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -59,7 +59,7 @@ $fieldName = $field->getName();
 
                     </div>
                     <label for="subMenu_123456">Sub menu</label>
-                    <div class="content-menu" id="subMenu_123456">
+                    <div class="content-menu">
 
                         <!-- Menu list -->
                         <div class="menu-item">
