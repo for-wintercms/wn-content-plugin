@@ -3,8 +3,9 @@
 namespace ForWinterCms\Content\Components;
 
 use Cms\Classes\ComponentBase;
-use ForWinterCms\Content\Classes\ContentItems;
 use ForWinterCms\Content\Models\Page as PageModel;
+use ForWinterCms\Content\Classes\ContentItems;
+use ForWinterCms\Content\Classes\Traits\ContentItemsData;
 
 /**
  * GetItems component
@@ -13,6 +14,8 @@ use ForWinterCms\Content\Models\Page as PageModel;
  */
 class GetItems extends ComponentBase
 {
+    use ContentItemsData;
+
     public function componentDetails()
     {
         return [
@@ -81,14 +84,14 @@ class GetItems extends ComponentBase
                     ->render(array_merge($this->controller->vars, $this->getProperties(), [
                         'item_slug'    => $item->name,
                         'partial'      => $partials[$item->name],
-                        'content_data' => $item->items,
+                        'content_data' => $this->getContentItemsData($item),
                     ]));
             }
         }
         else
         {
             foreach ($fnItems() as $item)
-                $result[$item->name] = $item->items;
+                $result[$item->name] = $this->getContentItemsData($item);
         }
 
         return $result;

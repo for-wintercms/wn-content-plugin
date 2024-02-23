@@ -841,21 +841,19 @@ class Items extends Controller implements ContentItems
 
     protected function actionAjax($id = null)
     {
-        if (method_exists($this, $this->ajaxHandler))
-            return call_user_func_array([$this, $this->ajaxHandler], func_get_args());
-
         $action = (is_numeric($id) && $id > 0) ? 'update' : 'index';
+        $ajaxHandlers = [
+            $this->ajaxHandler,
+            $this->ajaxHandler .'_'. $action,
+            $action .'_'. $this->ajaxHandler
+        ];
 
-        $thisMethodName = $this->ajaxHandler .'_'. $action;
-        if (method_exists($this, $thisMethodName))
-            return call_user_func_array([$this, $thisMethodName], func_get_args());
-
-        $methodName = $action .'_'. $this->ajaxHandler;
-        if ($this->methodExists($methodName))
+        foreach ($ajaxHandlers as $ajaxHandler)
         {
-            $this->actionAjax = null;
-            return call_user_func_array([$this, $methodName], func_get_args());
+            if ($this->methodExists($ajaxHandler))
+                return call_user_func_array([$this, $ajaxHandler], func_get_args());
         }
+
         return null;
     }
 
