@@ -36,6 +36,6 @@ class Menu extends FormWidgetBase
     protected function loadAssets()
     {
         $this->addCss(['less/content-menu.less']);
-        $this->addJs('js/content-menu.js');
+        $this->addJs(['js/content-menu.js']);
     }
 }
