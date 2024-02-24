@@ -92,7 +92,9 @@ $fieldName = $field->getName();
                             </div>
                         </div>
                     </div>
-
+                    <div class="menu-item-delete">
+                        <button type="button" class="oc-icon-trash-o btn-icon danger" data-delete-msg="<?= e(trans('forwintercms.content::widget.menu.delete_confirm')) ?>"></button>
+                    </div>
                 </div>
             </div>
             <div class="menu-item">

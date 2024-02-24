@@ -47,12 +47,22 @@ const contentMenu = {
         });
     },
 
-    events: function ()
+    deleteMenuItem: function()
     {
-        this.toggleMenu();
+        $('.field-contentmenu').on('click', '.content-menu .menu-item-delete button', function()
+        {
+            if (confirm($(this).data('delete-msg')))
+                $(this).closest('.menu-item').remove();
+        });
     },
 
-    init: function ()
+    events: function()
+    {
+        this.toggleMenu();
+        this.deleteMenuItem();
+    },
+
+    init: function()
     {
         this.events();
     }
