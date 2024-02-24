@@ -23,35 +23,44 @@ $fieldName = $field->getName();
                 <div class="menu-body">
                     <div class="row menu-item-form">
 
-<!--                        https://www.w3schools.com/tags/tag_a.asp -->
+                        <!-- https://www.w3schools.com/tags/tag_a.asp -->
 
-                        <div class="col-md-2">
-                            <input type="text" class="form-control" placeholder="Name" aria-label="Name">
+                        <div class="col-md-2 col-sm-6">
+                            <label for="<?= $field->getId('name') ?>">Name</label>
+                            <input id="<?= $field->getId('name') ?>" type="text" class="form-control" placeholder="Name" aria-label="Name">
                         </div>
-                        <div class="col-md-2">
-                            <input type="text" class="form-control" placeholder="Css class" aria-label="Css class">
+                        <div class="col-md-2 col-sm-6">
+                            <label for="<?= $field->getId('css_classes') ?>">Css classes</label>
+                            <input id="<?= $field->getId('css_classes') ?>" type="text" class="form-control" placeholder="Css class" aria-label="Css class">
                         </div>
-                        <div class="col-md-4">
-                            <div class="dropdown menu-form-button-type-dropdown">
-                                <a href="#" data-toggle="dropdown" class="btn btn-primary wn-icon-angle-down">Button type</a>
 
-                                <ul class="dropdown-menu" role="menu" data-dropdown-title="Add something small">
-                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="wn-icon-folder">Group</a></li>
-                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="wn-icon-copy">Page</a></li>
+                        <div class="col-md-2 col-sm-6 menu-form-button-type-dropdown">
+                            <label for="<?= $field->getId('button_type') ?>">Button type</label>
+                            <div class="dropdown">
+                                <a id="<?= $field->getId('button_type') ?>" href="#" data-toggle="dropdown" class="btn btn-primary wn-icon-angle-down">Button type</a>
+                                <ul class="dropdown-menu" role="menu" data-dropdown-title="Button type">
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="wn-icon-link">URL</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="wn-icon-file">Page</a></li>
                                 </ul>
                             </div>
-                            <div class="menu-form-button-type-input">
-                                <input type="text" class="form-control" placeholder="Url" aria-label="Url">
-                            </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="checkbox custom-checkbox menu-form-target-blank">
-                                <input name="checkbox" value="1" type="checkbox" id="<?= $field->getId('_blank') ?>">
-                                <label for="<?= $field->getId('_blank') ?>">target="_blank"</label>
-                            </div>
+                        <div class="col-md-2 col-sm-6 menu-form-button-type-input">
+                            <label for="<?= $field->getId('button_url') ?>">URL</label>
+                            <input id="<?= $field->getId('button_url') ?>" type="text" class="form-control" placeholder="Url" aria-label="Url">
                         </div>
-                        <div class="col-md-2">
-                            <select class="form-control custom-select">
+                        <div class="col-md-2 col-sm-6">
+                            <label for="<?= $field->getId('target') ?>">Target attr</label>
+                            <select id="<?= $field->getId('target') ?>" class="form-control custom-select">
+                                <option value="none" selected="selected">None</option>
+                                <option value="blank">_blank</option>
+                                <option value="self">_self</option>
+                                <option value="parent">_parent</option>
+                                <option value="top">_top</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 col-sm-6">
+                            <label for="<?= $field->getId('icon') ?>">Icon</label>
+                            <select id="<?= $field->getId('icon') ?>" class="form-control custom-select">
                                 <option value="1" selected="selected">One</option>
                                 <option value="2">Two</option>
                             </select>
