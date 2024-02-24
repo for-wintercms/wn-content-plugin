@@ -1,10 +1,10 @@
-var translate_items = translate_items || {
+const translate_items = {
 
     switchingTimeTranslatedFields: 200, // in milliseconds
 
     addFileLangMark: function()
     {
-        var funcAddFileLangMark = function(i, el)
+        const funcAddFileLangMark = function(i, el)
         {
             $formGroup = $(el).closest('.form-group');
 
@@ -15,18 +15,24 @@ var translate_items = translate_items || {
 
             $markHtml = '<span class="file-lang-mark">'+$formGroup.data('field-name').toUpperCase()+'</span>';
 
-            if ($formGroup.children().prop('tagName').toLowerCase() === 'label')
-                $formGroup.find('label:first-child').append($markHtml);
+            const $firstLabel = $formGroup.children('label:first-child');
+            if ($firstLabel.length && $firstLabel.prop('tagName').toLowerCase() === 'label')
+                $firstLabel.append($markHtml);
             else
             {
-                var findLabel = $formGroup.find('label[for="'+$formGroup.attr('id').replace(/-group$/,'')+'"]:first-child');
-                if (findLabel.length)
-                    findLabel.append($markHtml);
-                else
+                const formGroupId = $formGroup.attr('id');
+                if (formGroupId)
                 {
-                    var labelName = ($formGroup.parent().closest('.form-group').data('field-name')??'').toUpperCase();
-                    $formGroup.prepend('<label>'+labelName+' '+$markHtml+'</label>');
+                    const $findLabel = $formGroup.find('label[for="'+formGroupId.replace(/-group$/,'')+'"]:first-child');
+                    if ($findLabel.length)
+                    {
+                        $findLabel.append($markHtml);
+                        return;
+                    }
                 }
+
+                const labelName = ($formGroup.parent().closest('.form-group').data('field-name')??'').toUpperCase();
+                $formGroup.prepend('<label>'+labelName+' '+$markHtml+'</label>');
             }
         };
 
@@ -49,7 +55,7 @@ var translate_items = translate_items || {
 
     events: function()
     {
-        var me = this;
+        const me = this;
 
         // Switch translated fields
         me.switchTranslatedFields($('#translateTabs li.active:first').data('lang').toLowerCase(), 0);
