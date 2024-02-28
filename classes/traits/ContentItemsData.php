@@ -10,6 +10,9 @@ trait ContentItemsData
 {
     public function getContentItemsData(Item $itemModel)
     {
+        if (! $itemModel->exists())
+            return [];
+
         $itemsData = Event::fire('forwintercms.content.contentitemsdata', [$itemModel], true);
         if ($itemsData && is_array($itemsData))
             return $itemsData;
